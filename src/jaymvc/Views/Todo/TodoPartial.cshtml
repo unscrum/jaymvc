@@ -1,0 +1,58 @@
+﻿@using jaymvc.Models.Home
+@model Todo
+<div role="form">
+    <div class="form-group">
+        <input type="hidden" id="assignedToId" name="assignedToId" value="@Model.AssignedToId"/>
+        <label for="assignedToName">Assigned To</label>
+        <input type="text" class="form-control on-visible" data-visibility-action="wireUpTypeAhead" data-url="@Url.JsonAssigneeTypeAhead()" data-value-field="#assignedToId" id="assignedToName" name="assignedToName" value="@Model.AssignedToName" placeholder="Begin typing an employee name to search."/>
+    </div>
+   
+    <h6>Priority</h6>
+    <div class="form-check form-check-inline">
+        @if (Model.Priority == ActionItemPriorityConstants.High)
+        {
+            <input type="radio" class="form-check-input" id="priorityHigh" name="priority" checked="checked" value="@ActionItemPriorityConstants.High"/>
+        }
+        else
+        {
+            <input type="radio" class="form-check-input" id="priorityHigh" name="priority" value="@ActionItemPriorityConstants.High"/>
+        }
+        <label for="priorityHigh" class="form-check-label"><i class="fa fa-flag text-@Todo.GetPriortyClass(ActionItemPriorityConstants.High)"></i> @ActionItemPriorityConstants.High.ToString()</label>
+    </div>
+    <div class="form-check form-check-inline">
+        @if (Model.Priority == ActionItemPriorityConstants.Normal)
+        {
+            <input type="radio" class="form-check-input" id="priorityNormal" name="priority" checked="checked" value="@ActionItemPriorityConstants.Normal"/>
+        }
+        else
+        {
+            <input type="radio" class="form-check-input" id="priorityNormal" name="priority" value="@ActionItemPriorityConstants.Normal"/>
+        }
+        <label for="priorityNormal" class="form-check-label"><i class="fa fa-flag text-@Todo.GetPriortyClass(ActionItemPriorityConstants.Normal)"></i> @ActionItemPriorityConstants.Normal.ToString()</label>
+    </div>
+    <div class="form-check form-check-inline">
+        @if (Model.Priority == ActionItemPriorityConstants.Low)
+        {
+            <input type="radio" class="form-check-input" id="priorityLow" name="priority" checked="checked" value="@ActionItemPriorityConstants.Low"/>
+        }
+        else
+        {
+            <input type="radio" class="form-check-input" id="priorityLow" name="priority" value="@ActionItemPriorityConstants.Low"/>
+        }
+        <label for="priorityLow" class="form-check-label"><i class="fa fa-flag text-@Todo.GetPriortyClass(ActionItemPriorityConstants.Low)"></i> @ActionItemPriorityConstants.Low.ToString()</label>
+    </div>
+    <div class="form-group">
+        <label for="due">Due Date</label>
+        <div class="input-group time">
+            <input type="text" class="form-control" id="due" name="due" value="@Model.DueDate.ShortDate()"/>
+            <span class="input-group-append">
+                <i class="input-group-text fa fa-calendar"></i>
+            </span>
+        </div>
+    </div>
+    <div class="form-group">
+        <label for="text">Text</label>
+        <textarea class="form-control" rows="5" id="text" name="text">@Model.Text</textarea>
+    </div>
+</div>
+    

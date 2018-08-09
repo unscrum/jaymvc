@@ -1,0 +1,41 @@
+﻿[
+  {
+    "outputFileName": "wwwroot/css/globals.min.css",
+    "inputFiles": [
+      "wwwroot/css/Globals/01-bootstrap.css",
+      "wwwroot/css/Globals/02-jqueryui.css",
+      "wwwroot/css/Globals/10-jquery.jay.css",
+      "wwwroot/css/Globals/15-bootstrap.multiselect.css",
+      "wwwroot/css/Globals/20-bootstrap.datetimepicker.css"
+    ]
+  },
+  {
+    "outputFileName": "wwwroot/js/globals.min.js",
+    "inputFiles": [
+      "wwwroot/js/Globals/00-Pre.js",
+      "wwwroot/js/Globals/01-jquery.js",
+      "wwwroot/js/Globals/01-popper.js",
+      "wwwroot/js/Globals/02-bootstrap.js",
+      "wwwroot/js/Globals/02-jquery.ui.custom.js",
+      "wwwroot/js/Globals/03-jquery.ui.touchpunch.js",
+      "wwwroot/js/Globals/10-underscore.js",
+      "wwwroot/js/Globals/15-jquery.utility.js",
+      "wwwroot/js/Globals/20-jquery.onaction.js",
+      "wwwroot/js/Globals/25-jay.ondata.js",
+      "wwwroot/js/Globals/30-jquery.jay.js",
+      "wwwroot/js/Globals/50-jay.ajax.js",
+      "wwwroot/js/Globals/55-jay.typeahead.js",
+      "wwwroot/js/Globals/60-jay.message.js",
+      "wwwroot/js/Globals/65-jay.onvisible.js",
+      "wwwroot/js/Globals/70-jay.modal.js",
+      "wwwroot/js/Globals/75-bootstrap.multiselect.js",
+      "wwwroot/js/Globals/80-jay.datafilter.js",
+      "wwwroot/js/Globals/85-lockr.js",
+      "wwwroot/js/Globals/90-moment.js",
+      "wwwroot/js/Globals/95-bootstrap.datetimepicker.js"
+    ],
+    "minify": {
+      "renameLocals": true
+    }
+  }
+]

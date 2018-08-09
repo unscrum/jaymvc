@@ -1,0 +1,14 @@
+*.obj
+*.sou
+*.user
+.vs/
+bin/
+obj/
+.idea/**/workspace.xml
+*.dbmdl
+*.jfm
+*.zip
+Src/**/wwwroot/js/*.js.map
+Src/**/wwwroot/js/*.js
+Src/**/wwwroot/css/*.css
+contentModel.xml

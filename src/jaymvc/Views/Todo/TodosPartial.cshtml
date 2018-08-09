@@ -1,0 +1,38 @@
+﻿@using jaymvc.Extensions
+@using jaymvc.Models.Home
+@model Todos
+
+<table class="table table-striped">
+    <thead>
+    <tr>
+        <th></th>
+        <th></th>
+        <th class="d-none d-sm-table-cell">Due</th>
+        <th>Text</th>
+        <th></th>
+    </tr>
+    </thead>
+    <tbody>
+    @foreach (var p in Model)
+    {
+        <tr>
+            <td>
+                <button class="btn btn-sm btn-link action-edit text-secondary" data-url="@Url.PartialEditTodo(p.Id)" data-save-url="@Url.JsonSaveTodo(p.Id)" data-title="Edit Todo" data-target="#todos">
+                    <i class="fa fa-edit"></i>
+                </button>
+            </td>
+            <td><span class="btn btn-sm btn-link"><i class="text-@p.PriorityClass fa fa-flag"></i></span></td>
+            <td class="d-none d-sm-table-cell">@p.DueDate.ShortDate()</td>
+            <td>
+                <span class="d-sm-none">
+                    @p.DueDate.ShortDate()<br/>                   
+                </span>
+                @p.Text
+            </td>
+            <td class="text-right text-danger">
+                <button class="btn btn-sm btn-link action-delete" data-target="#todos" data-url="@Url.JsonCompleteTodo(p.Id)" title="Complete"><i class="fa fa-check-circle-o"></i> <span class="d-none d-md-inline">Complete</span></button>
+            </td>
+        </tr>
+    }
+    </tbody>
+</table>

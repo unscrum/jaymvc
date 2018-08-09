@@ -1,0 +1,40 @@
+﻿@using jaymvc.Extensions
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - JayMVC</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="~/css/globals.min.css" asp-append-version="true" />
+    @RenderSection("css", required: false)
+</head>
+<body>
+<header>
+    <nav class="navbar fixed-top navbar-expand-lg navbar-dark bg-dark">
+        <a href="@Url.Home()" class="navbar-brand">JayMVC</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarText" aria-controls="navbarText" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarText">
+            <ul class="navbar-nav w-100">
+                <li class="nav-item"><a class="nav-link ml-lg-2" href="@Url.Health()"><i class="fa fa-users"></i> Health</a></li>               
+            </ul>
+        </div>
+    </nav>
+</header>
+<main class="mb-5 pb-5 mt-5 pt-5">
+    @RenderSection("nocontainer", false)
+    <div class="container-fluid">
+        @RenderBody()
+    </div>
+</main>
+<footer class="fixed-bottom bg-dark border-light border-top text-white">
+    <div class="container-fluid">
+        <span>&copy; @DateTime.Today.Year - Jay Brummels.</span>
+    </div>
+</footer>
+<script src="~/js/globals.min.js" asp-append-version="true"></script>
+@RenderSection("js", required: false)
+</body>
+</html>
