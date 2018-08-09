@@ -1,4 +1,9 @@
-﻿(function ($) {
+﻿/*
+* jay.message jQuery plugin
+* Copyright 2011-2018 Jay Brummels
+* Licensed under MIT (https://github.com/unscrum/jaymvc/LICENSE)
+*/
+(function ($) {
     var stateClasses = {
         success: { state: 'alert alert-success', icon: 'fa fa-thumbs-o-up' },
         error: { state: 'alert alert-danger', icon: 'fa fa-exclamation-triangle' },

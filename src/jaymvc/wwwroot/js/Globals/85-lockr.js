@@ -1,4 +1,8 @@
-﻿(function (root, factory) {
+﻿/*!
+ * lockr.js
+ * Licensed under MIT (https://codeclimate.com/github/tsironis/lockr/LICENSE/source)
+ */
+(function (root, factory) {
 
     if (typeof exports !== 'undefined') {
         if (typeof module !== 'undefined' && module.exports) {

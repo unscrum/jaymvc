@@ -1,4 +1,10 @@
-﻿/**
+﻿/*!
+ * jquery.utility (https://github.com/unscrum/jaymvc)
+ * Copyright 2018 Jay Brummels
+ * Licensed under MIT (https://github.com/unscrum/jaymvc/LICENSE)
+ */
+
+/**
 * This file contains jQuery utility methods. These are small distinct functions 
 * that are more than likely not tied to the UI.
 */

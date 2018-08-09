@@ -1,4 +1,9 @@
-﻿@media (min-width: 992px) {
+﻿/*!
+ * jquery.jay (https://github.com/unscrum/jaymvc)
+ * Copyright 2018 Jay Brummels
+ * Licensed under MIT (https://github.com/unscrum/jaymvc/LICENSE)
+ */
+@media (min-width: 992px) {
     .modal-xl {
         max-width: 800px;
     }

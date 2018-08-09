@@ -1,4 +1,10 @@
-﻿!function ($) {
+﻿/*!
+ * jay.typeahead (https://github.com/unscrum/jaymvc)
+ * Copyright 2018 Jay Brummels
+ * Adapted from bootstrap3-typehead for bootstrap3 http://embed.plnkr.co/6XJ3sc/ by Bass Jobsen orginally licensed http://www.apache.org/licenses/LICENSE-2.0
+ * Licensed under MIT (https://github.com/unscrum/jaymvc/LICENSE)
+ */
+!function ($) {
     
     /* TYPEAHEAD PUBLIC CLASS DEFINITION
      * ================================= */

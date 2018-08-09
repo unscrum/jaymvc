@@ -1,4 +1,9 @@
-﻿(function ($) {
+﻿/*
+* jquery.datafilter plugin
+* Copyright 2011- 2018 Jay Brummels & Jonathan Sharp
+* Licensed under MIT (https://github.com/unscrum/jaymvc/LICENSE)
+*/
+(function ($) {
 
     function encodeName(name) {
         return 'data-' + name.replace(/([a-z0-9])([A-Z])/g, '$1-$2').toLowerCase();

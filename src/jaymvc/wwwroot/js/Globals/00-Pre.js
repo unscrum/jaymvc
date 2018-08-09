@@ -1,4 +1,10 @@
-﻿/*log stuff*/
+﻿/*!
+ * jay.pre (https://github.com/unscrum/jaymvc)
+ * Copyright 2018 Jay Brummels
+ * Licensed under MIT (https://github.com/unscrum/jaymvc/LICENSE)
+ */
+
+/*log stuff*/
 function log() {
     if (typeof console != 'undefined') {
         var args = Array.prototype.slice.call(arguments);

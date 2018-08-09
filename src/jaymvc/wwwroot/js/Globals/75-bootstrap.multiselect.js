@@ -1,3 +1,9 @@
+/*!
+ * bootstrap.multiselect (https://github.com/unscrum/jaymvc)
+ * Copyright 2018 Jay Brummels
+ * Adapted from bootstrap-multislect-dropdown for bootstrap3 https://www.jquery-az.com/10-demos-of-bootstrap-multiselect-dropdown-by-using-jquery/
+ * Licensed under MIT (https://github.com/unscrum/jaymvc/LICENSE)
+ */
 !function ($) {
     "use strict";// jshint ;_;
 

@@ -1,4 +1,9 @@
-﻿(function ($, jay) {
+﻿/*
+* jay.modal jQuery plugin
+* Copyright 2011-2018 Jay Brummels
+* Licensed under MIT (https://github.com/unscrum/jaymvc/LICENSE)
+*/
+(function ($, jay) {
     /*
     * call jay.alert('message'), or jay.alert('title', 'message');
     */

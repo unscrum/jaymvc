@@ -1,7 +1,8 @@
 /*!
- * Datetimepicker for Bootstrap 3
- * version : 4.17.47
- * https://github.com/Eonasdan/bootstrap-datetimepicker/
+ * bootstrap.datetimepicker for Bootstrap 4
+ * Copyright 2018 Jay Brummels
+ * adapted by Jay Brummels from Eonasdan's bootstrap 3 datetime picker https://github.com/Eonasdan/bootstrap-datetimepicker/  Copyright (c) 2015 Jonathan Peterson
+ * Licensed under MIT (https://github.com/unscrum/jaymvc/LICENSE)
  */
 .bootstrap-datetimepicker-widget {
     list-style: none;

@@ -1,8 +1,13 @@
-﻿/**
+﻿/*
+* jquery.jay plugin
+* Copyright 2011-2018 Jay Brummels
+* Licensed under MIT (https://github.com/unscrum/jaymvc/LICENSE)
+*/
+
+/**
 * This file contains jQuery methods specific to Jay. These are smaller functions 
 * tied to the UI. (Also see jquery.utility.js)
 */
-
 (function ($) {
 
     $.fn.selectRange = function (start, end) {

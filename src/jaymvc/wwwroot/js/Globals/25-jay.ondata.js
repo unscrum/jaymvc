@@ -1,4 +1,10 @@
-﻿(function ($) {
+﻿/*
+* jquery.ondata plugin
+* Copyright 2011- 2018 Jay Brummels & Jonathan Sharp
+* Licensed under MIT (https://github.com/unscrum/jaymvc/LICENSE)
+*/
+
+(function ($) {
     $.extend({
         triggerDataEvent: function (event, data) {
             if (typeof event == 'object') {

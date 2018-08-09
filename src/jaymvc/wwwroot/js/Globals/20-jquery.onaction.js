@@ -1,12 +1,7 @@
 ﻿/*
-* jQuery action Plugin
-* 
-* Released: 2011-7-18
-* Version:  1.2.1
-* 
-* Copyright (c) 20011 Jay Brummels.
-* Dual licensed under the MIT and GPL licenses.
-* http://docs.jquery.com/License
+* jquery.onaction plugin
+* Copyright 2011- 2018 Jay Brummels & Jonathan Sharp
+* Licensed under MIT (https://github.com/unscrum/jaymvc/LICENSE)
 */
 
 
