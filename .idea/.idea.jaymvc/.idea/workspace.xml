@@ -1,77 +1,49 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="69713ba6-9502-4faf-9b4a-edd26c56ae9e" name="Default" comment="initial commit">
-      <change afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/.idea.jaymvc/.idea/contentModel.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/.idea.jaymvc/.idea/indexLayout.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/.idea.jaymvc/.idea/modules.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/.idea.jaymvc/.idea/vcs.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/.idea.jaymvc/.idea/workspace.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/.idea.jaymvc/riderModule.iml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/jaymvc.sln" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/jaymvc/Controllers/HealthController.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/jaymvc/Controllers/HomeController.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/jaymvc/Controllers/TodoController.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/jaymvc/Extensions/FrameworkExtensions.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/jaymvc/Extensions/UrlExtensions.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/jaymvc/Extensions/ViewExtensions.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/jaymvc/Framework/JsonEnvelope.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/jaymvc/Framework/PureMvcControllerBase.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/jaymvc/Models/Health/ErrorPage.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/jaymvc/Models/Health/SimpleHealthCheck.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/jaymvc/Models/Home/Home.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/jaymvc/Models/Home/Todo.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/jaymvc/Models/Home/Todos.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/jaymvc/Models/TypeAheadResult.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/jaymvc/Program.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/jaymvc/Properties/launchSettings.json" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/jaymvc/Services/TodoService.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/jaymvc/Startup.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/jaymvc/Views/Health/ErrorPageView.cshtml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/jaymvc/Views/Health/SimpleHealthCheckView.cshtml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/jaymvc/Views/Home/HomeView.cshtml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/jaymvc/Views/Shared/_Layout.cshtml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/jaymvc/Views/Todo/TodoPartial.cshtml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/jaymvc/Views/Todo/TodosPartial.cshtml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/jaymvc/Views/_ViewImports.cshtml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/jaymvc/Views/_ViewStart.cshtml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/jaymvc/appsettings.Development.json" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/jaymvc/appsettings.json" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/jaymvc/bundleconfig.json" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/jaymvc/jaymvc.csproj" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/jaymvc/wwwroot/css/Globals/01-bootstrap.css" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/jaymvc/wwwroot/css/Globals/02-jqueryui.css" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/jaymvc/wwwroot/css/Globals/10-jquery.jay.css" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/jaymvc/wwwroot/css/Globals/15-bootstrap.multiselect.css" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/jaymvc/wwwroot/css/Globals/20-bootstrap.datetimepicker.css" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/jaymvc/wwwroot/favicon.ico" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/jaymvc/wwwroot/js/Globals/00-Pre.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/jaymvc/wwwroot/js/Globals/01-jquery.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/jaymvc/wwwroot/js/Globals/01-popper.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/jaymvc/wwwroot/js/Globals/02-bootstrap.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/jaymvc/wwwroot/js/Globals/02-jquery.ui.custom.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/jaymvc/wwwroot/js/Globals/03-jquery.ui.touchpunch.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/jaymvc/wwwroot/js/Globals/10-underscore.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/jaymvc/wwwroot/js/Globals/15-jquery.utility.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/jaymvc/wwwroot/js/Globals/20-jquery.onaction.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/jaymvc/wwwroot/js/Globals/25-jay.ondata.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/jaymvc/wwwroot/js/Globals/30-jquery.jay.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/jaymvc/wwwroot/js/Globals/50-jay.ajax.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/jaymvc/wwwroot/js/Globals/55-jay.typeahead.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/jaymvc/wwwroot/js/Globals/60-jay.message.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/jaymvc/wwwroot/js/Globals/65-jay.onvisible.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/jaymvc/wwwroot/js/Globals/70-jay.modal.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/jaymvc/wwwroot/js/Globals/75-bootstrap.multiselect.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/jaymvc/wwwroot/js/Globals/80-jay.datafilter.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/jaymvc/wwwroot/js/Globals/85-lockr.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/jaymvc/wwwroot/js/Globals/90-moment.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/jaymvc/wwwroot/js/Globals/95-bootstrap.datetimepicker.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/jaymvc/wwwroot/js/Views/delete.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/jaymvc/wwwroot/js/Views/edit.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/jaymvc/wwwroot/js/Views/load.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/jaymvc/wwwroot/js/Views/scrollTo.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/jaymvc/wwwroot/js/Views/wireUpTypeAhead.js" afterDir="false" />
+    <list default="true" id="69713ba6-9502-4faf-9b4a-edd26c56ae9e" name="Default" comment="">
+      <change afterPath="$PROJECT_DIR$/src/jaymvc/bin/Debug/netcoreapp2.1/jaymvc.Views.dll" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/jaymvc/bin/Debug/netcoreapp2.1/jaymvc.Views.pdb" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/jaymvc/bin/Debug/netcoreapp2.1/jaymvc.deps.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/jaymvc/bin/Debug/netcoreapp2.1/jaymvc.dll" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/jaymvc/bin/Debug/netcoreapp2.1/jaymvc.pdb" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/jaymvc/bin/Debug/netcoreapp2.1/jaymvc.runtimeconfig.dev.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/jaymvc/bin/Debug/netcoreapp2.1/jaymvc.runtimeconfig.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/jaymvc/obj/Debug/netcoreapp2.1/Razor/Views/Health/ErrorPageView.g.cshtml.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/jaymvc/obj/Debug/netcoreapp2.1/Razor/Views/Health/SimpleHealthCheckView.g.cshtml.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/jaymvc/obj/Debug/netcoreapp2.1/Razor/Views/Home/HomeView.g.cshtml.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/jaymvc/obj/Debug/netcoreapp2.1/Razor/Views/Shared/_Layout.g.cshtml.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/jaymvc/obj/Debug/netcoreapp2.1/Razor/Views/Todo/TodoPartial.g.cshtml.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/jaymvc/obj/Debug/netcoreapp2.1/Razor/Views/Todo/TodosPartial.g.cshtml.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/jaymvc/obj/Debug/netcoreapp2.1/Razor/Views/_ViewImports.g.cshtml.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/jaymvc/obj/Debug/netcoreapp2.1/Razor/Views/_ViewStart.g.cshtml.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/jaymvc/obj/Debug/netcoreapp2.1/jaymvc.AssemblyInfo.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/jaymvc/obj/Debug/netcoreapp2.1/jaymvc.AssemblyInfoInputs.cache" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/jaymvc/obj/Debug/netcoreapp2.1/jaymvc.RazorAssemblyInfo.cache" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/jaymvc/obj/Debug/netcoreapp2.1/jaymvc.RazorAssemblyInfo.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/jaymvc/obj/Debug/netcoreapp2.1/jaymvc.RazorCoreGenerate.cache" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/jaymvc/obj/Debug/netcoreapp2.1/jaymvc.RazorTargetAssemblyInfo.cache" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/jaymvc/obj/Debug/netcoreapp2.1/jaymvc.RazorTargetAssemblyInfo.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/jaymvc/obj/Debug/netcoreapp2.1/jaymvc.TagHelpers.input.cache" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/jaymvc/obj/Debug/netcoreapp2.1/jaymvc.TagHelpers.output.cache" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/jaymvc/obj/Debug/netcoreapp2.1/jaymvc.Views.dll" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/jaymvc/obj/Debug/netcoreapp2.1/jaymvc.Views.pdb" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/jaymvc/obj/Debug/netcoreapp2.1/jaymvc.assets.cache" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/jaymvc/obj/Debug/netcoreapp2.1/jaymvc.csproj.CopyComplete" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/jaymvc/obj/Debug/netcoreapp2.1/jaymvc.csproj.CoreCompileInputs.cache" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/jaymvc/obj/Debug/netcoreapp2.1/jaymvc.csproj.FileListAbsolute.txt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/jaymvc/obj/Debug/netcoreapp2.1/jaymvc.csprojAssemblyReference.cache" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/jaymvc/obj/Debug/netcoreapp2.1/jaymvc.dll" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/jaymvc/obj/Debug/netcoreapp2.1/jaymvc.pdb" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/jaymvc/obj/jaymvc.csproj.nuget.cache" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/jaymvc/obj/jaymvc.csproj.nuget.g.props" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/jaymvc/obj/jaymvc.csproj.nuget.g.targets" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/jaymvc/obj/project.assets.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/jaymvc/wwwroot/js/globals.min.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/.idea.jaymvc/.idea/contentModel.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.jaymvc/.idea/contentModel.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/jaymvc/Services/TodoService.cs" beforeDir="false" afterPath="$PROJECT_DIR$/src/jaymvc/Services/TodoService.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/jaymvc/Views/Home/HomeView.cshtml" beforeDir="false" afterPath="$PROJECT_DIR$/src/jaymvc/Views/Home/HomeView.cshtml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/jaymvc/Views/Todo/TodosPartial.cshtml" beforeDir="false" afterPath="$PROJECT_DIR$/src/jaymvc/Views/Todo/TodosPartial.cshtml" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="TRACKING_ENABLED" value="true" />
@@ -82,60 +54,115 @@
   </component>
   <component name="FileEditorManager">
     <leaf>
-      <file leaf-file-name="TodosPartial.cshtml" pinned="false" current-in-tab="false">
+      <file leaf-file-name="Microsoft.PackageDependencyResolution.targets" pinned="false" current-in-tab="false">
+        <entry file="file://C:/Program Files/dotnet/sdk/2.1.300/Sdks/Microsoft.NET.Sdk/targets/Microsoft.PackageDependencyResolution.targets">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="-388">
+              <caret line="197" column="4" selection-start-line="197" selection-start-column="4" selection-end-line="197" selection-end-column="4" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="_Layout.cshtml" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/jaymvc/Views/Shared/_Layout.cshtml">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="376">
+              <caret line="36" column="69" selection-start-line="36" selection-start-column="69" selection-end-line="36" selection-end-column="69" />
+              <folding>
+                <marker date="1533828371533" expanded="true" signature="41:1631" ph="&lt;html.../&gt;" />
+                <marker date="1533828371533" expanded="true" signature="48:454" ph="&lt;head.../&gt;" />
+                <marker date="1533828371533" expanded="true" signature="455:1623" ph="&lt;body.../&gt;" />
+                <marker date="1533828371533" expanded="true" signature="462:1163" ph="&lt;header.../&gt;" />
+                <marker date="1533828371533" expanded="true" signature="475:1153" ph="&lt;nav.../&gt;" />
+                <marker date="1533828371533" expanded="true" signature="613:859" ph="&lt;button.../&gt;" />
+                <marker date="1533828371533" expanded="true" signature="868:1142" ph="&lt;div.../&gt;" />
+                <marker date="1533828371533" expanded="true" signature="935:1127" ph="&lt;ul.../&gt;" />
+                <marker date="1533828371533" expanded="true" signature="1164:1314" ph="&lt;main.../&gt;" />
+                <marker date="1533828371533" expanded="true" signature="1244:1306" ph="&lt;div.../&gt;" />
+                <marker date="1533828371533" expanded="true" signature="1315:1507" ph="&lt;footer.../&gt;" />
+                <marker date="1533828371533" expanded="true" signature="1392:1497" ph="&lt;div.../&gt;" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="HomeView.cshtml" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/jaymvc/Views/Home/HomeView.cshtml">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="152">
+              <caret line="16" column="60" selection-start-line="16" selection-start-column="60" selection-end-line="16" selection-end-column="60" />
+              <folding>
+                <marker date="1533832579852" expanded="false" signature="7:50" ph="..." />
+                <marker date="1533832579852" expanded="true" signature="63:114" ph="@..." />
+                <marker date="1533832579852" expanded="true" signature="115:385" ph="@{...}" />
+                <marker date="1533832579852" expanded="true" signature="205:383" ph="&lt;script.../&gt;" />
+                <marker date="1533832579852" expanded="true" signature="297:367" ph="{...}" />
+                <marker date="1533832579852" expanded="true" signature="386:659" ph="@{...}" />
+                <marker date="1533832579852" expanded="true" signature="412:657" ph="&lt;div.../&gt;" />
+                <marker date="1533832579852" expanded="true" signature="477:646" ph="&lt;div.../&gt;" />
+                <marker date="1533832579852" expanded="true" signature="662:1249" ph="&lt;div.../&gt;" />
+                <marker date="1533832579852" expanded="true" signature="685:1242" ph="&lt;div.../&gt;" />
+                <marker date="1533832579852" expanded="true" signature="1252:2040" ph="&lt;div.../&gt;" />
+                <marker date="1533832579852" expanded="true" signature="1280:2033" ph="&lt;div.../&gt;" />
+                <marker date="1533832579852" expanded="true" signature="1312:1686" ph="&lt;div.../&gt;" />
+                <marker date="1533832579852" expanded="true" signature="1695:2022" ph="&lt;div.../&gt;" />
+                <marker date="1533832579852" expanded="true" signature="1879:2007" ph="&lt;div.../&gt;" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="UrlExtensions.cs" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/jaymvc/Extensions/UrlExtensions.cs">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="165">
+              <caret line="12" column="29" selection-start-line="12" selection-start-column="29" selection-end-line="12" selection-end-column="29" />
+              <folding>
+                <marker date="1533829862303" expanded="false" signature="6:45" ph="..." />
+                <marker date="1533829862303" expanded="true" signature="74:1699" ph="{...}" />
+                <marker date="1533829862303" expanded="true" signature="122:1697" ph="{...}" />
+                <marker date="1533829862303" expanded="true" signature="186:298" ph="{...}" />
+                <marker date="1533829862303" expanded="true" signature="373:483" ph="{...}" />
+                <marker date="1533829862303" expanded="true" signature="570:685" ph="{...}" />
+                <marker date="1533829862303" expanded="true" signature="762:872" ph="{...}" />
+                <marker date="1533829862303" expanded="true" signature="960:1079" ph="{...}" />
+                <marker date="1533829862303" expanded="true" signature="1171:1286" ph="{...}" />
+                <marker date="1533829862303" expanded="true" signature="1387:1507" ph="{...}" />
+                <marker date="1533829862303" expanded="true" signature="1576:1690" ph="{...}" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="TodosPartial.cshtml" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/jaymvc/Views/Todo/TodosPartial.cshtml">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="345">
-              <caret line="24" column="65" selection-start-line="24" selection-start-column="65" selection-end-line="24" selection-end-column="65" />
+            <state relative-caret-position="361">
+              <caret line="36" column="309" selection-start-line="36" selection-start-column="309" selection-end-line="36" selection-end-column="309" />
               <folding>
-                <marker date="1533831154113" expanded="false" signature="7:50" ph="..." />
-                <marker date="1533831154113" expanded="true" signature="65:1366" ph="&lt;table.../&gt;" />
-                <marker date="1533831154113" expanded="true" signature="105:272" ph="&lt;thead.../&gt;" />
-                <marker date="1533831154113" expanded="true" signature="117:259" ph="&lt;tr.../&gt;" />
-                <marker date="1533831154113" expanded="true" signature="277:1357" ph="&lt;tbody.../&gt;" />
-                <marker date="1533831154113" expanded="true" signature="289:1344" ph="@..." />
-                <marker date="1533831154113" expanded="true" signature="314:1344" ph="{...}" />
-                <marker date="1533831154113" expanded="true" signature="329:1338" ph="&lt;tr.../&gt;" />
-                <marker date="1533831154113" expanded="true" signature="346:643" ph="&lt;td.../&gt;" />
-                <marker date="1533831154113" expanded="true" signature="367:625" ph="&lt;button.../&gt;" />
-                <marker date="1533831154113" expanded="true" signature="842:1020" ph="&lt;td.../&gt;" />
-                <marker date="1533831154113" expanded="true" signature="863:978" ph="&lt;span.../&gt;" />
-                <marker date="1533831154113" expanded="true" signature="1033:1324" ph="&lt;td.../&gt;" />
+                <marker date="1533832895533" expanded="true" signature="40:1713" ph="&lt;table.../&gt;" />
+                <marker date="1533832895533" expanded="true" signature="80:304" ph="&lt;thead.../&gt;" />
+                <marker date="1533832895533" expanded="true" signature="92:291" ph="&lt;tr.../&gt;" />
+                <marker date="1533832895533" expanded="true" signature="309:1704" ph="&lt;tbody.../&gt;" />
+                <marker date="1533832895533" expanded="true" signature="321:1691" ph="@..." />
+                <marker date="1533832895533" expanded="true" signature="346:1691" ph="{...}" />
+                <marker date="1533832895533" expanded="true" signature="361:1685" ph="&lt;tr.../&gt;" />
+                <marker date="1533832895533" expanded="true" signature="378:675" ph="&lt;td.../&gt;" />
+                <marker date="1533832895533" expanded="true" signature="399:657" ph="&lt;button.../&gt;" />
+                <marker date="1533832895533" expanded="true" signature="944:1243" ph="&lt;td.../&gt;" />
+                <marker date="1533832895533" expanded="true" signature="978:1093" ph="&lt;span.../&gt;" />
+                <marker date="1533832895533" expanded="true" signature="1110:1201" ph="&lt;span.../&gt;" />
+                <marker date="1533832895533" expanded="true" signature="1256:1671" ph="&lt;td.../&gt;" />
               </folding>
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="Todos.cs" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/jaymvc/Models/Home/Todos.cs">
+      <file leaf-file-name="delete.js" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/jaymvc/wwwroot/js/Views/delete.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="90">
-              <caret line="6" column="16" selection-start-line="6" selection-start-column="16" selection-end-line="6" selection-end-column="16" />
-              <folding>
-                <marker date="1533828106828" expanded="true" signature="63:196" ph="{...}" />
-                <marker date="1533828106828" expanded="true" signature="101:194" ph="{...}" />
-                <marker date="1533828106828" expanded="true" signature="167:188" ph="{...}" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="ViewExtensions.cs" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/jaymvc/Extensions/ViewExtensions.cs">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="-24">
-              <caret line="16" column="41" selection-start-line="16" selection-start-column="41" selection-end-line="16" selection-end-column="41" />
-              <folding>
-                <marker date="1533831134800" expanded="true" signature="6:181" ph="..." />
-                <marker date="1533831134800" expanded="true" signature="210:1960" ph="{...}" />
-                <marker date="1533831134800" expanded="true" signature="251:1958" ph="{...}" />
-                <marker date="1533831134800" expanded="true" signature="314:458" ph="{...}" />
-                <marker date="1533831134800" expanded="true" signature="527:736" ph="{...}" />
-                <marker date="1533831134800" expanded="true" signature="1077:1603" ph="{...}" />
-                <marker date="1533831134800" expanded="true" signature="1301:1593" ph="{...}" />
-                <marker date="1533831134800" expanded="true" signature="1688:1781" ph="{...}" />
-                <marker date="1533831134800" expanded="true" signature="1862:1952" ph="{...}" />
-              </folding>
+            <state relative-caret-position="180">
+              <caret line="12" column="46" selection-start-line="12" selection-start-column="32" selection-end-line="12" selection-end-column="46" />
             </state>
           </provider>
         </entry>
@@ -143,7 +170,7 @@
       <file leaf-file-name="TodoPartial.cshtml" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/jaymvc/Views/Todo/TodoPartial.cshtml">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="420">
+            <state relative-caret-position="406">
               <caret line="46" column="99" selection-start-line="46" selection-start-column="99" selection-end-line="46" selection-end-column="99" />
               <folding>
                 <marker date="1533831121755" expanded="true" signature="38:3130" ph="&lt;div.../&gt;" />
@@ -169,102 +196,60 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="_ViewImports.cshtml" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/jaymvc/Views/_ViewImports.cshtml">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="45">
-              <caret line="3" column="52" selection-start-line="3" selection-start-column="52" selection-end-line="3" selection-end-column="52" />
-              <folding>
-                <marker date="1533828192768" expanded="true" signature="7:59" ph="..." />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
       <file leaf-file-name="TodoService.cs" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/jaymvc/Services/TodoService.cs">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="308">
-              <caret line="76" column="9" selection-start-line="76" selection-start-column="9" selection-end-line="76" selection-end-column="9" />
+            <state relative-caret-position="-575">
+              <caret line="42" column="12" selection-start-line="42" selection-start-column="12" selection-end-line="42" selection-end-column="12" />
               <folding>
-                <marker date="1533831244724" expanded="false" signature="6:113" ph="..." />
-                <marker date="1533831244724" expanded="true" signature="140:3505" ph="{...}" />
-                <marker date="1533831244724" expanded="true" signature="176:456" ph="{...}" />
-                <marker date="1533831244724" expanded="true" signature="496:3503" ph="{...}" />
-                <marker date="1533831244724" expanded="true" signature="686:1322" ph="{...}" />
-                <marker date="1533831244724" expanded="true" signature="835:1311" ph="{...}" />
-                <marker date="1533831244724" expanded="true" signature="1358:1439" ph="{...}" />
-                <marker date="1533831244724" expanded="true" signature="1557:2185" ph="{...}" />
-                <marker date="1533831244724" expanded="true" signature="1640:1820" ph="{...}" />
-                <marker date="1533831244724" expanded="true" signature="1837:2175" ph="{...}" />
-                <marker date="1533831244724" expanded="true" signature="1954:2159" ph="{...}" />
-                <marker date="1533831244724" expanded="true" signature="2219:2371" ph="{...}" />
-                <marker date="1533831244724" expanded="true" signature="2280:2335" ph="{...}" />
-                <marker date="1533831244724" expanded="true" signature="2398:2449" ph="{...}" />
-                <marker date="1533831244724" expanded="true" signature="2488:2583" ph="{...}" />
-                <marker date="1533831244724" expanded="true" signature="2653:3497" ph="{...}" />
-                <marker date="1533831244724" expanded="true" signature="3284:3395" ph="{...}" />
+                <marker date="1533832458153" expanded="false" signature="6:113" ph="..." />
+                <marker date="1533832458153" expanded="true" signature="140:3694" ph="{...}" />
+                <marker date="1533832458153" expanded="true" signature="176:456" ph="{...}" />
+                <marker date="1533832458153" expanded="true" signature="496:3692" ph="{...}" />
+                <marker date="1533832458153" expanded="true" signature="672:1308" ph="{...}" />
+                <marker date="1533832458153" expanded="true" signature="821:1297" ph="{...}" />
+                <marker date="1533832458153" expanded="true" signature="1344:1425" ph="{...}" />
+                <marker date="1533832458153" expanded="true" signature="1543:2374" ph="{...}" />
+                <marker date="1533832458153" expanded="true" signature="1626:1907" ph="{...}" />
+                <marker date="1533832458153" expanded="true" signature="1924:2364" ph="{...}" />
+                <marker date="1533832458153" expanded="true" signature="2041:2348" ph="{...}" />
+                <marker date="1533832458153" expanded="true" signature="2408:2560" ph="{...}" />
+                <marker date="1533832458153" expanded="true" signature="2469:2524" ph="{...}" />
+                <marker date="1533832458153" expanded="true" signature="2587:2638" ph="{...}" />
+                <marker date="1533832458153" expanded="true" signature="2677:2772" ph="{...}" />
+                <marker date="1533832458153" expanded="true" signature="2842:3686" ph="{...}" />
+                <marker date="1533832458153" expanded="true" signature="3473:3584" ph="{...}" />
               </folding>
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="launchSettings.json" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/jaymvc/Properties/launchSettings.json">
+      <file leaf-file-name="TodoController.cs" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/jaymvc/Controllers/TodoController.cs">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="345">
-              <caret line="23" column="48" lean-forward="true" selection-start-line="23" selection-start-column="48" selection-end-line="23" selection-end-column="48" />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="Startup.cs" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/jaymvc/Startup.cs">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="15">
-              <caret line="11" column="13" selection-start-line="11" selection-start-column="13" selection-end-line="11" selection-end-column="13" />
+            <state relative-caret-position="409">
+              <caret line="50" column="8" selection-start-line="50" selection-start-column="8" selection-end-line="50" selection-end-column="8" />
               <folding>
-                <marker date="1533831774992" expanded="false" signature="6:324" ph="..." />
-                <marker date="1533831774992" expanded="true" signature="342:2985" ph="{...}" />
-                <marker date="1533831774992" expanded="true" signature="369:2983" ph="{...}" />
-                <marker date="1533831774992" expanded="true" signature="536:610" ph="{...}" />
-                <marker date="1533831774992" expanded="true" signature="779:1276" ph="{...}" />
-                <marker date="1533831774992" expanded="true" signature="913:1238" ph="{...}" />
-                <marker date="1533831774992" expanded="true" signature="952:1090" ph="/* Set LocalTest:skipSsl to true to skip Ssl requrement in ... */" />
-                <marker date="1533831774992" expanded="true" signature="1510:2977" ph="{...}" />
-                <marker date="1533831774992" expanded="true" signature="1557:1634" ph="{...}" />
-                <marker date="1533831774992" expanded="true" signature="1651:1741" ph="{...}" />
-                <marker date="1533831774992" expanded="true" signature="1790:2587" ph="{...}" />
-                <marker date="1533831774992" expanded="true" signature="1865:2405" ph="{...}" />
-                <marker date="1533831774992" expanded="true" signature="1945:2161" ph="{...}" />
-                <marker date="1533831774992" expanded="true" signature="2186:2387" ph="{...}" />
-                <marker date="1533831774992" expanded="true" signature="2426:2573" ph="{...}" />
-                <marker date="1533831774992" expanded="true" signature="2695:2866" ph="{...}" />
+                <marker date="1533830869177" expanded="false" signature="6:188" ph="..." />
+                <marker date="1533830869177" expanded="true" signature="218:2419" ph="{...}" />
+                <marker date="1533830869177" expanded="true" signature="276:2417" ph="{...}" />
+                <marker date="1533830869177" expanded="true" signature="431:491" ph="{...}" />
+                <marker date="1533830869177" expanded="true" signature="557:892" ph="{...}" />
+                <marker date="1533830869177" expanded="true" signature="1049:1786" ph="{...}" />
+                <marker date="1533830869177" expanded="true" signature="1853:1925" ph="{...}" />
+                <marker date="1533830869177" expanded="true" signature="2009:2083" ph="{...}" />
+                <marker date="1533830869177" expanded="true" signature="2159:2231" ph="{...}" />
+                <marker date="1533830869177" expanded="true" signature="2303:2411" ph="{...}" />
               </folding>
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="Program.cs" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/jaymvc/Program.cs">
+      <file leaf-file-name="ActionMethodExecutor.cs" pinned="false" current-in-tab="false">
+        <entry file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/F58F0715-195C-43D2-AE82-0C604FB53FE1/96/53760bed/ActionMethodExecutor.cs">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="45">
-              <caret line="3" column="16" selection-start-line="3" selection-start-column="16" selection-end-line="3" selection-end-column="16" />
-              <folding>
-                <marker date="1533831774972" expanded="true" signature="6:63" ph="..." />
-                <marker date="1533831774972" expanded="true" signature="81:444" ph="{...}" />
-                <marker date="1533831774972" expanded="true" signature="108:442" ph="{...}" />
-                <marker date="1533831774972" expanded="true" signature="161:219" ph="{...}" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="appsettings.json" pinned="false" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/src/jaymvc/appsettings.json">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="90">
-              <caret line="6" column="3" selection-start-line="6" selection-start-column="3" selection-end-line="6" selection-end-column="3" />
+            <state relative-caret-position="175">
+              <caret line="81" column="8" selection-start-line="81" selection-start-column="8" selection-end-line="81" selection-end-column="8" />
             </state>
           </provider>
         </entry>
@@ -275,12 +260,15 @@
     <findStrings>
       <find>action</find>
       <find>ACL</find>
+      <find>lightning</find>
     </findStrings>
   </component>
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
   <component name="HighlightingSettingsPerFile">
+    <setting file="file://$PROJECT_DIR$/src/jaymvc/obj/Debug/netcoreapp2.1/Razor/Views/Shared/_Layout.g.cshtml.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/F58F0715-195C-43D2-AE82-0C604FB53FE1/96/53760bed/ActionMethodExecutor.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/src/jaymvc/Models/Health/SimpleHealthCheck.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/src/jaymvc/Models/Health/ErrorPage.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/src/jaymvc/Models/Home/Todos.cs" root0="FORCE_HIGHLIGHTING" />
@@ -335,15 +323,15 @@
         <option value="$PROJECT_DIR$/src/jaymvc/Extensions/FrameworkExtensions.cs" />
         <option value="$PROJECT_DIR$/src/jaymvc/Controllers/TodoController.cs" />
         <option value="$PROJECT_DIR$/src/jaymvc/bundleconfig.json" />
-        <option value="$PROJECT_DIR$/src/jaymvc/Views/Home/HomeView.cshtml" />
         <option value="$PROJECT_DIR$/src/jaymvc/Views/Todo/TodoPartial.cshtml" />
         <option value="$PROJECT_DIR$/src/jaymvc/Extensions/ViewExtensions.cs" />
-        <option value="$PROJECT_DIR$/src/jaymvc/Views/Todo/TodosPartial.cshtml" />
-        <option value="$PROJECT_DIR$/src/jaymvc/Services/TodoService.cs" />
         <option value="$PROJECT_DIR$/src/jaymvc/Properties/launchSettings.json" />
         <option value="$PROJECT_DIR$/src/jaymvc/Startup.cs" />
         <option value="$PROJECT_DIR$/src/jaymvc/Program.cs" />
         <option value="$PROJECT_DIR$/src/jaymvc/appsettings.json" />
+        <option value="$PROJECT_DIR$/src/jaymvc/Services/TodoService.cs" />
+        <option value="$PROJECT_DIR$/src/jaymvc/Views/Home/HomeView.cshtml" />
+        <option value="$PROJECT_DIR$/src/jaymvc/Views/Todo/TodosPartial.cshtml" />
       </list>
     </option>
   </component>
@@ -497,6 +485,14 @@
               <item name="jaymvc" type="977d5f41:SolutionExplorerNodeRider" />
               <item name="wwwroot" type="977d5f41:SolutionExplorerNodeRider" />
               <item name="js" type="977d5f41:SolutionExplorerNodeRider" />
+              <item name="Globals" type="977d5f41:SolutionExplorerNodeRider" />
+            </path>
+            <path>
+              <item name="" type="13324e5d:SolutionExplorerViewPane$ProjectViewPaneTreeStructure$createRoot$1" />
+              <item name="jaymvc (1 project)" type="977d5f41:SolutionExplorerNodeRider" />
+              <item name="jaymvc" type="977d5f41:SolutionExplorerNodeRider" />
+              <item name="wwwroot" type="977d5f41:SolutionExplorerNodeRider" />
+              <item name="js" type="977d5f41:SolutionExplorerNodeRider" />
               <item name="Views" type="977d5f41:SolutionExplorerNodeRider" />
             </path>
           </expand>
@@ -555,12 +551,27 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1533826928020</updated>
-      <workItem from="1533826929354" duration="4841000" />
+      <workItem from="1533826929354" duration="5961000" />
     </task>
+    <task id="LOCAL-00001" summary="initial commit">
+      <created>1533831813289</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1533831813289</updated>
+    </task>
+    <task id="LOCAL-00002" summary="fixing gitignore">
+      <created>1533831895462</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1533831895462</updated>
+    </task>
+    <option name="localTasksCounter" value="3" />
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="4841000" />
+    <option name="totallyTimeSpent" value="5961000" />
   </component>
   <component name="TodoView">
     <todo-panel id="selected-file">
@@ -581,7 +592,7 @@
       <window_info anchor="bottom" id="Unit Tests" />
       <window_info anchor="bottom" id="Database Changes" show_stripe_button="false" />
       <window_info anchor="bottom" id="Run" order="2" weight="0.32897604" />
-      <window_info anchor="bottom" id="Version Control" visible="true" weight="0.32897604" />
+      <window_info anchor="bottom" id="Version Control" weight="0.32897604" />
       <window_info anchor="bottom" id="Terminal" weight="0.33115467" />
       <window_info anchor="bottom" id="NuGet" />
       <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.25" />
@@ -590,7 +601,7 @@
       <window_info anchor="right" id="Database" />
       <window_info anchor="bottom" id="Find" order="1" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
-      <window_info anchor="bottom" id="Debug" order="3" weight="0.4" />
+      <window_info anchor="bottom" id="Debug" order="3" visible="true" weight="0.39978212" />
       <window_info id="Favorites" side_tool="true" />
       <window_info anchor="right" id="Commander" internal_type="SLIDING" order="0" type="SLIDING" weight="0.4" />
       <window_info anchor="right" id="Ant Build" order="1" weight="0.25" />
@@ -606,6 +617,16 @@
   <component name="UnityUnitTestConfiguration" currentTestLauncher="NUnit" />
   <component name="VcsContentAnnotationSettings">
     <option name="myLimit" value="2678400000" />
+  </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="initial commit" />
+    <MESSAGE value="fixing gitignore" />
+    <option name="LAST_COMMIT_MESSAGE" value="fixing gitignore" />
+  </component>
+  <component name="XDebuggerManager">
+    <breakpoint-manager>
+      <option name="time" value="3" />
+    </breakpoint-manager>
   </component>
   <component name="editorHistoryManager">
     <entry file="file://$PROJECT_DIR$/src/jaymvc/web.config">
@@ -801,41 +822,10 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/jaymvc/appsettings.Development.json">
-      <provider selected="true" editor-type-id="text-editor" />
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/jaymvc/jaymvc.csproj">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="345">
           <caret line="23" column="14" lean-forward="true" selection-start-line="23" selection-start-column="14" selection-end-line="23" selection-end-column="14" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/jaymvc/Views/Shared/_Layout.cshtml">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="441">
-          <caret line="36" column="69" selection-start-line="36" selection-start-column="69" selection-end-line="36" selection-end-column="69" />
-          <folding>
-            <marker date="1533828371533" expanded="true" signature="41:1631" ph="&lt;html.../&gt;" />
-            <marker date="1533828371533" expanded="true" signature="48:454" ph="&lt;head.../&gt;" />
-            <marker date="1533828371533" expanded="true" signature="455:1623" ph="&lt;body.../&gt;" />
-            <marker date="1533828371533" expanded="true" signature="462:1163" ph="&lt;header.../&gt;" />
-            <marker date="1533828371533" expanded="true" signature="475:1153" ph="&lt;nav.../&gt;" />
-            <marker date="1533828371533" expanded="true" signature="613:859" ph="&lt;button.../&gt;" />
-            <marker date="1533828371533" expanded="true" signature="868:1142" ph="&lt;div.../&gt;" />
-            <marker date="1533828371533" expanded="true" signature="935:1127" ph="&lt;ul.../&gt;" />
-            <marker date="1533828371533" expanded="true" signature="1164:1314" ph="&lt;main.../&gt;" />
-            <marker date="1533828371533" expanded="true" signature="1244:1306" ph="&lt;div.../&gt;" />
-            <marker date="1533828371533" expanded="true" signature="1315:1507" ph="&lt;footer.../&gt;" />
-            <marker date="1533828371533" expanded="true" signature="1392:1497" ph="&lt;div.../&gt;" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/jaymvc/wwwroot/js/Views/delete.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="180">
-          <caret line="12" column="46" selection-start-line="12" selection-start-column="32" selection-end-line="12" selection-end-column="46" />
         </state>
       </provider>
     </entry>
@@ -856,51 +846,10 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/jaymvc/Controllers/TodoController.cs">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="379">
-          <caret line="72" column="18" selection-start-line="72" selection-start-column="18" selection-end-line="72" selection-end-column="18" />
-          <folding>
-            <marker date="1533830869177" expanded="false" signature="6:188" ph="..." />
-            <marker date="1533830869177" expanded="true" signature="218:2419" ph="{...}" />
-            <marker date="1533830869177" expanded="true" signature="276:2417" ph="{...}" />
-            <marker date="1533830869177" expanded="true" signature="431:491" ph="{...}" />
-            <marker date="1533830869177" expanded="true" signature="557:892" ph="{...}" />
-            <marker date="1533830869177" expanded="true" signature="1049:1786" ph="{...}" />
-            <marker date="1533830869177" expanded="true" signature="1853:1925" ph="{...}" />
-            <marker date="1533830869177" expanded="true" signature="2009:2083" ph="{...}" />
-            <marker date="1533830869177" expanded="true" signature="2159:2231" ph="{...}" />
-            <marker date="1533830869177" expanded="true" signature="2303:2411" ph="{...}" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/jaymvc/bundleconfig.json">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="448">
           <caret line="39" column="3" selection-start-line="39" selection-start-column="3" selection-end-line="39" selection-end-column="3" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/jaymvc/Views/Home/HomeView.cshtml">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="465">
-          <caret line="32" column="42" selection-start-line="32" selection-start-column="42" selection-end-line="32" selection-end-column="42" />
-          <folding>
-            <marker date="1533831018603" expanded="false" signature="7:50" ph="..." />
-            <marker date="1533831018603" expanded="true" signature="63:114" ph="@..." />
-            <marker date="1533831018603" expanded="true" signature="115:196" ph="@{...}" />
-            <marker date="1533831018603" expanded="true" signature="197:487" ph="@{...}" />
-            <marker date="1533831018603" expanded="true" signature="223:485" ph="&lt;div.../&gt;" />
-            <marker date="1533831018603" expanded="true" signature="292:474" ph="&lt;div.../&gt;" />
-            <marker date="1533831018603" expanded="true" signature="490:1077" ph="&lt;div.../&gt;" />
-            <marker date="1533831018603" expanded="true" signature="513:1070" ph="&lt;div.../&gt;" />
-            <marker date="1533831018603" expanded="true" signature="1080:1874" ph="&lt;div.../&gt;" />
-            <marker date="1533831018603" expanded="true" signature="1108:1867" ph="&lt;div.../&gt;" />
-            <marker date="1533831018603" expanded="true" signature="1140:1520" ph="&lt;div.../&gt;" />
-            <marker date="1533831018603" expanded="true" signature="1529:1856" ph="&lt;div.../&gt;" />
-            <marker date="1533831018603" expanded="true" signature="1713:1841" ph="&lt;div.../&gt;" />
-          </folding>
         </state>
       </provider>
     </entry>
@@ -915,26 +864,6 @@
             <marker date="1533828828859" expanded="true" signature="645:1282" ph="{...}" />
             <marker date="1533828828859" expanded="true" signature="689:968" ph="{...}" />
             <marker date="1533828828859" expanded="true" signature="999:1272" ph="{...}" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/jaymvc/Extensions/UrlExtensions.cs">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="171">
-          <caret line="27" column="45" selection-start-line="27" selection-start-column="29" selection-end-line="27" selection-end-column="45" />
-          <folding>
-            <marker date="1533829862303" expanded="false" signature="6:45" ph="..." />
-            <marker date="1533829862303" expanded="true" signature="74:1699" ph="{...}" />
-            <marker date="1533829862303" expanded="true" signature="122:1697" ph="{...}" />
-            <marker date="1533829862303" expanded="true" signature="186:298" ph="{...}" />
-            <marker date="1533829862303" expanded="true" signature="373:483" ph="{...}" />
-            <marker date="1533829862303" expanded="true" signature="570:685" ph="{...}" />
-            <marker date="1533829862303" expanded="true" signature="762:872" ph="{...}" />
-            <marker date="1533829862303" expanded="true" signature="960:1079" ph="{...}" />
-            <marker date="1533829862303" expanded="true" signature="1171:1286" ph="{...}" />
-            <marker date="1533829862303" expanded="true" signature="1387:1507" ph="{...}" />
-            <marker date="1533829862303" expanded="true" signature="1576:1690" ph="{...}" />
           </folding>
         </state>
       </provider>
@@ -963,93 +892,6 @@
             <marker date="1533831134800" expanded="true" signature="1301:1593" ph="{...}" />
             <marker date="1533831134800" expanded="true" signature="1688:1781" ph="{...}" />
             <marker date="1533831134800" expanded="true" signature="1862:1952" ph="{...}" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/jaymvc/Views/Todo/TodoPartial.cshtml">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="420">
-          <caret line="46" column="99" selection-start-line="46" selection-start-column="99" selection-end-line="46" selection-end-column="99" />
-          <folding>
-            <marker date="1533831121755" expanded="true" signature="38:3130" ph="&lt;div.../&gt;" />
-            <marker date="1533831121755" expanded="true" signature="60:550" ph="&lt;div.../&gt;" />
-            <marker date="1533831121755" expanded="true" signature="581:1240" ph="&lt;div.../&gt;" />
-            <marker date="1533831121755" expanded="true" signature="632:1029" ph="@..." />
-            <marker date="1533831121755" expanded="true" signature="688:861" ph="{...}" />
-            <marker date="1533831121755" expanded="true" signature="874:1029" ph="{...}" />
-            <marker date="1533831121755" expanded="true" signature="1245:1920" ph="&lt;div.../&gt;" />
-            <marker date="1533831121755" expanded="true" signature="1296:1703" ph="@..." />
-            <marker date="1533831121755" expanded="true" signature="1354:1531" ph="{...}" />
-            <marker date="1533831121755" expanded="true" signature="1544:1703" ph="{...}" />
-            <marker date="1533831121755" expanded="true" signature="1925:2576" ph="&lt;div.../&gt;" />
-            <marker date="1533831121755" expanded="true" signature="1976:2368" ph="@..." />
-            <marker date="1533831121755" expanded="true" signature="2031:2202" ph="{...}" />
-            <marker date="1533831121755" expanded="true" signature="2215:2368" ph="{...}" />
-            <marker date="1533831121755" expanded="true" signature="2581:2951" ph="&lt;div.../&gt;" />
-            <marker date="1533831121755" expanded="true" signature="2656:2940" ph="&lt;div.../&gt;" />
-            <marker date="1533831121755" expanded="true" signature="2808:2925" ph="&lt;span.../&gt;" />
-            <marker date="1533831121755" expanded="true" signature="2956:3123" ph="&lt;div.../&gt;" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/jaymvc/Views/Todo/TodosPartial.cshtml">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="345">
-          <caret line="24" column="65" selection-start-line="24" selection-start-column="65" selection-end-line="24" selection-end-column="65" />
-          <folding>
-            <marker date="1533831154113" expanded="false" signature="7:50" ph="..." />
-            <marker date="1533831154113" expanded="true" signature="65:1366" ph="&lt;table.../&gt;" />
-            <marker date="1533831154113" expanded="true" signature="105:272" ph="&lt;thead.../&gt;" />
-            <marker date="1533831154113" expanded="true" signature="117:259" ph="&lt;tr.../&gt;" />
-            <marker date="1533831154113" expanded="true" signature="277:1357" ph="&lt;tbody.../&gt;" />
-            <marker date="1533831154113" expanded="true" signature="289:1344" ph="@..." />
-            <marker date="1533831154113" expanded="true" signature="314:1344" ph="{...}" />
-            <marker date="1533831154113" expanded="true" signature="329:1338" ph="&lt;tr.../&gt;" />
-            <marker date="1533831154113" expanded="true" signature="346:643" ph="&lt;td.../&gt;" />
-            <marker date="1533831154113" expanded="true" signature="367:625" ph="&lt;button.../&gt;" />
-            <marker date="1533831154113" expanded="true" signature="842:1020" ph="&lt;td.../&gt;" />
-            <marker date="1533831154113" expanded="true" signature="863:978" ph="&lt;span.../&gt;" />
-            <marker date="1533831154113" expanded="true" signature="1033:1324" ph="&lt;td.../&gt;" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/jaymvc/Models/Home/Todos.cs">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="90">
-          <caret line="6" column="16" selection-start-line="6" selection-start-column="16" selection-end-line="6" selection-end-column="16" />
-          <folding>
-            <marker date="1533828106828" expanded="true" signature="63:196" ph="{...}" />
-            <marker date="1533828106828" expanded="true" signature="101:194" ph="{...}" />
-            <marker date="1533828106828" expanded="true" signature="167:188" ph="{...}" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/jaymvc/Services/TodoService.cs">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="308">
-          <caret line="76" column="9" selection-start-line="76" selection-start-column="9" selection-end-line="76" selection-end-column="9" />
-          <folding>
-            <marker date="1533831244724" expanded="false" signature="6:113" ph="..." />
-            <marker date="1533831244724" expanded="true" signature="140:3505" ph="{...}" />
-            <marker date="1533831244724" expanded="true" signature="176:456" ph="{...}" />
-            <marker date="1533831244724" expanded="true" signature="496:3503" ph="{...}" />
-            <marker date="1533831244724" expanded="true" signature="686:1322" ph="{...}" />
-            <marker date="1533831244724" expanded="true" signature="835:1311" ph="{...}" />
-            <marker date="1533831244724" expanded="true" signature="1358:1439" ph="{...}" />
-            <marker date="1533831244724" expanded="true" signature="1557:2185" ph="{...}" />
-            <marker date="1533831244724" expanded="true" signature="1640:1820" ph="{...}" />
-            <marker date="1533831244724" expanded="true" signature="1837:2175" ph="{...}" />
-            <marker date="1533831244724" expanded="true" signature="1954:2159" ph="{...}" />
-            <marker date="1533831244724" expanded="true" signature="2219:2371" ph="{...}" />
-            <marker date="1533831244724" expanded="true" signature="2280:2335" ph="{...}" />
-            <marker date="1533831244724" expanded="true" signature="2398:2449" ph="{...}" />
-            <marker date="1533831244724" expanded="true" signature="2488:2583" ph="{...}" />
-            <marker date="1533831244724" expanded="true" signature="2653:3497" ph="{...}" />
-            <marker date="1533831244724" expanded="true" signature="3284:3395" ph="{...}" />
           </folding>
         </state>
       </provider>
@@ -1103,6 +945,206 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="90">
           <caret line="6" column="3" selection-start-line="6" selection-start-column="3" selection-end-line="6" selection-end-column="3" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/jaymvc/appsettings.Development.json">
+      <provider selected="true" editor-type-id="text-editor" />
+    </entry>
+    <entry file="file://$PROJECT_DIR$/.idea/.idea.jaymvc/.idea/workspace.xml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-540" />
+      </provider>
+    </entry>
+    <entry file="file://C:/Program Files/dotnet/sdk/2.1.300/Sdks/Microsoft.NET.Sdk/targets/Microsoft.PackageDependencyResolution.targets">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-388">
+          <caret line="197" column="4" selection-start-line="197" selection-start-column="4" selection-end-line="197" selection-end-column="4" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/jaymvc/Controllers/TodoController.cs">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="409">
+          <caret line="50" column="8" selection-start-line="50" selection-start-column="8" selection-end-line="50" selection-end-column="8" />
+          <folding>
+            <marker date="1533830869177" expanded="false" signature="6:188" ph="..." />
+            <marker date="1533830869177" expanded="true" signature="218:2419" ph="{...}" />
+            <marker date="1533830869177" expanded="true" signature="276:2417" ph="{...}" />
+            <marker date="1533830869177" expanded="true" signature="431:491" ph="{...}" />
+            <marker date="1533830869177" expanded="true" signature="557:892" ph="{...}" />
+            <marker date="1533830869177" expanded="true" signature="1049:1786" ph="{...}" />
+            <marker date="1533830869177" expanded="true" signature="1853:1925" ph="{...}" />
+            <marker date="1533830869177" expanded="true" signature="2009:2083" ph="{...}" />
+            <marker date="1533830869177" expanded="true" signature="2159:2231" ph="{...}" />
+            <marker date="1533830869177" expanded="true" signature="2303:2411" ph="{...}" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/F58F0715-195C-43D2-AE82-0C604FB53FE1/96/53760bed/ActionMethodExecutor.cs">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="175">
+          <caret line="81" column="8" selection-start-line="81" selection-start-column="8" selection-end-line="81" selection-end-column="8" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/jaymvc/Models/Home/Todos.cs">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="90">
+          <caret line="6" column="16" selection-start-line="6" selection-start-column="16" selection-end-line="6" selection-end-column="16" />
+          <folding>
+            <marker date="1533828106828" expanded="true" signature="63:196" ph="{...}" />
+            <marker date="1533828106828" expanded="true" signature="101:194" ph="{...}" />
+            <marker date="1533828106828" expanded="true" signature="167:188" ph="{...}" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/jaymvc/Extensions/UrlExtensions.cs">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="165">
+          <caret line="12" column="29" selection-start-line="12" selection-start-column="29" selection-end-line="12" selection-end-column="29" />
+          <folding>
+            <marker date="1533829862303" expanded="false" signature="6:45" ph="..." />
+            <marker date="1533829862303" expanded="true" signature="74:1699" ph="{...}" />
+            <marker date="1533829862303" expanded="true" signature="122:1697" ph="{...}" />
+            <marker date="1533829862303" expanded="true" signature="186:298" ph="{...}" />
+            <marker date="1533829862303" expanded="true" signature="373:483" ph="{...}" />
+            <marker date="1533829862303" expanded="true" signature="570:685" ph="{...}" />
+            <marker date="1533829862303" expanded="true" signature="762:872" ph="{...}" />
+            <marker date="1533829862303" expanded="true" signature="960:1079" ph="{...}" />
+            <marker date="1533829862303" expanded="true" signature="1171:1286" ph="{...}" />
+            <marker date="1533829862303" expanded="true" signature="1387:1507" ph="{...}" />
+            <marker date="1533829862303" expanded="true" signature="1576:1690" ph="{...}" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/jaymvc/Services/TodoService.cs">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-575">
+          <caret line="42" column="12" selection-start-line="42" selection-start-column="12" selection-end-line="42" selection-end-column="12" />
+          <folding>
+            <marker date="1533832458153" expanded="false" signature="6:113" ph="..." />
+            <marker date="1533832458153" expanded="true" signature="140:3694" ph="{...}" />
+            <marker date="1533832458153" expanded="true" signature="176:456" ph="{...}" />
+            <marker date="1533832458153" expanded="true" signature="496:3692" ph="{...}" />
+            <marker date="1533832458153" expanded="true" signature="672:1308" ph="{...}" />
+            <marker date="1533832458153" expanded="true" signature="821:1297" ph="{...}" />
+            <marker date="1533832458153" expanded="true" signature="1344:1425" ph="{...}" />
+            <marker date="1533832458153" expanded="true" signature="1543:2374" ph="{...}" />
+            <marker date="1533832458153" expanded="true" signature="1626:1907" ph="{...}" />
+            <marker date="1533832458153" expanded="true" signature="1924:2364" ph="{...}" />
+            <marker date="1533832458153" expanded="true" signature="2041:2348" ph="{...}" />
+            <marker date="1533832458153" expanded="true" signature="2408:2560" ph="{...}" />
+            <marker date="1533832458153" expanded="true" signature="2469:2524" ph="{...}" />
+            <marker date="1533832458153" expanded="true" signature="2587:2638" ph="{...}" />
+            <marker date="1533832458153" expanded="true" signature="2677:2772" ph="{...}" />
+            <marker date="1533832458153" expanded="true" signature="2842:3686" ph="{...}" />
+            <marker date="1533832458153" expanded="true" signature="3473:3584" ph="{...}" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/jaymvc/wwwroot/js/Views/delete.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="180">
+          <caret line="12" column="46" selection-start-line="12" selection-start-column="32" selection-end-line="12" selection-end-column="46" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/jaymvc/Views/Todo/TodoPartial.cshtml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="406">
+          <caret line="46" column="99" selection-start-line="46" selection-start-column="99" selection-end-line="46" selection-end-column="99" />
+          <folding>
+            <marker date="1533831121755" expanded="true" signature="38:3130" ph="&lt;div.../&gt;" />
+            <marker date="1533831121755" expanded="true" signature="60:550" ph="&lt;div.../&gt;" />
+            <marker date="1533831121755" expanded="true" signature="581:1240" ph="&lt;div.../&gt;" />
+            <marker date="1533831121755" expanded="true" signature="632:1029" ph="@..." />
+            <marker date="1533831121755" expanded="true" signature="688:861" ph="{...}" />
+            <marker date="1533831121755" expanded="true" signature="874:1029" ph="{...}" />
+            <marker date="1533831121755" expanded="true" signature="1245:1920" ph="&lt;div.../&gt;" />
+            <marker date="1533831121755" expanded="true" signature="1296:1703" ph="@..." />
+            <marker date="1533831121755" expanded="true" signature="1354:1531" ph="{...}" />
+            <marker date="1533831121755" expanded="true" signature="1544:1703" ph="{...}" />
+            <marker date="1533831121755" expanded="true" signature="1925:2576" ph="&lt;div.../&gt;" />
+            <marker date="1533831121755" expanded="true" signature="1976:2368" ph="@..." />
+            <marker date="1533831121755" expanded="true" signature="2031:2202" ph="{...}" />
+            <marker date="1533831121755" expanded="true" signature="2215:2368" ph="{...}" />
+            <marker date="1533831121755" expanded="true" signature="2581:2951" ph="&lt;div.../&gt;" />
+            <marker date="1533831121755" expanded="true" signature="2656:2940" ph="&lt;div.../&gt;" />
+            <marker date="1533831121755" expanded="true" signature="2808:2925" ph="&lt;span.../&gt;" />
+            <marker date="1533831121755" expanded="true" signature="2956:3123" ph="&lt;div.../&gt;" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/jaymvc/Views/Home/HomeView.cshtml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="152">
+          <caret line="16" column="60" selection-start-line="16" selection-start-column="60" selection-end-line="16" selection-end-column="60" />
+          <folding>
+            <marker date="1533832579852" expanded="false" signature="7:50" ph="..." />
+            <marker date="1533832579852" expanded="true" signature="63:114" ph="@..." />
+            <marker date="1533832579852" expanded="true" signature="115:385" ph="@{...}" />
+            <marker date="1533832579852" expanded="true" signature="205:383" ph="&lt;script.../&gt;" />
+            <marker date="1533832579852" expanded="true" signature="297:367" ph="{...}" />
+            <marker date="1533832579852" expanded="true" signature="386:659" ph="@{...}" />
+            <marker date="1533832579852" expanded="true" signature="412:657" ph="&lt;div.../&gt;" />
+            <marker date="1533832579852" expanded="true" signature="477:646" ph="&lt;div.../&gt;" />
+            <marker date="1533832579852" expanded="true" signature="662:1249" ph="&lt;div.../&gt;" />
+            <marker date="1533832579852" expanded="true" signature="685:1242" ph="&lt;div.../&gt;" />
+            <marker date="1533832579852" expanded="true" signature="1252:2040" ph="&lt;div.../&gt;" />
+            <marker date="1533832579852" expanded="true" signature="1280:2033" ph="&lt;div.../&gt;" />
+            <marker date="1533832579852" expanded="true" signature="1312:1686" ph="&lt;div.../&gt;" />
+            <marker date="1533832579852" expanded="true" signature="1695:2022" ph="&lt;div.../&gt;" />
+            <marker date="1533832579852" expanded="true" signature="1879:2007" ph="&lt;div.../&gt;" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/jaymvc/Views/Shared/_Layout.cshtml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="376">
+          <caret line="36" column="69" selection-start-line="36" selection-start-column="69" selection-end-line="36" selection-end-column="69" />
+          <folding>
+            <marker date="1533828371533" expanded="true" signature="41:1631" ph="&lt;html.../&gt;" />
+            <marker date="1533828371533" expanded="true" signature="48:454" ph="&lt;head.../&gt;" />
+            <marker date="1533828371533" expanded="true" signature="455:1623" ph="&lt;body.../&gt;" />
+            <marker date="1533828371533" expanded="true" signature="462:1163" ph="&lt;header.../&gt;" />
+            <marker date="1533828371533" expanded="true" signature="475:1153" ph="&lt;nav.../&gt;" />
+            <marker date="1533828371533" expanded="true" signature="613:859" ph="&lt;button.../&gt;" />
+            <marker date="1533828371533" expanded="true" signature="868:1142" ph="&lt;div.../&gt;" />
+            <marker date="1533828371533" expanded="true" signature="935:1127" ph="&lt;ul.../&gt;" />
+            <marker date="1533828371533" expanded="true" signature="1164:1314" ph="&lt;main.../&gt;" />
+            <marker date="1533828371533" expanded="true" signature="1244:1306" ph="&lt;div.../&gt;" />
+            <marker date="1533828371533" expanded="true" signature="1315:1507" ph="&lt;footer.../&gt;" />
+            <marker date="1533828371533" expanded="true" signature="1392:1497" ph="&lt;div.../&gt;" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/jaymvc/Views/Todo/TodosPartial.cshtml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="361">
+          <caret line="36" column="309" selection-start-line="36" selection-start-column="309" selection-end-line="36" selection-end-column="309" />
+          <folding>
+            <marker date="1533832895533" expanded="true" signature="40:1713" ph="&lt;table.../&gt;" />
+            <marker date="1533832895533" expanded="true" signature="80:304" ph="&lt;thead.../&gt;" />
+            <marker date="1533832895533" expanded="true" signature="92:291" ph="&lt;tr.../&gt;" />
+            <marker date="1533832895533" expanded="true" signature="309:1704" ph="&lt;tbody.../&gt;" />
+            <marker date="1533832895533" expanded="true" signature="321:1691" ph="@..." />
+            <marker date="1533832895533" expanded="true" signature="346:1691" ph="{...}" />
+            <marker date="1533832895533" expanded="true" signature="361:1685" ph="&lt;tr.../&gt;" />
+            <marker date="1533832895533" expanded="true" signature="378:675" ph="&lt;td.../&gt;" />
+            <marker date="1533832895533" expanded="true" signature="399:657" ph="&lt;button.../&gt;" />
+            <marker date="1533832895533" expanded="true" signature="944:1243" ph="&lt;td.../&gt;" />
+            <marker date="1533832895533" expanded="true" signature="978:1093" ph="&lt;span.../&gt;" />
+            <marker date="1533832895533" expanded="true" signature="1110:1201" ph="&lt;span.../&gt;" />
+            <marker date="1533832895533" expanded="true" signature="1256:1671" ph="&lt;td.../&gt;" />
+          </folding>
         </state>
       </provider>
     </entry>

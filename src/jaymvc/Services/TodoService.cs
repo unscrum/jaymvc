@@ -19,10 +19,10 @@ namespace jaymvc.Services
     
     class TodoService:ITodoService
     {
-        private static readonly IDictionary<Guid,Todo> _todos;
-        private static readonly IDictionary<Guid, (string first, string last)> _assignees;
+        private readonly IDictionary<Guid,Todo> _todos;
+        private readonly IDictionary<Guid, (string first, string last)> _assignees;
 
-        static TodoService()
+        public TodoService()
         {
             _todos = new Dictionary<Guid, Todo>();
             _assignees = new Dictionary<Guid, (string first, string last)>
@@ -51,6 +51,7 @@ namespace jaymvc.Services
                 it.DueDate = due;
                 it.Text = text;
                 it.AssignedToId = assignedTo;
+                it.AssignedToName = $"{_assignees[assignedTo].first} {_assignees[assignedTo].last}";
             }
             else
             {
@@ -61,7 +62,8 @@ namespace jaymvc.Services
                     DueDate = due,
                     Priority = priority,
                     Text = text,
-                    AssignedToId = assignedTo
+                    AssignedToId = assignedTo,
+                    AssignedToName = $"{_assignees[assignedTo].first} {_assignees[assignedTo].last}"
                 });
             }
         }

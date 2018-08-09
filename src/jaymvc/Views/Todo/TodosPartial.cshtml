@@ -1,5 +1,4 @@
-﻿@using jaymvc.Extensions
-@using jaymvc.Models.Home
+﻿@using jaymvc.Models.Home
 @model Todos
 
 <table class="table table-striped">
@@ -8,6 +7,7 @@
         <th></th>
         <th></th>
         <th class="d-none d-sm-table-cell">Due</th>
+        <th class="d-none d-sm-table-cell">Assignee</th>
         <th>Text</th>
         <th></th>
     </tr>
@@ -23,14 +23,18 @@
             </td>
             <td><span class="btn btn-sm btn-link"><i class="text-@p.PriorityClass fa fa-flag"></i></span></td>
             <td class="d-none d-sm-table-cell">@p.DueDate.ShortDate()</td>
-            <td>
+            <td class="d-none d-sm-table-cell">@p.AssignedToName</td>
+            <td class="w-75">
                 <span class="d-sm-none">
                     @p.DueDate.ShortDate()<br/>                   
                 </span>
+                <span class="d-sm-none">
+                    @p.AssignedToName<br/>
+                </span>
                 @p.Text
             </td>
-            <td class="text-right text-danger">
-                <button class="btn btn-sm btn-link action-delete" data-target="#todos" data-url="@Url.JsonCompleteTodo(p.Id)" title="Complete"><i class="fa fa-check-circle-o"></i> <span class="d-none d-md-inline">Complete</span></button>
+            <td class="text-right">
+                <button class="btn btn-sm btn-link text-danger action-delete" data-message="Are you sure you want to complete this todo?" data-title="Complete todo" data-positive-button="Yes, Complete" data-target="#todos" data-url="@Url.JsonCompleteTodo(p.Id)" title="Complete"><i class="fa fa-check-circle-o"></i> <span class="d-none d-md-inline">Complete</span></button>
             </td>
         </tr>
     }
