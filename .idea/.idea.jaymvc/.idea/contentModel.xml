@@ -78,7 +78,6 @@
               <e p="15-bootstrap.multiselect.css" t="Include" />
               <e p="20-bootstrap.datetimepicker.css" t="Include" />
             </e>
-            <e p="globals.min.css" t="Include" />
           </e>
           <e p="favicon.ico" t="Include" />
           <e p="js" t="Include">

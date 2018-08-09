@@ -12,3 +12,4 @@ Src/**/wwwroot/js/*.js.map
 Src/**/wwwroot/js/*.js
 Src/**/wwwroot/css/*.css
 contentModel.xml
+workspace.xml
