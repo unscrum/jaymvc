@@ -13,12 +13,16 @@
   <ItemGroup>
     <Content Remove="wwwroot\**\Components\*" />
     <Content Remove="wwwroot\**\Globals\*" />
+    <Content Remove="wwwroot\js\globals.js" />
+    <Content Remove="wwwroot\css\globals.css" />
     <Content Remove="bundleconfig.json" />
     <Content Remove="appsettings.Development.json" />
   </ItemGroup>
   <ItemGroup>
     <None Include="wwwroot\**\Components\*" />
     <None Include="wwwroot\**\Globals\*" />
+    <None Include="wwwroot\js\globals.js" />
+    <None Include="wwwroot\css\globals.css" />
     <None Include="bundleconfig.json" />
     <None Include="appsettings.Development.json" />
   </ItemGroup>

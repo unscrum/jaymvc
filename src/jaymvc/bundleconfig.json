@@ -1,6 +1,6 @@
 ﻿[
   {
-    "outputFileName": "wwwroot/css/globals.min.css",
+    "outputFileName": "wwwroot/css/globals.css",
     "inputFiles": [
       "wwwroot/css/Globals/01-bootstrap.css",
       "wwwroot/css/Globals/02-jqueryui.css",
@@ -10,7 +10,7 @@
     ]
   },
   {
-    "outputFileName": "wwwroot/js/globals.min.js",
+    "outputFileName": "wwwroot/js/globals.js",
     "inputFiles": [
       "wwwroot/js/Globals/00-Pre.js",
       "wwwroot/js/Globals/01-jquery.js",
