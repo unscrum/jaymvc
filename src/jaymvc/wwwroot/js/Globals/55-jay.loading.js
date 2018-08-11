@@ -5,7 +5,7 @@
 */
 
 /**
-* This file extends jQuery to show loading icons either inside a contaner or convering one.  Requires font awesome
+* This plugin extends jQuery to show loading icons either inside a container or covering one.  Requires font awesome
 */
 (function ($) {
     $.fn.showContentLoading = function (size, zindex) {

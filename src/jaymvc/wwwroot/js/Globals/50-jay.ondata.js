@@ -17,6 +17,7 @@
 
             }
         },
+        
         /*
         * This method takes an event name (such as totalRecordCount), a selector to execute when that event occurs
         * (such as .data-total-record-count), and finally a callback method to execute when the event is triggered.

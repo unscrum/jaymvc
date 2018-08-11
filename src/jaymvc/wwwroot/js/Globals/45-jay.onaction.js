@@ -6,10 +6,10 @@
 
 
 /*
-* This is the main event handling pattern for these sites. All event handling is processed through event delegation
+* This is the main event handling pattern for the site. All event handling is processed through event delegation
 * with the following pattern. Event handlers are defined but not bound to individual elements (decoupled) by calling
 * $.onAction('someAction', function() { ... }); Elements are then tagged for specific events by adding a css
-* class that starts with action- followed by the action name, so in our example above, the associated action would be
+* class that starts with action- followed by the action name, so in the example above, the associated action would be
 * action-some-action. Multiple action handlers may be registered for a single action. If only one action handler should
 * be registered at a give time, you may setup that action by using $.singleOnAction(...) which will remove any
 * existing action handlers for that action. This is useful if a script is loaded or included multiple times on a page.

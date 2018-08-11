@@ -4,7 +4,7 @@
 * Licensed under MIT (https://github.com/unscrum/jaymvc/LICENSE)
 */
 /*
-* This is the main Ajax handling component for the entire project. It wraps all Ajax calls to and from the server
+* This is the main Ajax handling component for the entire site. It wraps all Ajax calls to and from the server
 * expecting a common envelope format that it unpacks and passes back the enclosed data.
 */
 (function ($, jay) {
