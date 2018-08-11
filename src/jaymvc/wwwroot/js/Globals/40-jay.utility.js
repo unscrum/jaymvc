@@ -1,11 +1,11 @@
 ﻿/*!
- * jquery.utility (https://github.com/unscrum/jaymvc)
+ * jay.utility (https://github.com/unscrum/jaymvc)
  * Copyright 2018 Jay Brummels
  * Licensed under MIT (https://github.com/unscrum/jaymvc/LICENSE)
  */
 
 /**
-* This file contains jQuery utility methods. These are small distinct functions 
+* This file contains jQuery utility methods. These are small distinct functions
 * that are more than likely not tied to the UI.
 */
 (function($) {
@@ -111,6 +111,54 @@
             timeout);
         return this;
     };
+
+    $.fn.selectRange = function (start, end) {
+        var e = this[0];
+        var $this = $(e);
+        if (arguments.length === 0) {
+            start = 0;
+            end = $this.val().length;
+        } else if (arguments.length === 1) {
+            end = start;
+            start = 0;
+        }
+        if (document.activeElement !== e) {
+            $this.focus();
+        }
+        if (e.setSelectionRange) { /* WebKit */
+            setTimeout(function(){
+                e.setSelectionRange(start, end);
+            }, 1);
+        }
+        else if (e.createTextRange) { /* IE */
+            var range = e.createTextRange();
+            range.collapse(true); range.moveEnd('character', end);
+            range.moveStart('character', start);
+            range.select();
+        }
+        else if (e.selectionStart && e.selectionEnd) {
+            e.selectionStart = start;
+            e.selectionEnd = end;
+        }
+        return this;
+    };
+
+    $.fn.selectRangeOnFocus = function () {
+        return this.each(function () {
+            $(this).on('focusin', function () {
+                $(this).selectRange();
+            });
+        });
+
+    };
+
+    $.fn.selectRangeOnFocusDestroy = function () {
+        return this.each(function () {
+            $(this).off('focusin');
+        });
+
+    };
+
 
     // This method connects one dom event to another
     /*
@@ -257,7 +305,7 @@
         }
         return this;
     };
-    
+
     $.fn.filterTextType = function() {
         var ret = [];
         this.each(function () {
@@ -267,9 +315,9 @@
         });
         return $(ret);
     };
-    
+
     $.fn.isEmpty = function () {
         var $t = $(this[0]);
-        return $t.has('*').length === 0 && $t.text().trim().length === 0; 
+        return $t.has('*').length === 0 && $t.text().trim().length === 0;
     };
 })(jQuery);

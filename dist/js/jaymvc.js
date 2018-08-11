@@ -23263,4327 +23263,6 @@ var jay = {
     };
 
 })(jQuery);
-//     Underscore.js 1.8.3
-//     http://underscorejs.org
-//     (c) 2009-2015 Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
-//     Underscore may be freely distributed under the MIT license.
-
-(function () {
-
-    // Baseline setup
-    // --------------
-
-    // Establish the root object, `window` in the browser, or `exports` on the server.
-    var root = this;
-
-    // Save the previous value of the `_` variable.
-    var previousUnderscore = root._;
-
-    // Save bytes in the minified (but not gzipped) version:
-    var ArrayProto = Array.prototype, ObjProto = Object.prototype, FuncProto = Function.prototype;
-
-    // Create quick reference variables for speed access to core prototypes.
-    var
-        push = ArrayProto.push,
-        slice = ArrayProto.slice,
-        toString = ObjProto.toString,
-        hasOwnProperty = ObjProto.hasOwnProperty;
-
-    // All **ECMAScript 5** native function implementations that we hope to use
-    // are declared here.
-    var
-        nativeIsArray = Array.isArray,
-        nativeKeys = Object.keys,
-        nativeBind = FuncProto.bind,
-        nativeCreate = Object.create;
-
-    // Naked function reference for surrogate-prototype-swapping.
-    var Ctor = function () { };
-
-    // Create a safe reference to the Underscore object for use below.
-    var _ = function (obj) {
-        if (obj instanceof _) return obj;
-        if (!(this instanceof _)) return new _(obj);
-        this._wrapped = obj;
-    };
-
-    // Export the Underscore object for **Node.js**, with
-    // backwards-compatibility for the old `require()` API. If we're in
-    // the browser, add `_` as a global object.
-    if (typeof exports !== 'undefined') {
-        if (typeof module !== 'undefined' && module.exports) {
-            exports = module.exports = _;
-        }
-        exports._ = _;
-    } else {
-        root._ = _;
-    }
-
-    // Current version.
-    _.VERSION = '1.8.3';
-
-    // Internal function that returns an efficient (for current engines) version
-    // of the passed-in callback, to be repeatedly applied in other Underscore
-    // functions.
-    var optimizeCb = function (func, context, argCount) {
-        if (context === void 0) return func;
-        switch (argCount == null ? 3 : argCount) {
-        case 1: return function (value) {
-            return func.call(context, value);
-        };
-        case 2: return function (value, other) {
-            return func.call(context, value, other);
-        };
-        case 3: return function (value, index, collection) {
-            return func.call(context, value, index, collection);
-        };
-        case 4: return function (accumulator, value, index, collection) {
-            return func.call(context, accumulator, value, index, collection);
-        };
-        }
-        return function () {
-            return func.apply(context, arguments);
-        };
-    };
-
-    // A mostly-internal function to generate callbacks that can be applied
-    // to each element in a collection, returning the desired result — either
-    // identity, an arbitrary callback, a property matcher, or a property accessor.
-    var cb = function (value, context, argCount) {
-        if (value == null) return _.identity;
-        if (_.isFunction(value)) return optimizeCb(value, context, argCount);
-        if (_.isObject(value)) return _.matcher(value);
-        return _.property(value);
-    };
-    _.iteratee = function (value, context) {
-        return cb(value, context, Infinity);
-    };
-
-    // An internal function for creating assigner functions.
-    var createAssigner = function (keysFunc, undefinedOnly) {
-        return function (obj) {
-            var length = arguments.length;
-            if (length < 2 || obj == null) return obj;
-            for (var index = 1; index < length; index++) {
-                var source = arguments[index],
-                    keys = keysFunc(source),
-                    l = keys.length;
-                for (var i = 0; i < l; i++) {
-                    var key = keys[i];
-                    if (!undefinedOnly || obj[key] === void 0) obj[key] = source[key];
-                }
-            }
-            return obj;
-        };
-    };
-
-    // An internal function for creating a new object that inherits from another.
-    var baseCreate = function (prototype) {
-        if (!_.isObject(prototype)) return {};
-        if (nativeCreate) return nativeCreate(prototype);
-        Ctor.prototype = prototype;
-        var result = new Ctor;
-        Ctor.prototype = null;
-        return result;
-    };
-
-    var property = function (key) {
-        return function (obj) {
-            return obj == null ? void 0 : obj[key];
-        };
-    };
-
-    // Helper for collection methods to determine whether a collection
-    // should be iterated as an array or as an object
-    // Related: http://people.mozilla.org/~jorendorff/es6-draft.html#sec-tolength
-    // Avoids a very nasty iOS 8 JIT bug on ARM-64. #2094
-    var MAX_ARRAY_INDEX = Math.pow(2, 53) - 1;
-    var getLength = property('length');
-    var isArrayLike = function (collection) {
-        var length = getLength(collection);
-        return typeof length == 'number' && length >= 0 && length <= MAX_ARRAY_INDEX;
-    };
-
-    // Collection Functions
-    // --------------------
-
-    // The cornerstone, an `each` implementation, aka `forEach`.
-    // Handles raw objects in addition to array-likes. Treats all
-    // sparse array-likes as if they were dense.
-    _.each = _.forEach = function (obj, iteratee, context) {
-        iteratee = optimizeCb(iteratee, context);
-        var i, length;
-        if (isArrayLike(obj)) {
-            for (i = 0, length = obj.length; i < length; i++) {
-                iteratee(obj[i], i, obj);
-            }
-        } else {
-            var keys = _.keys(obj);
-            for (i = 0, length = keys.length; i < length; i++) {
-                iteratee(obj[keys[i]], keys[i], obj);
-            }
-        }
-        return obj;
-    };
-
-    // Return the results of applying the iteratee to each element.
-    _.map = _.collect = function (obj, iteratee, context) {
-        iteratee = cb(iteratee, context);
-        var keys = !isArrayLike(obj) && _.keys(obj),
-            length = (keys || obj).length,
-            results = Array(length);
-        for (var index = 0; index < length; index++) {
-            var currentKey = keys ? keys[index] : index;
-            results[index] = iteratee(obj[currentKey], currentKey, obj);
-        }
-        return results;
-    };
-
-    // Create a reducing function iterating left or right.
-    function createReduce(dir) {
-        // Optimized iterator function as using arguments.length
-        // in the main function will deoptimize the, see #1991.
-        function iterator(obj, iteratee, memo, keys, index, length) {
-            for (; index >= 0 && index < length; index += dir) {
-                var currentKey = keys ? keys[index] : index;
-                memo = iteratee(memo, obj[currentKey], currentKey, obj);
-            }
-            return memo;
-        }
-
-        return function (obj, iteratee, memo, context) {
-            iteratee = optimizeCb(iteratee, context, 4);
-            var keys = !isArrayLike(obj) && _.keys(obj),
-                length = (keys || obj).length,
-                index = dir > 0 ? 0 : length - 1;
-            // Determine the initial value if none is provided.
-            if (arguments.length < 3) {
-                memo = obj[keys ? keys[index] : index];
-                index += dir;
-            }
-            return iterator(obj, iteratee, memo, keys, index, length);
-        };
-    }
-
-    // **Reduce** builds up a single result from a list of values, aka `inject`,
-    // or `foldl`.
-    _.reduce = _.foldl = _.inject = createReduce(1);
-
-    // The right-associative version of reduce, also known as `foldr`.
-    _.reduceRight = _.foldr = createReduce(-1);
-
-    // Return the first value which passes a truth test. Aliased as `detect`.
-    _.find = _.detect = function (obj, predicate, context) {
-        var key;
-        if (isArrayLike(obj)) {
-            key = _.findIndex(obj, predicate, context);
-        } else {
-            key = _.findKey(obj, predicate, context);
-        }
-        if (key !== void 0 && key !== -1) return obj[key];
-    };
-
-    // Return all the elements that pass a truth test.
-    // Aliased as `select`.
-    _.filter = _.select = function (obj, predicate, context) {
-        var results = [];
-        predicate = cb(predicate, context);
-        _.each(obj, function (value, index, list) {
-            if (predicate(value, index, list)) results.push(value);
-        });
-        return results;
-    };
-
-    // Return all the elements for which a truth test fails.
-    _.reject = function (obj, predicate, context) {
-        return _.filter(obj, _.negate(cb(predicate)), context);
-    };
-
-    // Determine whether all of the elements match a truth test.
-    // Aliased as `all`.
-    _.every = _.all = function (obj, predicate, context) {
-        predicate = cb(predicate, context);
-        var keys = !isArrayLike(obj) && _.keys(obj),
-            length = (keys || obj).length;
-        for (var index = 0; index < length; index++) {
-            var currentKey = keys ? keys[index] : index;
-            if (!predicate(obj[currentKey], currentKey, obj)) return false;
-        }
-        return true;
-    };
-
-    // Determine if at least one element in the object matches a truth test.
-    // Aliased as `any`.
-    _.some = _.any = function (obj, predicate, context) {
-        predicate = cb(predicate, context);
-        var keys = !isArrayLike(obj) && _.keys(obj),
-            length = (keys || obj).length;
-        for (var index = 0; index < length; index++) {
-            var currentKey = keys ? keys[index] : index;
-            if (predicate(obj[currentKey], currentKey, obj)) return true;
-        }
-        return false;
-    };
-
-    // Determine if the array or object contains a given item (using `===`).
-    // Aliased as `includes` and `include`.
-    _.contains = _.includes = _.include = function (obj, item, fromIndex, guard) {
-        if (!isArrayLike(obj)) obj = _.values(obj);
-        if (typeof fromIndex != 'number' || guard) fromIndex = 0;
-        return _.indexOf(obj, item, fromIndex) >= 0;
-    };
-
-    // Invoke a method (with arguments) on every item in a collection.
-    _.invoke = function (obj, method) {
-        var args = slice.call(arguments, 2);
-        var isFunc = _.isFunction(method);
-        return _.map(obj, function (value) {
-            var func = isFunc ? method : value[method];
-            return func == null ? func : func.apply(value, args);
-        });
-    };
-
-    // Convenience version of a common use case of `map`: fetching a property.
-    _.pluck = function (obj, key) {
-        return _.map(obj, _.property(key));
-    };
-
-    // Convenience version of a common use case of `filter`: selecting only objects
-    // containing specific `key:value` pairs.
-    _.where = function (obj, attrs) {
-        return _.filter(obj, _.matcher(attrs));
-    };
-
-    // Convenience version of a common use case of `find`: getting the first object
-    // containing specific `key:value` pairs.
-    _.findWhere = function (obj, attrs) {
-        return _.find(obj, _.matcher(attrs));
-    };
-
-    // Return the maximum element (or element-based computation).
-    _.max = function (obj, iteratee, context) {
-        var result = -Infinity, lastComputed = -Infinity,
-            value, computed;
-        if (iteratee == null && obj != null) {
-            obj = isArrayLike(obj) ? obj : _.values(obj);
-            for (var i = 0, length = obj.length; i < length; i++) {
-                value = obj[i];
-                if (value > result) {
-                    result = value;
-                }
-            }
-        } else {
-            iteratee = cb(iteratee, context);
-            _.each(obj, function (value, index, list) {
-                computed = iteratee(value, index, list);
-                if (computed > lastComputed || computed === -Infinity && result === -Infinity) {
-                    result = value;
-                    lastComputed = computed;
-                }
-            });
-        }
-        return result;
-    };
-
-    // Return the minimum element (or element-based computation).
-    _.min = function (obj, iteratee, context) {
-        var result = Infinity, lastComputed = Infinity,
-            value, computed;
-        if (iteratee == null && obj != null) {
-            obj = isArrayLike(obj) ? obj : _.values(obj);
-            for (var i = 0, length = obj.length; i < length; i++) {
-                value = obj[i];
-                if (value < result) {
-                    result = value;
-                }
-            }
-        } else {
-            iteratee = cb(iteratee, context);
-            _.each(obj, function (value, index, list) {
-                computed = iteratee(value, index, list);
-                if (computed < lastComputed || computed === Infinity && result === Infinity) {
-                    result = value;
-                    lastComputed = computed;
-                }
-            });
-        }
-        return result;
-    };
-
-    // Shuffle a collection, using the modern version of the
-    // [Fisher-Yates shuffle](http://en.wikipedia.org/wiki/Fisher–Yates_shuffle).
-    _.shuffle = function (obj) {
-        var set = isArrayLike(obj) ? obj : _.values(obj);
-        var length = set.length;
-        var shuffled = Array(length);
-        for (var index = 0, rand; index < length; index++) {
-            rand = _.random(0, index);
-            if (rand !== index) shuffled[index] = shuffled[rand];
-            shuffled[rand] = set[index];
-        }
-        return shuffled;
-    };
-
-    // Sample **n** random values from a collection.
-    // If **n** is not specified, returns a single random element.
-    // The internal `guard` argument allows it to work with `map`.
-    _.sample = function (obj, n, guard) {
-        if (n == null || guard) {
-            if (!isArrayLike(obj)) obj = _.values(obj);
-            return obj[_.random(obj.length - 1)];
-        }
-        return _.shuffle(obj).slice(0, Math.max(0, n));
-    };
-
-    // Sort the object's values by a criterion produced by an iteratee.
-    _.sortBy = function (obj, iteratee, context) {
-        iteratee = cb(iteratee, context);
-        return _.pluck(_.map(obj, function (value, index, list) {
-            return {
-                value: value,
-                index: index,
-                criteria: iteratee(value, index, list)
-            };
-        }).sort(function (left, right) {
-            var a = left.criteria;
-            var b = right.criteria;
-            if (a !== b) {
-                if (a > b || a === void 0) return 1;
-                if (a < b || b === void 0) return -1;
-            }
-            return left.index - right.index;
-        }), 'value');
-    };
-
-    // An internal function used for aggregate "group by" operations.
-    var group = function (behavior) {
-        return function (obj, iteratee, context) {
-            var result = {};
-            iteratee = cb(iteratee, context);
-            _.each(obj, function (value, index) {
-                var key = iteratee(value, index, obj);
-                behavior(result, value, key);
-            });
-            return result;
-        };
-    };
-
-    // Groups the object's values by a criterion. Pass either a string attribute
-    // to group by, or a function that returns the criterion.
-    _.groupBy = group(function (result, value, key) {
-        if (_.has(result, key)) result[key].push(value); else result[key] = [value];
-    });
-
-    // Indexes the object's values by a criterion, similar to `groupBy`, but for
-    // when you know that your index values will be unique.
-    _.indexBy = group(function (result, value, key) {
-        result[key] = value;
-    });
-
-    // Counts instances of an object that group by a certain criterion. Pass
-    // either a string attribute to count by, or a function that returns the
-    // criterion.
-    _.countBy = group(function (result, value, key) {
-        if (_.has(result, key)) result[key]++; else result[key] = 1;
-    });
-
-    // Safely create a real, live array from anything iterable.
-    _.toArray = function (obj) {
-        if (!obj) return [];
-        if (_.isArray(obj)) return slice.call(obj);
-        if (isArrayLike(obj)) return _.map(obj, _.identity);
-        return _.values(obj);
-    };
-
-    // Return the number of elements in an object.
-    _.size = function (obj) {
-        if (obj == null) return 0;
-        return isArrayLike(obj) ? obj.length : _.keys(obj).length;
-    };
-
-    // Split a collection into two arrays: one whose elements all satisfy the given
-    // predicate, and one whose elements all do not satisfy the predicate.
-    _.partition = function (obj, predicate, context) {
-        predicate = cb(predicate, context);
-        var pass = [], fail = [];
-        _.each(obj, function (value, key, obj) {
-            (predicate(value, key, obj) ? pass : fail).push(value);
-        });
-        return [pass, fail];
-    };
-
-    // Array Functions
-    // ---------------
-
-    // Get the first element of an array. Passing **n** will return the first N
-    // values in the array. Aliased as `head` and `take`. The **guard** check
-    // allows it to work with `_.map`.
-    _.first = _.head = _.take = function (array, n, guard) {
-        if (array == null) return void 0;
-        if (n == null || guard) return array[0];
-        return _.initial(array, array.length - n);
-    };
-
-    // Returns everything but the last entry of the array. Especially useful on
-    // the arguments object. Passing **n** will return all the values in
-    // the array, excluding the last N.
-    _.initial = function (array, n, guard) {
-        return slice.call(array, 0, Math.max(0, array.length - (n == null || guard ? 1 : n)));
-    };
-
-    // Get the last element of an array. Passing **n** will return the last N
-    // values in the array.
-    _.last = function (array, n, guard) {
-        if (array == null) return void 0;
-        if (n == null || guard) return array[array.length - 1];
-        return _.rest(array, Math.max(0, array.length - n));
-    };
-
-    // Returns everything but the first entry of the array. Aliased as `tail` and `drop`.
-    // Especially useful on the arguments object. Passing an **n** will return
-    // the rest N values in the array.
-    _.rest = _.tail = _.drop = function (array, n, guard) {
-        return slice.call(array, n == null || guard ? 1 : n);
-    };
-
-    // Trim out all falsy values from an array.
-    _.compact = function (array) {
-        return _.filter(array, _.identity);
-    };
-
-    // Internal implementation of a recursive `flatten` function.
-    var flatten = function (input, shallow, strict, startIndex) {
-        var output = [], idx = 0;
-        for (var i = startIndex || 0, length = getLength(input) ; i < length; i++) {
-            var value = input[i];
-            if (isArrayLike(value) && (_.isArray(value) || _.isArguments(value))) {
-                //flatten current level of array or arguments object
-                if (!shallow) value = flatten(value, shallow, strict);
-                var j = 0, len = value.length;
-                output.length += len;
-                while (j < len) {
-                    output[idx++] = value[j++];
-                }
-            } else if (!strict) {
-                output[idx++] = value;
-            }
-        }
-        return output;
-    };
-
-    // Flatten out an array, either recursively (by default), or just one level.
-    _.flatten = function (array, shallow) {
-        return flatten(array, shallow, false);
-    };
-
-    // Return a version of the array that does not contain the specified value(s).
-    _.without = function (array) {
-        return _.difference(array, slice.call(arguments, 1));
-    };
-
-    // Produce a duplicate-free version of the array. If the array has already
-    // been sorted, you have the option of using a faster algorithm.
-    // Aliased as `unique`.
-    _.uniq = _.unique = function (array, isSorted, iteratee, context) {
-        if (!_.isBoolean(isSorted)) {
-            context = iteratee;
-            iteratee = isSorted;
-            isSorted = false;
-        }
-        if (iteratee != null) iteratee = cb(iteratee, context);
-        var result = [];
-        var seen = [];
-        for (var i = 0, length = getLength(array) ; i < length; i++) {
-            var value = array[i],
-                computed = iteratee ? iteratee(value, i, array) : value;
-            if (isSorted) {
-                if (!i || seen !== computed) result.push(value);
-                seen = computed;
-            } else if (iteratee) {
-                if (!_.contains(seen, computed)) {
-                    seen.push(computed);
-                    result.push(value);
-                }
-            } else if (!_.contains(result, value)) {
-                result.push(value);
-            }
-        }
-        return result;
-    };
-
-    // Produce an array that contains the union: each distinct element from all of
-    // the passed-in arrays.
-    _.union = function () {
-        return _.uniq(flatten(arguments, true, true));
-    };
-
-    // Produce an array that contains every item shared between all the
-    // passed-in arrays.
-    _.intersection = function (array) {
-        var result = [];
-        var argsLength = arguments.length;
-        for (var i = 0, length = getLength(array) ; i < length; i++) {
-            var item = array[i];
-            if (_.contains(result, item)) continue;
-            for (var j = 1; j < argsLength; j++) {
-                if (!_.contains(arguments[j], item)) break;
-            }
-            if (j === argsLength) result.push(item);
-        }
-        return result;
-    };
-
-    // Take the difference between one array and a number of other arrays.
-    // Only the elements present in just the first array will remain.
-    _.difference = function (array) {
-        var rest = flatten(arguments, true, true, 1);
-        return _.filter(array, function (value) {
-            return !_.contains(rest, value);
-        });
-    };
-
-    // Zip together multiple lists into a single array -- elements that share
-    // an index go together.
-    _.zip = function () {
-        return _.unzip(arguments);
-    };
-
-    // Complement of _.zip. Unzip accepts an array of arrays and groups
-    // each array's elements on shared indices
-    _.unzip = function (array) {
-        var length = array && _.max(array, getLength).length || 0;
-        var result = Array(length);
-
-        for (var index = 0; index < length; index++) {
-            result[index] = _.pluck(array, index);
-        }
-        return result;
-    };
-
-    // Converts lists into objects. Pass either a single array of `[key, value]`
-    // pairs, or two parallel arrays of the same length -- one of keys, and one of
-    // the corresponding values.
-    _.object = function (list, values) {
-        var result = {};
-        for (var i = 0, length = getLength(list) ; i < length; i++) {
-            if (values) {
-                result[list[i]] = values[i];
-            } else {
-                result[list[i][0]] = list[i][1];
-            }
-        }
-        return result;
-    };
-
-    // Generator function to create the findIndex and findLastIndex functions
-    function createPredicateIndexFinder(dir) {
-        return function (array, predicate, context) {
-            predicate = cb(predicate, context);
-            var length = getLength(array);
-            var index = dir > 0 ? 0 : length - 1;
-            for (; index >= 0 && index < length; index += dir) {
-                if (predicate(array[index], index, array)) return index;
-            }
-            return -1;
-        };
-    }
-
-    // Returns the first index on an array-like that passes a predicate test
-    _.findIndex = createPredicateIndexFinder(1);
-    _.findLastIndex = createPredicateIndexFinder(-1);
-
-    // Use a comparator function to figure out the smallest index at which
-    // an object should be inserted so as to maintain order. Uses binary search.
-    _.sortedIndex = function (array, obj, iteratee, context) {
-        iteratee = cb(iteratee, context, 1);
-        var value = iteratee(obj);
-        var low = 0, high = getLength(array);
-        while (low < high) {
-            var mid = Math.floor((low + high) / 2);
-            if (iteratee(array[mid]) < value) low = mid + 1; else high = mid;
-        }
-        return low;
-    };
-
-    // Generator function to create the indexOf and lastIndexOf functions
-    function createIndexFinder(dir, predicateFind, sortedIndex) {
-        return function (array, item, idx) {
-            var i = 0, length = getLength(array);
-            if (typeof idx == 'number') {
-                if (dir > 0) {
-                    i = idx >= 0 ? idx : Math.max(idx + length, i);
-                } else {
-                    length = idx >= 0 ? Math.min(idx + 1, length) : idx + length + 1;
-                }
-            } else if (sortedIndex && idx && length) {
-                idx = sortedIndex(array, item);
-                return array[idx] === item ? idx : -1;
-            }
-            if (item !== item) {
-                idx = predicateFind(slice.call(array, i, length), _.isNaN);
-                return idx >= 0 ? idx + i : -1;
-            }
-            for (idx = dir > 0 ? i : length - 1; idx >= 0 && idx < length; idx += dir) {
-                if (array[idx] === item) return idx;
-            }
-            return -1;
-        };
-    }
-
-    // Return the position of the first occurrence of an item in an array,
-    // or -1 if the item is not included in the array.
-    // If the array is large and already in sort order, pass `true`
-    // for **isSorted** to use binary search.
-    _.indexOf = createIndexFinder(1, _.findIndex, _.sortedIndex);
-    _.lastIndexOf = createIndexFinder(-1, _.findLastIndex);
-
-    // Generate an integer Array containing an arithmetic progression. A port of
-    // the native Python `range()` function. See
-    // [the Python documentation](http://docs.python.org/library/functions.html#range).
-    _.range = function (start, stop, step) {
-        if (stop == null) {
-            stop = start || 0;
-            start = 0;
-        }
-        step = step || 1;
-
-        var length = Math.max(Math.ceil((stop - start) / step), 0);
-        var range = Array(length);
-
-        for (var idx = 0; idx < length; idx++, start += step) {
-            range[idx] = start;
-        }
-
-        return range;
-    };
-
-    // Function (ahem) Functions
-    // ------------------
-
-    // Determines whether to execute a function as a constructor
-    // or a normal function with the provided arguments
-    var executeBound = function (sourceFunc, boundFunc, context, callingContext, args) {
-        if (!(callingContext instanceof boundFunc)) return sourceFunc.apply(context, args);
-        var self = baseCreate(sourceFunc.prototype);
-        var result = sourceFunc.apply(self, args);
-        if (_.isObject(result)) return result;
-        return self;
-    };
-
-    // Create a function bound to a given object (assigning `this`, and arguments,
-    // optionally). Delegates to **ECMAScript 5**'s native `Function.bind` if
-    // available.
-    _.bind = function (func, context) {
-        if (nativeBind && func.bind === nativeBind) return nativeBind.apply(func, slice.call(arguments, 1));
-        if (!_.isFunction(func)) throw new TypeError('Bind must be called on a function');
-        var args = slice.call(arguments, 2);
-        var bound = function () {
-            return executeBound(func, bound, context, this, args.concat(slice.call(arguments)));
-        };
-        return bound;
-    };
-
-    // Partially apply a function by creating a version that has had some of its
-    // arguments pre-filled, without changing its dynamic `this` context. _ acts
-    // as a placeholder, allowing any combination of arguments to be pre-filled.
-    _.partial = function (func) {
-        var boundArgs = slice.call(arguments, 1);
-        var bound = function () {
-            var position = 0, length = boundArgs.length;
-            var args = Array(length);
-            for (var i = 0; i < length; i++) {
-                args[i] = boundArgs[i] === _ ? arguments[position++] : boundArgs[i];
-            }
-            while (position < arguments.length) args.push(arguments[position++]);
-            return executeBound(func, bound, this, this, args);
-        };
-        return bound;
-    };
-
-    // Bind a number of an object's methods to that object. Remaining arguments
-    // are the method names to be bound. Useful for ensuring that all callbacks
-    // defined on an object belong to it.
-    _.bindAll = function (obj) {
-        var i, length = arguments.length, key;
-        if (length <= 1) throw new Error('bindAll must be passed function names');
-        for (i = 1; i < length; i++) {
-            key = arguments[i];
-            obj[key] = _.bind(obj[key], obj);
-        }
-        return obj;
-    };
-
-    // Memoize an expensive function by storing its results.
-    _.memoize = function (func, hasher) {
-        var memoize = function (key) {
-            var cache = memoize.cache;
-            var address = '' + (hasher ? hasher.apply(this, arguments) : key);
-            if (!_.has(cache, address)) cache[address] = func.apply(this, arguments);
-            return cache[address];
-        };
-        memoize.cache = {};
-        return memoize;
-    };
-
-    // Delays a function for the given number of milliseconds, and then calls
-    // it with the arguments supplied.
-    _.delay = function (func, wait) {
-        var args = slice.call(arguments, 2);
-        return setTimeout(function () {
-            return func.apply(null, args);
-        }, wait);
-    };
-
-    // Defers a function, scheduling it to run after the current call stack has
-    // cleared.
-    _.defer = _.partial(_.delay, _, 1);
-
-    // Returns a function, that, when invoked, will only be triggered at most once
-    // during a given window of time. Normally, the throttled function will run
-    // as much as it can, without ever going more than once per `wait` duration;
-    // but if you'd like to disable the execution on the leading edge, pass
-    // `{leading: false}`. To disable execution on the trailing edge, ditto.
-    _.throttle = function (func, wait, options) {
-        var context, args, result;
-        var timeout = null;
-        var previous = 0;
-        if (!options) options = {};
-        var later = function () {
-            previous = options.leading === false ? 0 : _.now();
-            timeout = null;
-            result = func.apply(context, args);
-            if (!timeout) context = args = null;
-        };
-        return function () {
-            var now = _.now();
-            if (!previous && options.leading === false) previous = now;
-            var remaining = wait - (now - previous);
-            context = this;
-            args = arguments;
-            if (remaining <= 0 || remaining > wait) {
-                if (timeout) {
-                    clearTimeout(timeout);
-                    timeout = null;
-                }
-                previous = now;
-                result = func.apply(context, args);
-                if (!timeout) context = args = null;
-            } else if (!timeout && options.trailing !== false) {
-                timeout = setTimeout(later, remaining);
-            }
-            return result;
-        };
-    };
-
-    // Returns a function, that, as long as it continues to be invoked, will not
-    // be triggered. The function will be called after it stops being called for
-    // N milliseconds. If `immediate` is passed, trigger the function on the
-    // leading edge, instead of the trailing.
-    _.debounce = function (func, wait, immediate) {
-        var timeout, args, context, timestamp, result;
-
-        var later = function () {
-            var last = _.now() - timestamp;
-
-            if (last < wait && last >= 0) {
-                timeout = setTimeout(later, wait - last);
-            } else {
-                timeout = null;
-                if (!immediate) {
-                    result = func.apply(context, args);
-                    if (!timeout) context = args = null;
-                }
-            }
-        };
-
-        return function () {
-            context = this;
-            args = arguments;
-            timestamp = _.now();
-            var callNow = immediate && !timeout;
-            if (!timeout) timeout = setTimeout(later, wait);
-            if (callNow) {
-                result = func.apply(context, args);
-                context = args = null;
-            }
-
-            return result;
-        };
-    };
-
-    // Returns the first function passed as an argument to the second,
-    // allowing you to adjust arguments, run code before and after, and
-    // conditionally execute the original function.
-    _.wrap = function (func, wrapper) {
-        return _.partial(wrapper, func);
-    };
-
-    // Returns a negated version of the passed-in predicate.
-    _.negate = function (predicate) {
-        return function () {
-            return !predicate.apply(this, arguments);
-        };
-    };
-
-    // Returns a function that is the composition of a list of functions, each
-    // consuming the return value of the function that follows.
-    _.compose = function () {
-        var args = arguments;
-        var start = args.length - 1;
-        return function () {
-            var i = start;
-            var result = args[start].apply(this, arguments);
-            while (i--) result = args[i].call(this, result);
-            return result;
-        };
-    };
-
-    // Returns a function that will only be executed on and after the Nth call.
-    _.after = function (times, func) {
-        return function () {
-            if (--times < 1) {
-                return func.apply(this, arguments);
-            }
-        };
-    };
-
-    // Returns a function that will only be executed up to (but not including) the Nth call.
-    _.before = function (times, func) {
-        var memo;
-        return function () {
-            if (--times > 0) {
-                memo = func.apply(this, arguments);
-            }
-            if (times <= 1) func = null;
-            return memo;
-        };
-    };
-
-    // Returns a function that will be executed at most one time, no matter how
-    // often you call it. Useful for lazy initialization.
-    _.once = _.partial(_.before, 2);
-
-    // Object Functions
-    // ----------------
-
-    // Keys in IE < 9 that won't be iterated by `for key in ...` and thus missed.
-    var hasEnumBug = !{ toString: null }.propertyIsEnumerable('toString');
-    var nonEnumerableProps = ['valueOf', 'isPrototypeOf', 'toString',
-        'propertyIsEnumerable', 'hasOwnProperty', 'toLocaleString'];
-
-    function collectNonEnumProps(obj, keys) {
-        var nonEnumIdx = nonEnumerableProps.length;
-        var constructor = obj.constructor;
-        var proto = (_.isFunction(constructor) && constructor.prototype) || ObjProto;
-
-        // Constructor is a special case.
-        var prop = 'constructor';
-        if (_.has(obj, prop) && !_.contains(keys, prop)) keys.push(prop);
-
-        while (nonEnumIdx--) {
-            prop = nonEnumerableProps[nonEnumIdx];
-            if (prop in obj && obj[prop] !== proto[prop] && !_.contains(keys, prop)) {
-                keys.push(prop);
-            }
-        }
-    }
-
-    // Retrieve the names of an object's own properties.
-    // Delegates to **ECMAScript 5**'s native `Object.keys`
-    _.keys = function (obj) {
-        if (!_.isObject(obj)) return [];
-        if (nativeKeys) return nativeKeys(obj);
-        var keys = [];
-        for (var key in obj) if (_.has(obj, key)) keys.push(key);
-        // Ahem, IE < 9.
-        if (hasEnumBug) collectNonEnumProps(obj, keys);
-        return keys;
-    };
-
-    // Retrieve all the property names of an object.
-    _.allKeys = function (obj) {
-        if (!_.isObject(obj)) return [];
-        var keys = [];
-        for (var key in obj) keys.push(key);
-        // Ahem, IE < 9.
-        if (hasEnumBug) collectNonEnumProps(obj, keys);
-        return keys;
-    };
-
-    // Retrieve the values of an object's properties.
-    _.values = function (obj) {
-        var keys = _.keys(obj);
-        var length = keys.length;
-        var values = Array(length);
-        for (var i = 0; i < length; i++) {
-            values[i] = obj[keys[i]];
-        }
-        return values;
-    };
-
-    // Returns the results of applying the iteratee to each element of the object
-    // In contrast to _.map it returns an object
-    _.mapObject = function (obj, iteratee, context) {
-        iteratee = cb(iteratee, context);
-        var keys = _.keys(obj),
-            length = keys.length,
-            results = {},
-            currentKey;
-        for (var index = 0; index < length; index++) {
-            currentKey = keys[index];
-            results[currentKey] = iteratee(obj[currentKey], currentKey, obj);
-        }
-        return results;
-    };
-
-    // Convert an object into a list of `[key, value]` pairs.
-    _.pairs = function (obj) {
-        var keys = _.keys(obj);
-        var length = keys.length;
-        var pairs = Array(length);
-        for (var i = 0; i < length; i++) {
-            pairs[i] = [keys[i], obj[keys[i]]];
-        }
-        return pairs;
-    };
-
-    // Invert the keys and values of an object. The values must be serializable.
-    _.invert = function (obj) {
-        var result = {};
-        var keys = _.keys(obj);
-        for (var i = 0, length = keys.length; i < length; i++) {
-            result[obj[keys[i]]] = keys[i];
-        }
-        return result;
-    };
-
-    // Return a sorted list of the function names available on the object.
-    // Aliased as `methods`
-    _.functions = _.methods = function (obj) {
-        var names = [];
-        for (var key in obj) {
-            if (_.isFunction(obj[key])) names.push(key);
-        }
-        return names.sort();
-    };
-
-    // Extend a given object with all the properties in passed-in object(s).
-    _.extend = createAssigner(_.allKeys);
-
-    // Assigns a given object with all the own properties in the passed-in object(s)
-    // (https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object/assign)
-    _.extendOwn = _.assign = createAssigner(_.keys);
-
-    // Returns the first key on an object that passes a predicate test
-    _.findKey = function (obj, predicate, context) {
-        predicate = cb(predicate, context);
-        var keys = _.keys(obj), key;
-        for (var i = 0, length = keys.length; i < length; i++) {
-            key = keys[i];
-            if (predicate(obj[key], key, obj)) return key;
-        }
-    };
-
-    // Return a copy of the object only containing the whitelisted properties.
-    _.pick = function (object, oiteratee, context) {
-        var result = {}, obj = object, iteratee, keys;
-        if (obj == null) return result;
-        if (_.isFunction(oiteratee)) {
-            keys = _.allKeys(obj);
-            iteratee = optimizeCb(oiteratee, context);
-        } else {
-            keys = flatten(arguments, false, false, 1);
-            iteratee = function (value, key, obj) { return key in obj; };
-            obj = Object(obj);
-        }
-        for (var i = 0, length = keys.length; i < length; i++) {
-            var key = keys[i];
-            var value = obj[key];
-            if (iteratee(value, key, obj)) result[key] = value;
-        }
-        return result;
-    };
-
-    // Return a copy of the object without the blacklisted properties.
-    _.omit = function (obj, iteratee, context) {
-        if (_.isFunction(iteratee)) {
-            iteratee = _.negate(iteratee);
-        } else {
-            var keys = _.map(flatten(arguments, false, false, 1), String);
-            iteratee = function (value, key) {
-                return !_.contains(keys, key);
-            };
-        }
-        return _.pick(obj, iteratee, context);
-    };
-
-    // Fill in a given object with default properties.
-    _.defaults = createAssigner(_.allKeys, true);
-
-    // Creates an object that inherits from the given prototype object.
-    // If additional properties are provided then they will be added to the
-    // created object.
-    _.create = function (prototype, props) {
-        var result = baseCreate(prototype);
-        if (props) _.extendOwn(result, props);
-        return result;
-    };
-
-    // Create a (shallow-cloned) duplicate of an object.
-    _.clone = function (obj) {
-        if (!_.isObject(obj)) return obj;
-        return _.isArray(obj) ? obj.slice() : _.extend({}, obj);
-    };
-
-    // Invokes interceptor with the obj, and then returns obj.
-    // The primary purpose of this method is to "tap into" a method chain, in
-    // order to perform operations on intermediate results within the chain.
-    _.tap = function (obj, interceptor) {
-        interceptor(obj);
-        return obj;
-    };
-
-    // Returns whether an object has a given set of `key:value` pairs.
-    _.isMatch = function (object, attrs) {
-        var keys = _.keys(attrs), length = keys.length;
-        if (object == null) return !length;
-        var obj = Object(object);
-        for (var i = 0; i < length; i++) {
-            var key = keys[i];
-            if (attrs[key] !== obj[key] || !(key in obj)) return false;
-        }
-        return true;
-    };
-
-
-    // Internal recursive comparison function for `isEqual`.
-    var eq = function (a, b, aStack, bStack) {
-        // Identical objects are equal. `0 === -0`, but they aren't identical.
-        // See the [Harmony `egal` proposal](http://wiki.ecmascript.org/doku.php?id=harmony:egal).
-        if (a === b) return a !== 0 || 1 / a === 1 / b;
-        // A strict comparison is necessary because `null == undefined`.
-        if (a == null || b == null) return a === b;
-        // Unwrap any wrapped objects.
-        if (a instanceof _) a = a._wrapped;
-        if (b instanceof _) b = b._wrapped;
-        // Compare `[[Class]]` names.
-        var className = toString.call(a);
-        if (className !== toString.call(b)) return false;
-        switch (className) {
-            // Strings, numbers, regular expressions, dates, and booleans are compared by value.
-        case '[object RegExp]':
-        // RegExps are coerced to strings for comparison (Note: '' + /a/i === '/a/i')
-        case '[object String]':
-            // Primitives and their corresponding object wrappers are equivalent; thus, `"5"` is
-            // equivalent to `new String("5")`.
-            return '' + a === '' + b;
-        case '[object Number]':
-            // `NaN`s are equivalent, but non-reflexive.
-            // Object(NaN) is equivalent to NaN
-            if (+a !== +a) return +b !== +b;
-            // An `egal` comparison is performed for other numeric values.
-            return +a === 0 ? 1 / +a === 1 / b : +a === +b;
-        case '[object Date]':
-        case '[object Boolean]':
-            // Coerce dates and booleans to numeric primitive values. Dates are compared by their
-            // millisecond representations. Note that invalid dates with millisecond representations
-            // of `NaN` are not equivalent.
-            return +a === +b;
-        }
-
-        var areArrays = className === '[object Array]';
-        if (!areArrays) {
-            if (typeof a != 'object' || typeof b != 'object') return false;
-
-            // Objects with different constructors are not equivalent, but `Object`s or `Array`s
-            // from different frames are.
-            var aCtor = a.constructor, bCtor = b.constructor;
-            if (aCtor !== bCtor && !(_.isFunction(aCtor) && aCtor instanceof aCtor &&
-                    _.isFunction(bCtor) && bCtor instanceof bCtor)
-                && ('constructor' in a && 'constructor' in b)) {
-                return false;
-            }
-        }
-        // Assume equality for cyclic structures. The algorithm for detecting cyclic
-        // structures is adapted from ES 5.1 section 15.12.3, abstract operation `JO`.
-
-        // Initializing stack of traversed objects.
-        // It's done here since we only need them for objects and arrays comparison.
-        aStack = aStack || [];
-        bStack = bStack || [];
-        var length = aStack.length;
-        while (length--) {
-            // Linear search. Performance is inversely proportional to the number of
-            // unique nested structures.
-            if (aStack[length] === a) return bStack[length] === b;
-        }
-
-        // Add the first object to the stack of traversed objects.
-        aStack.push(a);
-        bStack.push(b);
-
-        // Recursively compare objects and arrays.
-        if (areArrays) {
-            // Compare array lengths to determine if a deep comparison is necessary.
-            length = a.length;
-            if (length !== b.length) return false;
-            // Deep compare the contents, ignoring non-numeric properties.
-            while (length--) {
-                if (!eq(a[length], b[length], aStack, bStack)) return false;
-            }
-        } else {
-            // Deep compare objects.
-            var keys = _.keys(a), key;
-            length = keys.length;
-            // Ensure that both objects contain the same number of properties before comparing deep equality.
-            if (_.keys(b).length !== length) return false;
-            while (length--) {
-                // Deep compare each member
-                key = keys[length];
-                if (!(_.has(b, key) && eq(a[key], b[key], aStack, bStack))) return false;
-            }
-        }
-        // Remove the first object from the stack of traversed objects.
-        aStack.pop();
-        bStack.pop();
-        return true;
-    };
-
-    // Perform a deep comparison to check if two objects are equal.
-    _.isEqual = function (a, b) {
-        return eq(a, b);
-    };
-
-    // Is a given array, string, or object empty?
-    // An "empty" object has no enumerable own-properties.
-    _.isEmpty = function (obj) {
-        if (obj == null) return true;
-        if (isArrayLike(obj) && (_.isArray(obj) || _.isString(obj) || _.isArguments(obj))) return obj.length === 0;
-        return _.keys(obj).length === 0;
-    };
-
-    // Is a given value a DOM element?
-    _.isElement = function (obj) {
-        return !!(obj && obj.nodeType === 1);
-    };
-
-    // Is a given value an array?
-    // Delegates to ECMA5's native Array.isArray
-    _.isArray = nativeIsArray || function (obj) {
-        return toString.call(obj) === '[object Array]';
-    };
-
-    // Is a given variable an object?
-    _.isObject = function (obj) {
-        var type = typeof obj;
-        return type === 'function' || type === 'object' && !!obj;
-    };
-
-    // Add some isType methods: isArguments, isFunction, isString, isNumber, isDate, isRegExp, isError.
-    _.each(['Arguments', 'Function', 'String', 'Number', 'Date', 'RegExp', 'Error'], function (name) {
-        _['is' + name] = function (obj) {
-            return toString.call(obj) === '[object ' + name + ']';
-        };
-    });
-
-    // Define a fallback version of the method in browsers (ahem, IE < 9), where
-    // there isn't any inspectable "Arguments" type.
-    if (!_.isArguments(arguments)) {
-        _.isArguments = function (obj) {
-            return _.has(obj, 'callee');
-        };
-    }
-
-    // Optimize `isFunction` if appropriate. Work around some typeof bugs in old v8,
-    // IE 11 (#1621), and in Safari 8 (#1929).
-    if (typeof /./ != 'function' && typeof Int8Array != 'object') {
-        _.isFunction = function (obj) {
-            return typeof obj == 'function' || false;
-        };
-    }
-
-    // Is a given object a finite number?
-    _.isFinite = function (obj) {
-        return isFinite(obj) && !isNaN(parseFloat(obj));
-    };
-
-    // Is the given value `NaN`? (NaN is the only number which does not equal itself).
-    _.isNaN = function (obj) {
-        return _.isNumber(obj) && obj !== +obj;
-    };
-
-    // Is a given value a boolean?
-    _.isBoolean = function (obj) {
-        return obj === true || obj === false || toString.call(obj) === '[object Boolean]';
-    };
-
-    // Is a given value equal to null?
-    _.isNull = function (obj) {
-        return obj === null;
-    };
-
-    // Is a given variable undefined?
-    _.isUndefined = function (obj) {
-        return obj === void 0;
-    };
-
-    // Shortcut function for checking if an object has a given property directly
-    // on itself (in other words, not on a prototype).
-    _.has = function (obj, key) {
-        return obj != null && hasOwnProperty.call(obj, key);
-    };
-
-    // Utility Functions
-    // -----------------
-
-    // Run Underscore.js in *noConflict* mode, returning the `_` variable to its
-    // previous owner. Returns a reference to the Underscore object.
-    _.noConflict = function () {
-        root._ = previousUnderscore;
-        return this;
-    };
-
-    // Keep the identity function around for default iteratees.
-    _.identity = function (value) {
-        return value;
-    };
-
-    // Predicate-generating functions. Often useful outside of Underscore.
-    _.constant = function (value) {
-        return function () {
-            return value;
-        };
-    };
-
-    _.noop = function () { };
-
-    _.property = property;
-
-    // Generates a function for a given object that returns a given property.
-    _.propertyOf = function (obj) {
-        return obj == null ? function () { } : function (key) {
-            return obj[key];
-        };
-    };
-
-    // Returns a predicate for checking whether an object has a given set of
-    // `key:value` pairs.
-    _.matcher = _.matches = function (attrs) {
-        attrs = _.extendOwn({}, attrs);
-        return function (obj) {
-            return _.isMatch(obj, attrs);
-        };
-    };
-
-    // Run a function **n** times.
-    _.times = function (n, iteratee, context) {
-        var accum = Array(Math.max(0, n));
-        iteratee = optimizeCb(iteratee, context, 1);
-        for (var i = 0; i < n; i++) accum[i] = iteratee(i);
-        return accum;
-    };
-
-    // Return a random integer between min and max (inclusive).
-    _.random = function (min, max) {
-        if (max == null) {
-            max = min;
-            min = 0;
-        }
-        return min + Math.floor(Math.random() * (max - min + 1));
-    };
-
-    // A (possibly faster) way to get the current timestamp as an integer.
-    _.now = Date.now || function () {
-        return new Date().getTime();
-    };
-
-    // List of HTML entities for escaping.
-    var escapeMap = {
-        '&': '&amp;',
-        '<': '&lt;',
-        '>': '&gt;',
-        '"': '&quot;',
-        "'": '&#x27;',
-        '`': '&#x60;'
-    };
-    var unescapeMap = _.invert(escapeMap);
-
-    // Functions for escaping and unescaping strings to/from HTML interpolation.
-    var createEscaper = function (map) {
-        var escaper = function (match) {
-            return map[match];
-        };
-        // Regexes for identifying a key that needs to be escaped
-        var source = '(?:' + _.keys(map).join('|') + ')';
-        var testRegexp = RegExp(source);
-        var replaceRegexp = RegExp(source, 'g');
-        return function (string) {
-            string = string == null ? '' : '' + string;
-            return testRegexp.test(string) ? string.replace(replaceRegexp, escaper) : string;
-        };
-    };
-    _.escape = createEscaper(escapeMap);
-    _.unescape = createEscaper(unescapeMap);
-
-    // If the value of the named `property` is a function then invoke it with the
-    // `object` as context; otherwise, return it.
-    _.result = function (object, property, fallback) {
-        var value = object == null ? void 0 : object[property];
-        if (value === void 0) {
-            value = fallback;
-        }
-        return _.isFunction(value) ? value.call(object) : value;
-    };
-
-    // Generate a unique integer id (unique within the entire client session).
-    // Useful for temporary DOM ids.
-    var idCounter = 0;
-    _.uniqueId = function (prefix) {
-        var id = ++idCounter + '';
-        return prefix ? prefix + id : id;
-    };
-
-    // By default, Underscore uses ERB-style template delimiters, change the
-    // following template settings to use alternative delimiters.
-    _.templateSettings = {
-        evaluate: /<%([\s\S]+?)%>/g,
-        interpolate: /<%=([\s\S]+?)%>/g,
-        escape: /<%-([\s\S]+?)%>/g
-    };
-
-    // When customizing `templateSettings`, if you don't want to define an
-    // interpolation, evaluation or escaping regex, we need one that is
-    // guaranteed not to match.
-    var noMatch = /(.)^/;
-
-    // Certain characters need to be escaped so that they can be put into a
-    // string literal.
-    var escapes = {
-        "'": "'",
-        '\\': '\\',
-        '\r': 'r',
-        '\n': 'n',
-        '\u2028': 'u2028',
-        '\u2029': 'u2029'
-    };
-
-    var escaper = /\\|'|\r|\n|\u2028|\u2029/g;
-
-    var escapeChar = function (match) {
-        return '\\' + escapes[match];
-    };
-
-    // JavaScript micro-templating, similar to John Resig's implementation.
-    // Underscore templating handles arbitrary delimiters, preserves whitespace,
-    // and correctly escapes quotes within interpolated code.
-    // NB: `oldSettings` only exists for backwards compatibility.
-    _.template = function (text, settings, oldSettings) {
-        if (!settings && oldSettings) settings = oldSettings;
-        settings = _.defaults({}, settings, _.templateSettings);
-
-        // Combine delimiters into one regular expression via alternation.
-        var matcher = RegExp([
-            (settings.escape || noMatch).source,
-            (settings.interpolate || noMatch).source,
-            (settings.evaluate || noMatch).source
-        ].join('|') + '|$', 'g');
-
-        // Compile the template source, escaping string literals appropriately.
-        var index = 0;
-        var source = "__p+='";
-        text.replace(matcher, function (match, escape, interpolate, evaluate, offset) {
-            source += text.slice(index, offset).replace(escaper, escapeChar);
-            index = offset + match.length;
-
-            if (escape) {
-                source += "'+\n((__t=(" + escape + "))==null?'':_.escape(__t))+\n'";
-            } else if (interpolate) {
-                source += "'+\n((__t=(" + interpolate + "))==null?'':__t)+\n'";
-            } else if (evaluate) {
-                source += "';\n" + evaluate + "\n__p+='";
-            }
-
-            // Adobe VMs need the match returned to produce the correct offest.
-            return match;
-        });
-        source += "';\n";
-
-        // If a variable is not specified, place data values in local scope.
-        if (!settings.variable) source = 'with(obj||{}){\n' + source + '}\n';
-
-        source = "var __t,__p='',__j=Array.prototype.join," +
-            "print=function(){__p+=__j.call(arguments,'');};\n" +
-            source + 'return __p;\n';
-
-        try {
-            var render = new Function(settings.variable || 'obj', '_', source);
-        } catch (e) {
-            e.source = source;
-            throw e;
-        }
-
-        var template = function (data) {
-            return render.call(this, data, _);
-        };
-
-        // Provide the compiled source as a convenience for precompilation.
-        var argument = settings.variable || 'obj';
-        template.source = 'function(' + argument + '){\n' + source + '}';
-
-        return template;
-    };
-
-    // Add a "chain" function. Start chaining a wrapped Underscore object.
-    _.chain = function (obj) {
-        var instance = _(obj);
-        instance._chain = true;
-        return instance;
-    };
-
-    // OOP
-    // ---------------
-    // If Underscore is called as a function, it returns a wrapped object that
-    // can be used OO-style. This wrapper holds altered versions of all the
-    // underscore functions. Wrapped objects may be chained.
-
-    // Helper function to continue chaining intermediate results.
-    var result = function (instance, obj) {
-        return instance._chain ? _(obj).chain() : obj;
-    };
-
-    // Add your own custom functions to the Underscore object.
-    _.mixin = function (obj) {
-        _.each(_.functions(obj), function (name) {
-            var func = _[name] = obj[name];
-            _.prototype[name] = function () {
-                var args = [this._wrapped];
-                push.apply(args, arguments);
-                return result(this, func.apply(_, args));
-            };
-        });
-    };
-
-    // Add all of the Underscore functions to the wrapper object.
-    _.mixin(_);
-
-    // Add all mutator Array functions to the wrapper.
-    _.each(['pop', 'push', 'reverse', 'shift', 'sort', 'splice', 'unshift'], function (name) {
-        var method = ArrayProto[name];
-        _.prototype[name] = function () {
-            var obj = this._wrapped;
-            method.apply(obj, arguments);
-            if ((name === 'shift' || name === 'splice') && obj.length === 0) delete obj[0];
-            return result(this, obj);
-        };
-    });
-
-    // Add all accessor Array functions to the wrapper.
-    _.each(['concat', 'join', 'slice'], function (name) {
-        var method = ArrayProto[name];
-        _.prototype[name] = function () {
-            return result(this, method.apply(this._wrapped, arguments));
-        };
-    });
-
-    // Extracts the result from a wrapped and chained object.
-    _.prototype.value = function () {
-        return this._wrapped;
-    };
-
-    // Provide unwrapping proxy for some methods used in engine operations
-    // such as arithmetic and JSON stringification.
-    _.prototype.valueOf = _.prototype.toJSON = _.prototype.value;
-
-    _.prototype.toString = function () {
-        return '' + this._wrapped;
-    };
-
-    // AMD registration happens at the end for compatibility with AMD loaders
-    // that may not enforce next-turn semantics on modules. Even though general
-    // practice for AMD registration is to be anonymous, underscore registers
-    // as a named module because, like jQuery, it is a base library that is
-    // popular enough to be bundled in a third party lib, but not be part of
-    // an AMD load request. Those cases could generate an error when an
-    // anonymous define() is called outside of a loader request.
-    if (typeof define === 'function' && define.amd) {
-        define('underscore', [], function () {
-            return _;
-        });
-    }
-}.call(this));
-/*!
- * jquery.utility (https://github.com/unscrum/jaymvc)
- * Copyright 2018 Jay Brummels
- * Licensed under MIT (https://github.com/unscrum/jaymvc/LICENSE)
- */
-
-/**
-* This file contains jQuery utility methods. These are small distinct functions 
-* that are more than likely not tied to the UI.
-*/
-(function($) {
-    // Debugging methods
-    $.fn.dumpStack = function(title, content) {
-        if (this.length === 0) {
-            log('dumpStack ' + (title ? '(' + title + ') ' : '') + 'empty');
-        } else {
-            log('dumpStack ' + (title ? '(' + title + ') ' : '') + this.length);
-            this.each(function(i) {
-                log(i +
-                    ': ' +
-                    this.tagName +
-                    (this.id ? '#' + this.id : '') +
-                    (this.className !== '' ? '.' + this.className.replace(/\s/g, '.') : '') +
-                    ($(this).is(':input') ? ' VAL[' + $(this).val() + ']' : '') +
-                    (title === true || content ? ' HTML[' + $(this).html().substr(0, 45) + '...]' : ''));
-            });
-            log('dumpStack (end)');
-        }
-        return this;
-    };
-
-
-    // Given two classes, will replace one with the second
-    // Third argument specifies if the first class is required for
-    // the second to be added
-    $.fn.swapClass = function(c1, c2, requireFirst) {
-        return this.each(function() {
-            if (requireFirst === false || $(this).hasClass(c1)) {
-                var c = $(this).attr('class');
-                c = c.replace(new RegExp('(^|\\\s+)' + c1 + '(\\\s+|$)'), '$1' + c2 + '$2');
-                $(this).attr('class', c);
-            }
-        });
-    };
-
-    // Returns a new jQuery collection with all unique elements
-    $.fn.unique = function() {
-        return this.pushStack($.unique(this));
-    };
-
-    /*
-    * This method is similar to clone with the exception that
-    * it will return an array of all of the clones of the element.
-    */
-    $.fn.duplicate = function(count, cloneEvents) {
-        var tmp = [];
-        for (var i = 0; i < count; i++) {
-            $.merge(tmp, this.clone(cloneEvents).get());
-        }
-        return this.pushStack(tmp);
-    };
-
-    // Returns an array of values
-    $.fn.values = function() {
-        var values = [];
-        this.each(function() {
-            values.push($(this).val());
-        });
-        return values;
-    };
-
-    // Returns a string of joined values
-    $.fn.joinValues = function(delim) {
-        return this.values().join(arguments.length === 0 ? ',' : delim);
-    };
-
-    // Returns the value of the first element that contains the specified attribute
-    // otherwise returns an empty string
-    $.fn.firstAttr = function(attr) {
-        var ret = '';
-        this.each(function() {
-            var r = $(this).attr(attr);
-            if (r !== '') {
-                ret = r;
-                return false;
-            }
-// ReSharper disable NotAllPathsReturnValue
-        });
-// ReSharper restore NotAllPathsReturnValue
-        return ret;
-    };
-
-    // Usage:
-    // $('a').wait(5000, ['hello', 'world'], function(a, b) {
-    //   alert( a + ' ' + b );
-    //   $(this).addClass('highlight-links');
-    // });
-    $.fn.wait = function(timeout, data, fn) {
-        if ($.isFunction(data)) {
-            fn = data;
-            data = [];
-        }
-// ReSharper disable InconsistentNaming
-        var _this = this;
-// ReSharper restore InconsistentNaming
-        setTimeout(function() {
-                _this.each(function() {
-                    fn.call(this, data);
-                });
-            },
-            timeout);
-        return this;
-    };
-
-    // This method connects one dom event to another
-    /*
-    * This method is used to cross bind events. For example you can bind the click event of #element1
-    * to the updateList custom event of #element2 by doing:
-    * $('#element1').connect('click', '#element2', 'updateList');
-    */
-    $.fn.connect = function(/*[propagation, ]sourceEvent, target, targetEvent [, argsArray]*/) {
-        var sourceHandling = false;
-        var i = 0;
-        if (typeof arguments[0] === 'boolean' || typeof arguments[0] === 'object') {
-            sourceHandling = arguments[0];
-            i++;
-        }
-        var sourceEvent = arguments[i++],
-            target = arguments[i++],
-            targetEvent = arguments[i++] || null,
-            args = arguments[i] || null;
-
-        return this.on(sourceEvent,
-            function(evt) {
-// ReSharper disable InconsistentNaming
-                var _args = args;
-// ReSharper restore InconsistentNaming
-                // If the user didn't specify any arguments, pass through the events args
-                // (very useful for custom events)
-                if (_args === null) {
-                    _args = Array.prototype.slice.call(arguments, 1);
-                }
-                $(target || this).trigger(targetEvent || sourceEvent, _args || []);
-                if (typeof sourceHandling === 'object') {
-                    if (sourceHandling.stopPropagation === true) {
-                        evt.stopPropagation();
-                    }
-                    if (sourceHandling.preventDefault === true) {
-                        evt.preventDefault();
-                    }
-                    if (sourceHandling.stopImmediatePropagation === true) {
-                        evt.stopImmediatePropagation();
-                    }
-                }
-                return sourceEvent;
-            });
-    };
-    /*
-    * Clears all form inputs
-    */
-    $.fn.clearForm = function() {
-        return this.each(function() {
-            var $t = $(this);
-            var type = $t.attr('type');
-            var tag = this.tagName.toLowerCase(); // normalize case
-            // it's ok to reset the value attr of text inputs,
-            // password inputs, and textareas
-            if (type === 'text' || type === 'password' || tag === 'textarea' || tag === 'select') {
-                if (tag === 'select') {
-                    $t.attr('selectedIndex', -1);
-                }
-                $t.val('');
-                // checkboxes and radios need to have their checked state cleared
-                // but should *not* have their 'value' changed
-            } else if (type === 'checkbox' || type === 'radio') {
-                $t.attr('checked', false);
-            }
-        });
-    };
-
-    /*
-    *  This is the preferred method for gathering form input.
-    */
-    $.fn.getInputValues = function(extra, allFields) {
-        if (arguments.length === 1 && typeof extra === 'boolean') {
-            allFields = extra;
-            extra = null;
-        }
-        var data = {};
-        var elements = this;
-        if (this.is('form') || !this.is(':input')) {
-            elements = $(this).find(':input');
-        }
-        elements.each(function() {
-            var $t = $(this);
-            var $e = $t.is(':hidden') ? $t.parent() : $t;
-            if (allFields === true || $e.is(':visible')) {
-                // Find the closest element that has either a name attribute or an id attribute
-                var tmp = $t.closest('[name],[id]');
-                var id = tmp.attr('name') || tmp.attr('id');
-                if (($t.is(':checkbox,:radio') && !$t.is(':checked')) || ($t.is(':text') && $t.val() === '')) {
-                    return;
-                }
-
-                var val = $t.is(':checkbox') ? ($t.attr('value') !== 'on' ? $t.val() : $t.is(':checked')) : $t.val();
-                if (data[id] === undefined) {
-                    data[id] = val;
-                } else {
-                    data[id] = $.makeArray(data[id]);
-                    data[id].push(val);
-                }
-            }
-        });
-        if (extra) {
-            $.extend(data, extra);
-        }
-        return data;
-    };
-
-    $.fn.isTextType = function () {
-        var $t = $(this).first();
-        return $t.is('textarea') ||
-            $t.is(':text, :password') ||
-            $t.is(':input[type="color"]') ||
-            $t.is(':input[type="date"]') ||
-            $t.is(':input[type="datetime"]') ||
-            $t.is(':input[type="datetime-local"]') ||
-            $t.is(':input[type="email"]') ||
-            $t.is(':input[type="month"]') ||
-            $t.is(':input[type="number"]') ||
-            $t.is(':input[type="range"]') ||
-            $t.is(':input[type="search"]') ||
-            $t.is(':input[type="tel"]') ||
-            $t.is(':input[type="time"]') ||
-            $t.is(':input[type="url"]') ||
-            $t.is(':input[type="week"]');
-    };
-
-    $.fn.clearJsonValidation = function(){
-        $('span.form-text.text-danger', this).remove();
-        $('.form-control.is-invalid',this).removeClass('is-invalid');
-        return this.messageRemove();
-    };
-
-    $.fn.applyJsonValidation = function(dict){
-
-        if ($.isPlainObject(dict)) {
-            for (var key in dict) {
-                if (dict.hasOwnProperty(key)) {
-                    $(':input[name="' + key + '"]', this).addClass('is-invalid').closest('div.form-group')
-                        .append($('<span/>').addClass('form-text text-danger')
-                            .html(dict[key]));
-                }
-            }
-        } else {
-            this.message('error', dict);
-        }
-        return this;
-    };
-    
-    $.fn.filterTextType = function() {
-        var ret = [];
-        this.each(function () {
-            if ($(this).isTextType() === true) {
-                ret.push(this);
-            }
-        });
-        return $(ret);
-    };
-    
-    $.fn.isEmpty = function () {
-        var $t = $(this[0]);
-        return $t.has('*').length === 0 && $t.text().trim().length === 0; 
-    };
-})(jQuery);
-/*
-* jquery.onaction plugin
-* Copyright 2011- 2018 Jay Brummels & Jonathan Sharp
-* Licensed under MIT (https://github.com/unscrum/jaymvc/LICENSE)
-*/
-
-
-/*
-* This is the main event handling pattern for these sites. All event handling is processed through event delegation
-* with the following pattern. Event handlers are defined but not bound to individual elements (decoupled) by calling 
-* $.onAction('someAction', function() { ... }); Elements are then tagged for specific events by adding a css 
-* class that starts with action- followed by the action name, so in our example above, the associated action would be
-* action-some-action. Multiple action handlers may be registered for a single action. If only one action handler should
-* be registered at a give time, you may setup that action by using $.singleOnAction(...) which will remove any 
-* existing action handlers for that action. This is useful if a script is loaded or included multiple times on a page.
-*/
-(function ($) {
-
-// ReSharper disable InconsistentNaming
-    var ACTION = {
-// ReSharper restore InconsistentNaming
-        dataMap: {},
-        handlers: {}
-    };
-
-    // Given an action, execute all of the action handlers in the context of the target element
-    function handleAction(target, action, data) {
-        log('onAction:handleAction: ' + action);
-        var act = action.toLowerCase();
-        if (ACTION.handlers[act] && ACTION.handlers[act].length > 0) {
-            var handlers = ACTION.handlers[act];
-
-            // Has an actionData callback has been implemented to extract an elements data prior to event handling?
-            var dataMap = ACTION.dataMap[ACTION.dataMap[act] ? act : '*'];
-            data = $.extend(dataMap.call(target, { type: action, target: target }, data), data || {});
-
-            // Iterate over the action handlers and execute each one.
-            for (var i = 0, il = handlers.length; i < il; i++) {
-                if (handlers[i] !== null) {
-                    var settings = handlers[i][0];
-                    var ret = handlers[i][1].call(target, settings, { type: action, target: target }, $.extend(settings.data, data));
-                    // This handler is only executed once
-                    if (settings.one === true) {
-                        handlers[i] = null;
-                    }
-                    if (ret === false) {
-                        break;
-                    }
-                }
-            }
-        }
-        if(target !== document) 
-            if ($(target).isTextType())
-                $( target ).data( 'onactionblur', false );
-    }
-
-    $.extend({
-        actionCssClass: function (klass) {
-            return klass.replace(/([a-z])([A-Z])/g, '$1-$2')
-						.replace(/([a-z])([0-9])/gi, '$1-$2')
-						.replace(/([0-9])([a-z])/g, '$1-$2')
-						.toLowerCase();
-        },
-        actionData: function (action, handler) {
-            var actions = action.split(/\s+/);
-            for (var i = 0, il = actions.length; i < il; i++) {
-                action = actions[i].toLowerCase();
-                ACTION.dataMap[action] = handler;
-            }
-        },
-// ReSharper disable InconsistentNaming
-        onAction: function (_action, callback, data) {
-// ReSharper restore InconsistentNaming
-            var settings = {
-                unique: false,
-                one: false,
-                action: '',
-                handler: null,
-                data: null
-            };
-            if (arguments.length === 1) {
-                settings = $.extend(settings, arguments[0]);
-            } else if (arguments.length >= 2) {
-                settings.action = _action;
-                settings.handler = callback;
-                settings.data = data;
-            }
-            var actions = settings.action.split(/\s+/);
-            for (var i = 0, il = actions.length; i < il; i++) {
-                settings.action = actions[i];
-                settings.actionClass = this.actionCssClass(settings.action);
-
-                var action = settings.action.toLowerCase();
-                if (!ACTION.handlers[action] || settings.unique === true) {
-                    ACTION.handlers[action] = [];
-                }
-                ACTION.handlers[action].push([settings, function (settings, evt, data) {
-                    return settings.handler.call(evt.target, evt, data);
-                } ]);
-            }
-        },
-        singleOnAction: function (action, callback, data) {
-            this.onAction({
-                action: action,
-                handler: callback,
-                data: data,
-                unique: true
-            });
-        },
-        doAction: function (action, data, target) {
-            handleAction(target || document, action, data);
-        }
-    });
-
-    // Our default datamap handler
-    $.actionData('*', function (evt, data) {
-        if (typeof data !== 'object') {
-            if (this.nodeType && this.nodeType === 1) {
-                return $(this).data();
-            } else {
-                return {};
-            }
-        }
-        return data;
-    });
-
-    $.fn.doAction = function (action, data) {
-        return this.each(function () {
-            handleAction(this, action, data);
-        });
-    };
-
-    $(document)
-// ReSharper disable InconsistentNaming
-		.on('focusin', function (evt, _target) {
-// ReSharper restore InconsistentNaming
-		    var target = _target || evt.target;
-		    // log('focus on ' + target);
-		    if ($(target).is(document))
-		        return;
-		    // Bind to change event for SELECT elements and syntetically bubble it
-		    if ($(target).is('select') && $(target).data('onactionchange') !== true) {
-		        log('onAction:binding change');
-		        $(target)
-					.data('onactionchange', true)
-					.change(function () {
-					    log('change event triggered');
-					    $(this).trigger('actionchange');
-					});
-		    }
-		    else if ($(target).isTextType() && $(target).data('onactionblur') !== true) {
-		        var onEnter = $(target).data('onEnter');
-		        if (onEnter === true){
-                    $(target).on('keypress', function (e) {
-                        if (e.which === 13){
-                            $(this).trigger('blur').off('keypress');
-                        } 
-                    });
-                }
-		        $(target)
-                    .data('onactionblur', true)
-                    .one('blur', function () {
-                        $(this).trigger('actionblur');
-                    });
-		    }
-		})
-		.on('click actionchange actionblur', function (evt) {
-		    var ret = true;
-            var $target = $(evt.target);
-            if ( evt.type === 'click' && ( $target.isTextType() || $target.is('select') || $target.is('option') ) )
-// ReSharper disable InconsistentFunctionReturns
-		        return;
-// ReSharper restore InconsistentFunctionReturns
-		    // Construct a group of elements (target, parents) and walk 
-		    // through the elements looking for the first action-* class
-            $target
-				.add($target.parents())
-				.each(function () {
-		            if (this.className && this.className.match) {
-				        var action = this.className.match(/(^|\s)action-([^\s]+)(\s|$)/);
-				        if (action) {
-				            action = action[2].replace(/[^a-z0-9]/gi, '').toLowerCase();
-				            var $t = $(this);
-				            if (!($t.attr('disabled') === 'disabled'))
-				            {
-                                log('onAction:actionCaptured: (' + evt.type + ')' + action + ' ' + this.tagName.toLowerCase() + '#' + ($t.attr('id') || '') + '');
-                                handleAction(this, action, $t.data());
-				            }
-				            ret = false;
-				            return false;
-				        }
-		            }
-// ReSharper disable NotAllPathsReturnValue
-		        });
-// ReSharper restore NotAllPathsReturnValue
-
-		    // Do not cancel click events on a checkbox or radio button
-            if (!$target.is(':checkbox,:radio,select')) {
-		        log(evt.type + ' returning ' + ret);
-		        if (ret === false) {
-		            evt.preventDefault();
-		        }
-		        return ret;
-		    }
-		});
-})(jQuery);
-/*
-* jquery.ondata plugin
-* Copyright 2011- 2018 Jay Brummels & Jonathan Sharp
-* Licensed under MIT (https://github.com/unscrum/jaymvc/LICENSE)
-*/
-
-(function ($) {
-    $.extend({
-        triggerDataEvent: function (event, data) {
-            if (typeof event == 'object') {
-                $.each(event, function (k, v) {
-                    $.triggerDataEvent(k, v);
-                });
-            } else {
-                $(document)
-                    .trigger('data' + jay.camelToPascal(event), [data]);
-
-            }
-        },
-        /*
-        * This method takes an event name (such as totalRecordCount), a selector to execute when that event occurs
-        * (such as .data-total-record-count), and finally a callback method to execute when the event is triggered.
-        */
-        onDataEvent: function (event, selector, callback) {
-            if ($.isFunction(selector)) {
-                callback = selector;
-                selector = document;
-            }
-            $(document).on('data' + jay.camelToPascal(event), function () {
-                // Strip off the 'native' jQuery event object
-                var args = Array.prototype.slice.call(arguments, 1);
-                $(selector).each(function () {
-                    callback.apply(this, args);
-                });
-            });
-        },
-
-        /*
-        * A generic method for binding a data event callback handler without specifying a DOM node.
-        * This allows for non DOM specific operations to take place.
-        */
-        onData: function (event, callback) {
-            $(document).on('data' + jay.camelToPascal(event), function () {
-                callback.apply({}, Array.prototype.slice.call(arguments, 1));
-            });
-        }
-    });
-})(jQuery);
-/*
-* jquery.jay plugin
-* Copyright 2011-2018 Jay Brummels
-* Licensed under MIT (https://github.com/unscrum/jaymvc/LICENSE)
-*/
-
-/**
-* This file contains jQuery methods specific to Jay. These are smaller functions 
-* tied to the UI. (Also see jquery.utility.js)
-*/
-(function ($) {
-
-    $.fn.selectRange = function (start, end) {
-        var e = this[0];
-        var $this = $(e);
-        if (arguments.length === 0) {
-            start = 0;
-            end = $this.val().length;
-        } else if (arguments.length === 1) {
-            end = start;
-            start = 0;
-        }
-        if (document.activeElement !== e) {
-            $this.focus();
-        }
-        if (e.setSelectionRange) { /* WebKit */
-            setTimeout(function(){
-                e.setSelectionRange(start, end);
-            }, 1);
-        }
-        else if (e.createTextRange) { /* IE */
-            var range = e.createTextRange();
-            range.collapse(true); range.moveEnd('character', end);
-            range.moveStart('character', start);
-            range.select();
-        }
-        else if (e.selectionStart && e.selectionEnd) {
-            e.selectionStart = start;
-            e.selectionEnd = end;
-        }
-        return this;
-    };
-
-    $.fn.selectRangeOnFocus = function () {
-        return this.each(function () {
-            $(this).on('focusin', function () {
-                $(this).selectRange();
-            });
-        });
-
-    };
-
-    $.fn.selectRangeOnFocusDestroy = function () {
-        return this.each(function () {
-            $(this).off('focusin');
-        });
-
-    };
-
-    $.fn.showContentLoading = function (size, zindex) {
-        var sizes = {
-            sm: '<h5/>',
-            md: '<h4/>',
-            lg: '<h3/>',
-            xl: '<h2/>'
-        };
-        var $spinner = $('<i/>').addClass('fa fa-spin fa-spinner');
-        var $wrap = $(sizes[size] || sizes['lg']).addClass('m-1').html($spinner);
-        var $col = $('<div/>').addClass('col-12').html($wrap);
-        var $row = $('<div/>').addClass('row').html($col);
-        var $loading = $('<div/>').addClass('jay-loading p-5 position-absolute text-center').css({
-            'z-index': 103,
-            background:'rgba(167,167,167,0.65)'
-        }).html($row);
-
-        return this.hideContentLoading().each(function () {
-            var over = $loading.clone();
-            var zIndex = parseInt(zindex, 10) || 0;
-            if (zIndex) {
-                over.css('z-index', zindex);
-            }
-
-            var $element = $(this);
-            var target = $element.closest('div.modal');
-            if (target.length === 0) {
-                target = 'body';
-            } else {
-                over.css('z-index', zIndex > 1060 ? zIndex : 1060);
-            }
-            over
-                .on('reposition', function () {
-                    $(this)
-                        .css({
-                            width: $element.outerWidth(),
-                            height: $element.outerHeight()
-                        })
-                        .position({
-                            my: 'top left',
-                            at: 'top left',
-                            of: $element
-                        });
-                })
-                .appendTo(target)
-                .trigger('reposition') //trigger it twice for webkit, first time always has negative top.
-                .trigger('reposition');
-
-            var data = $element.data('loadingElements') || [];
-            data.push(over[0]);
-            $element.data('loadingElements', data);
-        });
-    };
-    $.fn.hideContentLoading = function () {
-        return this.each(function () {
-            var loading = $(this).data('loadingElements') || [];
-            var ln = loading.length;
-            while (ln >= 0) {
-                $(loading[--ln]).fadeOut('fast', function () {
-                    $(this).remove();
-                });
-            }
-        });
-    };
-    $.extend({
-        hideAllContentLoading: function() {
-            $('div.jay-loading').remove();
-        }
-    });
-
-    $(window).on('resize', function () {
-        $('div.jay-loading').trigger('reposition');
-    });
-
-    $.fn.addInlineLoading = function (txt) {
-        var $spinner = $('<i/>').addClass('fa fa-spin fa-spinner');
-        var $col = $('<span/>').addClass('col-12 m-2').html($spinner);
-        var $loading = $('<span/>').addClass('row').html($col);
-        if (txt) {
-            $spinner.addClass('float-left');
-            $col.append($('<span/>').html(txt).addClass('float-left mx-2'));
-        }
-        return this.html($loading);
-    };
-    
-})(jQuery);
-/*
-* jquery.ajax plugin
-* Copyright 2011- 2018 Jay Brummels & Jonathan Sharp
-* Licensed under MIT (https://github.com/unscrum/jaymvc/LICENSE)
-*/
-/*
-* This is the main Ajax handling component for the entire project. It wraps all Ajax calls to and from the server 
-* expecting a common envelope format that it unpacks and passes back the enclosed data.
-*/
-(function ($, jay) {
-    jay.ajaxPostHtml = function(options) {
-        var ajaxOptions = $.extend({
-            // Default values (overwriteable)
-            async: true,
-            cache: false,
-            dataType: 'html',
-            global: true,
-            type: 'POST',
-            target: this[0],
-            traditional: true
-        },            
-        // Optional user options
-		options.ajax || {}, {
-		    url: options.url,
-		    data: options.data || {}
-		});
-
-		var failedAbortErrorDeferred = $.Deferred();
-        var jqXhr = $.ajax(ajaxOptions);
-
-        jqXhr.fail(function (xhr, status, error) {
-            if (xhr.status !== 0) {
-                if (xhr.status === 401) {
-                    self.location.replace(window.location.pathname);
-                } else {
-                    if (xhr.status === 403) {
-                        jay.alert('Access Denied.');
-                    }
-                    failedAbortErrorDeferred.reject(xhr, status, error);
-                }
-            }
-        });
-
-     
-        failedAbortErrorDeferred.promise();
-
-        return $.extend(jqXhr, {
-            fail: failedAbortErrorDeferred.fail
-        });
-    };
-
-    jay.ajax = function (options) {
-        var ajaxOptions = $.extend({
-            // Default values (overwriteable)
-            async: true,
-            cache: false,
-            dataType: 'json',
-            global: true,
-            type: 'POST',
-            target: this[0],
-            traditional:true
-        },
-        // Optional user options
-		options.ajax || {}, {
-		    url: options.url,
-		    data: options.data || {}
-		});
-        var successErrorDeferred = $.Deferred();
-        var failedAbortErrorDeferred = $.Deferred();
-        var jqXhr = $.ajax(ajaxOptions);
-
-        jqXhr.done(function (json, status, xhr) {
-            if (json && json.status && json.status === 'success') {
-                successErrorDeferred.resolve(json.data, status, xhr);
-            } else {
-                successErrorDeferred.reject(json.data, 'error', xhr);
-            }
-        }).fail(function (xhr, status, error) {
-            if (xhr.status !== 0) {
-                if (xhr.status === 401) {
-                    self.location.replace(window.location.pathname);
-                } else {
-                    if (xhr.status === 403) {
-                            jay.alert('Access Denied.');
-                    }
-                    failedAbortErrorDeferred.reject(xhr, status, error);
-                }
-            }
-        });
-
-        successErrorDeferred.promise();
-        failedAbortErrorDeferred.promise();
-
-        return $.extend(jqXhr, {
-            fail: failedAbortErrorDeferred.fail
-        }, {
-            done: successErrorDeferred.done,
-            error: successErrorDeferred.fail
-        });
-    };
-
-    $.fn.jayLoad = function(url, data, func) {
-        var $t = $(this);
-        if (arguments.length === 2) {
-            func = data;
-            data = {};
-        }
-        jay.ajaxPostHtml({
-            url: url,
-            data: data
-        }).done(function(html) {
-            $t.html(html);
-            if (func && $.isFunction(func)) {
-                func.call($t);
-            }
-        });
-    };
-    
-})(jQuery, jay);
-/*!
- * jay.typeahead (https://github.com/unscrum/jaymvc)
- * Copyright 2018 Jay Brummels
- * Adapted from bootstrap3-typehead for bootstrap3 http://embed.plnkr.co/6XJ3sc/ by Bass Jobsen orginally licensed http://www.apache.org/licenses/LICENSE-2.0
- * Licensed under MIT (https://github.com/unscrum/jaymvc/LICENSE)
- */
-!function ($) {
-    
-    /* TYPEAHEAD PUBLIC CLASS DEFINITION
-     * ================================= */
-
-    var Typeahead = function (element, options) {
-
-        var that = this;
-        that.$element = $(element).attr('autocomplete', 'off');
-        that.options = $.extend({}, {
-            items: 10,
-            alignWidth: true,
-            menu: '<ul class="typeahead dropdown-menu"></ul>',
-            item: '<li class="dropdown-item"><a href="#" class="text-dark"></a></li>',
-            valueField: 'id',
-            displayField: 'val',
-            postParam: 'q',
-            ajax: {
-                url: null,
-                timeout: 300,
-                triggerLength: 2
-            }
-        }, options);
-        that.$menu = $(that.options.menu).insertAfter(that.$element);
-        that.ajax = $.extend({}, that.options.ajax);
-        that.query = '';
-        that.shown = false;
-        that.listen();
-    };
-
-    Typeahead.prototype = {
-        constructor: Typeahead,
-        //=============================================================================================================
-        //  Utils
-        //  Check if an event is supported by the browser eg. 'keypress'
-        //  * This was included to handle the "exhaustive deprecation" of jQuery.browser in jQuery 1.8
-        //=============================================================================================================
-        select: function () {
-            var $selectedItem = this.$menu.find('.active');
-            if ($selectedItem.length) {
-                var data = $selectedItem.data();
-                var text = this.$menu.find('.active a').text();
-
-                this.$element
-                    .val(this.updater(text))
-                    .trigger('typeaheadsuccess', [data.value, text, data.all])
-                    .change();
-            }
-            return this.hide();
-        },
-        updater: function (item) {
-            return item;
-        },
-        show: function () {
-            var pos = $.extend({}, this.$element.position(), {
-                height: this.$element[0].offsetHeight
-            });
-
-            this.$menu.css({
-                top: pos.top + pos.height,
-                left: pos.left
-            });
-
-            if (this.options.alignWidth) {
-                var width = $(this.$element[0]).outerWidth();
-                this.$menu.css({
-                    'min-width': width
-                });
-            }
-
-            this.$menu.show();
-            this.shown = true;
-            return this;
-        },
-        hide: function () {
-            this.$menu.hide();
-            this.shown = false;
-            return this;
-        },
-        ajaxLookup: function () {
-
-            var query = $.trim(this.$element.val());
-
-            if (query === this.query) {
-                return this;
-            }
-
-            // Query changed
-            this.query = query;
-
-            // Cancel last timer if set
-            if (this.ajax.timerId) {
-                clearTimeout(this.ajax.timerId);
-                this.ajax.timerId = null;
-            }
-
-            if (!query || query.length < this.ajax.triggerLength) {
-                // cancel the ajax callback if in progress
-                if (this.ajax.xhr) {
-                    this.ajax.xhr.abort();
-                    this.ajax.xhr = null;
-                }
-
-                return this.shown ? this.hide() : this;
-            }
-
-            function execute() {
-                var that = this;
-
-                // Cancel last call if already in progress
-                if (that.ajax.xhr)
-                    that.ajax.xhr.abort();
-
-                var postData = {};
-                postData[that.options.postParam] = query;
-
-                that.$element.trigger('typeaheadstartingsearch', arguments);
-                this.ajax.xhr = jay.ajax({
-                    url: this.ajax.url,
-                    data: postData
-                }).done(function () {
-                    that.$element.trigger('typeaheadsearchdone', arguments);
-                    that.ajaxSource.apply(that, arguments);
-                }).error(function() {
-                    if (that.shown) {
-                         that.hide();
-                    }
-                    that.$element.trigger('typeaheadnoresults', arguments);
-                }).fail(function () {
-                    that.$element.trigger('typeaheadfail', arguments);                    
-                });
-                this.ajax.timerId = null;
-            }
-
-            // Query is good to send, set a timer
-            this.ajax.timerId = setTimeout($.proxy(execute, this), this.ajax.timeout);
-
-            return this;
-        },
-        ajaxSource: function (data) {
-            var that = this;
-            if (!that.ajax.xhr)
-                return null;
-
-            // Save for selection retreival
-            that.ajax.data = data;
-
-            // Manipulate objects
-            var items = that.grepper(that.ajax.data) || [];
-            that.ajax.xhr = null;
-            return that.render(items.slice(0, that.options.items)).show();
-        },
-        matcher: function (item) {
-            return ~item.toLowerCase().indexOf(this.query.toLowerCase());
-        },
-        highlighter: function (item) {
-            var query = this.query.replace(/[\-\[\]{}()*+?.,\\\^$|#\s]/g, '\\$&');
-            return item.replace(new RegExp('(' + query + ')', 'ig'), function ($1, match) {
-                return '<strong>' + match + '</strong>';
-            });
-        },
-        render: function (items) {
-            var that = this, display, isString = typeof that.options.displayField === 'string';
-
-            items = $(items).map(function (i, item) {
-                if (typeof item === 'object') {
-                    display = isString ? item[that.options.displayField] : that.options.displayField(item);
-                    i = $(that.options.item).attr('data-value', item[that.options.valueField]).data('all', item);
-                } else {
-                    display = item;
-                    i = $(that.options.item).attr('data-value', item).data('all', item);
-                }
-                i.find('a').html(that.highlighter(display));
-                return i[0];
-            });
-            items.first().addClass('active');
-
-            this.$menu.html(items);
-            return this;
-        },
-        //------------------------------------------------------------------
-        //  Filters relevent results
-        //
-        grepper: function (data) {
-            var that = this, items, display, isString = typeof that.options.displayField === 'string';
-
-            if (isString && data && data.length) {
-                if (data[0].hasOwnProperty(that.options.displayField)) {
-                    items = $.grep(data, function (item) {
-                        display = isString ? item[that.options.displayField] : that.options.displayField(item);
-                        return that.matcher(display);
-                    });
-                } else if (typeof data[0] === 'string') {
-                    items = $.grep(data, function (item) {
-                        return that.matcher(item);
-                    });
-                } else {
-                    log('null inner');
-                    return null;
-                }
-            } else {
-                return null;
-            }
-            return items;
-        },
-        next: function () {
-            var active = this.$menu.find('.active').removeClass('active'),
-                next = active.next();
-
-            if (!next.length) {
-                next = $(this.$menu.find('li')[0]);
-            }
-            
-            next.addClass('active');
-        },
-        prev: function () {
-            var active = this.$menu.find('.active').removeClass('active'),
-                prev = active.prev();
-
-            if (!prev.length) {
-                prev = this.$menu.find('li').last();
-            }
-
-            prev.addClass('active');
-
-        },
-        listen: function () {
-            this.$element
-                .on('focus.typeahead', $.proxy(this.focus, this))
-                .on('blur.typeahead', $.proxy(this.blur, this))
-                .on('keypress.typeahead', $.proxy(this.keypress, this))
-                .on('keyup.typeahead', $.proxy(this.keyup, this))
-                .on('keydown.typeahead', $.proxy(this.keydown, this));
-            
-            this.$menu
-                .on('click.typeahead', $.proxy(this.click, this))
-                .on('mouseenter.typeahead', 'li', $.proxy(this.mouseenter, this))
-                .on('mouseleave.typeahead', 'li', $.proxy(this.mouseleave, this));
-        },
-        move: function (e) {
-            if (!this.shown)
-                return;
-
-            switch (e.keyCode) {
-            case 9: // tab
-            case 13: // enter
-            case 27: // escape
-                e.preventDefault();
-                break;
-
-            case 38: // up arrow
-                e.preventDefault();
-                this.prev();
-                break;
-
-            case 40: // down arrow
-                e.preventDefault();
-                this.next();
-                break;
-            }
-
-            e.stopPropagation();
-        },
-        keydown: function (e) {
-            this.suppressKeyPressRepeat = ~$.inArray(e.keyCode, [40, 38, 9, 13, 27]);
-            this.move(e);
-        },
-        keypress: function (e) {
-            if (this.suppressKeyPressRepeat)
-                return;
-            this.move(e);
-        },
-        keyup: function (e) {
-            switch (e.keyCode) {
-            case 40: // down arrow
-            case 38: // up arrow
-            case 16: // shift
-            case 17: // ctrl
-            case 18: // alt
-                break;
-
-            case 9: // tab
-            case 13: // enter
-                if (!this.shown)
-                    return;
-                this.select();
-                break;
-
-            case 27: // escape
-                if (!this.shown)
-                    return;
-                this.hide();
-                break;
-
-            default:
-                this.ajaxLookup();
-            }
-            e.stopPropagation();
-            e.preventDefault();
-        },
-        focus: function () {
-            this.focused = true;
-        },
-        blur: function () {
-            this.focused = false;
-            if (!this.mousedover && this.shown)
-                this.hide();
-        },
-        click: function (e) {
-            e.stopPropagation();
-            e.preventDefault();
-            this.select();
-            this.$element.focus();
-        },
-        mouseenter: function (e) {
-            this.mousedover = true;
-            this.$menu.find('.active').removeClass('active');
-            $(e.currentTarget).addClass('active');
-        },
-        mouseleave: function () {
-            this.mousedover = false;
-            if (!this.focused && this.shown)
-                this.hide();
-        },
-        destroy: function () {
-            this.$element.off('.typeahead');
-            this.$menu.off('.typeahead').remove();
-            this.$element.removeData('typeahead');
-        }
-    };
-
-
-    /* TYPEAHEAD PLUGIN DEFINITION
-     * =========================== */
-
-    $.fn.typeahead = function (option) {
-        return this.each(function () {
-            var $this = $(this),
-                data = $this.data('typeahead'),
-                options = typeof option === 'object' && option;
-            if (!data)
-                $this.data('typeahead', (data = new Typeahead(this, options)));
-            if (typeof option === 'string')
-                data[option]();
-        });
-    };
-    
-    $.fn.typeahead.Constructor = Typeahead;
-
-}(window.jQuery);
-/*
-* jay.message jQuery plugin
-* Copyright 2011-2018 Jay Brummels
-* Licensed under MIT (https://github.com/unscrum/jaymvc/LICENSE)
-*/
-(function ($) {
-    var stateClasses = {
-        success: { state: 'alert alert-success', icon: 'fa fa-thumbs-o-up' },
-        error: { state: 'alert alert-danger', icon: 'fa fa-exclamation-triangle' },
-        warning: { state: 'alert alert-warning', icon: 'fa fa-exclamation-triangle' },
-        loading: { state: 'alert alert-info', icon: 'fa fa-spinner fa-pulse' },
-        info: { state: 'alert alert-info', icon: 'fa fa-info-circle' }
-    };
-
-    /*
-    * call $(elm).message('message'), or $(elm).message('success', 'message');
-    * Types are error, success
-    * it will prepend the message to the elmement used
-    */
-    $.fn.message = function (type, message, timeout) {
-        if (arguments.length === 1) {
-            message = type;
-            type = 'info';
-        };
-        if (!stateClasses[type])
-            type = 'info';
-
-
-        var $i = $('<i></i>').addClass(stateClasses[type].icon);
-        var $p = $('<p></p>').addClass('mb-0').append($i).append('&nbsp;&nbsp;').append(message);
-
-        return this.messageRemove().each(function () {
-            $('<div></div>')
-                .addClass('message')
-                .addClass(stateClasses[type].state)
-                .html($p)
-                .prependTo($(this))
-                .one('click.message', function () {
-                    $(this).slideUp('slow', function () {
-                        $(this).remove();
-                    });
-                }).wait(timeout, function () {
-                    if ((parseInt(timeout, 10) || 0) > 0) {
-                        $(this).slideUp('fast', function () {
-                            $(this).messageRemove();
-                        });
-                    }
-                });
-        });
-    };
-
-    $.fn.messageRemove = function () {
-        return this.each(function () {
-            //Get rid
-            $('div.message', this).off('.message').remove();
-        });
-    };
-})(jQuery);
-/*
-* jay.onvisible jQuery plugin
-* Copyright 2011-2018 Jay Brummels
-* Licensed under MIT (https://github.com/unscrum/jaymvc/LICENSE)
-*/
-(function ($, jay, window) {
-
-    $(function() {
-        window.setInterval(function() {
-
-            $('.on-visible:visible').removeClass('on-visible').each(function() {
-                var $t = $(this);
-                var data = $t.data();
-                log('triggering visibility action for', this, data.visibilityAction);
-                if (data && data.visibilityAction) {
-                    $t.doAction(data.visibilityAction);
-                }
-            });
-
-        }, 200);
-    });
-
-
-})(jQuery, jay, window);
-/*
-* jay.modal jQuery plugin
-* Copyright 2011-2018 Jay Brummels
-* Licensed under MIT (https://github.com/unscrum/jaymvc/LICENSE)
-*/
-(function ($, jay) {
-    /*
-    * call jay.alert('message'), or jay.alert('title', 'message');
-    */
-    jay.alert = function (title, message, size) {
-        if (arguments.length === 1) {
-            message = title;
-            title = 'Alert';
-        };
-
-        jay.modal({
-            content: $('<p title="text-danger"></p>').html(message),
-            title: title,
-            size: size || 'small',
-            buttons: [
-                {
-                    label: 'Close',
-                    close: true
-                }
-            ]
-        });
-    };
-    /*
-    * call jay.modal( { title:'title', 
-    *                        content: $('#contentID') } ); to load content into a modal from an ID
-    * or jay.modal( { title:'title', 
-    *                            partialUrl: '/controller/action/', 
-    *                           partialData: { id: 1, name: 'jay' } } ); to load the content in from a parital view with the data provided
-    * optionally set the first container in the partial view to have a data-modal-title="Title" attribute and call
-    * or jay.modal( { partialUrl: '/controller/action/', 
-    *                               partialData: { id: 1, name: 'jay' } } );
-    * or jay.modal( { partialUrl: '/controller/action/'} ); for a partial that does not take any parameters.
-    * You can override the buttons by typing your own buttons collection:
-    * jay.modal( { partialUrl: '/controller/action/', buttons [ { label: 'Cancel',
-    *                                                             onClick: null,
-    *                                                             close: true},
-    *                                                           { label: 'Validate',
-    *                                                             onClick: function(evt, $modalContantArea, $modalWrapper){
-    *                                                               //CODE HERE TO Validate
-    *                                                               $modalWrapper.modal('hide') //To close when you are done inside of promise
-    *                                                              },
-    *                                                             close: false,
-    *                                                             cssClass: 'btn-danger'
-    *                                                           }  
-    *                                                           { label: 'Save and Close',
-    *                                                             onClick: function(evt, $modalContantArea, $modalWrapper){
-    *                                                               //CODE HERE TO SAVE
-    *                                                              },
-    *                                                             close: true}  
-    *                                                        ] ); 
-    * other options include :
-    * title: 'My Modal Window' //Title of the modal window
-    * open: function () { //code to run when it first opens (after the partial loads if using a partial) }
-    * close: function(){ //code to run after it closes }
-    * size: 'medium'  //small or large also work or override use your own width, height
-    */
-    jay.modal = function (options) {
-        options = $.extend({
-            title: 'Modal',
-            size: 'medium',
-            partialUrl: null,
-            partialData: {},
-            content: $('<div>content</div>'),
-            open: function () { log('modal open action'); },
-            close: function () { log('modal close action'); },
-            static: false
-        }, options);
-
-        var sizeClass = '';
-        if (options.size === 'large') {
-            sizeClass = ' modal-lg';
-        } else if (options.size === 'small') {
-            sizeClass = ' modal-sm';
-        } else if (options.size === 'xl') {
-            sizeClass = ' modal-xl';
-        }
-
-        var $modalDialog = $('<div/>').addClass('modal-dialog' + sizeClass).attr('role', 'document');
-        var $modalWrapper = $('<div/>').attr('role', 'dialog')
-            .addClass('modal fade')
-            .attr('tabindex', -1)
-            .append($modalDialog)
-            .appendTo('body');
-        var $modalHeader = $('<div/>')
-            .addClass('modal-header')
-            .append($('<h5>').addClass('modal-title').html(options.title))
-            .append('<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>');
-           
-        var $content = $('<div class="jayModal modal-body"></div>');
-
-        var $modalContent = $('<div/>')
-            .addClass('modal-content')
-            .append($modalHeader)
-            .append($content)
-            .appendTo($modalDialog);
-
-        if (options.buttons && $.isArray(options.buttons)) {
-            var $modalFooter = $('<div/>').addClass('modal-footer');
-            var ln = options.buttons.length; //IE SUCKS so figure out how may up front
-            for (var i = 0; i < ln; i++) {
-                var isLastButton = i === (ln - 1);
-                var buttonClass = options.buttons[i].cssClass || (isLastButton ? 'btn-primary' : 'btn-light');
-
-
-                var $button = $('<button type="button"></button>').addClass('btn').addClass(buttonClass).html(options.buttons[i].label).appendTo($modalFooter);
-                if (options.buttons[i].disabled === true) {
-                    $button.attr('disabled', 'disabled');
-                }
-                if (options.buttons[i].onClick || $.isFunction(options.buttons[i].onClick)) {
-                    $button
-                        .data('buttonOption', options.buttons[i])
-                        .on('click', function (e) {
-                            var buttonOption = $(this).data('buttonOption');
-                            buttonOption.onClick.apply(this, [e, $content, $modalWrapper]);
-                            if (buttonOption.close === true) {
-                                $modalWrapper.modal('hide');
-                            }
-                        });
-                } else if (options.buttons[i].close === true) {
-                    $button.on('click', function () {
-                        $modalWrapper.modal('hide');
-                    });
-                }
-            }
-            $modalFooter.appendTo($modalContent);
-        }
-        $modalWrapper.on('hidden.bs.modal', function () {
-            options.close.apply($content, arguments);
-            $(this).remove(); //remove me from the dom.
-        });
-
-        var modalOptions = {
-            backdrop: options.static === true ? 'static' : true,
-            show: true
-        };
-
-        if (options.partialUrl) {
-            $content.append($('<div/>').css({ 'font-size': '200%', 'text-align': 'center' }).addInlineLoading('loading...'));
-            $modalWrapper.on('shown.bs.modal', function () {
-                jay.ajaxPostHtml({
-                    url: options.partialUrl,
-                    data: options.partialData || {}
-                }).done(function (html) {
-                    $content.html(html);
-                    options.open.apply($content);
-                }).fail(function () {
-                    $content.empty().message('error', jay.failMessage);
-                });
-            }).modal(modalOptions);
-            
-        } else {
-            $content
-                .html(options.content.clone()[0]);
-            $modalWrapper.on('shown.bs.modal', function() {
-                options.open.apply($content);
-            }).modal(modalOptions);
-        }
-    };
-
-
-})(jQuery, jay);
-/*!
- * bootstrap.multiselect (https://github.com/unscrum/jaymvc)
- * Copyright 2018 Jay Brummels
- * Adapted from bootstrap-multislect-dropdown for bootstrap3 https://www.jquery-az.com/10-demos-of-bootstrap-multiselect-dropdown-by-using-jquery/
- * Licensed under MIT (https://github.com/unscrum/jaymvc/LICENSE)
- */
-!function ($) {
-    "use strict";// jshint ;_;
-
-
-    function forEach(array, callback) {
-        for (var index = 0; index < array.length; ++index) {
-            callback(array[index], index);
-        }
-    }
-
-    /**
-     * Constructor to create a new multiselect using the given select.
-     *
-     * @param {jQuery} select
-     * @param {Object} options
-     * @returns {Multiselect}
-     */
-    function Multiselect(select, options) {
-
-        this.$select = $(select);
-
-        // Placeholder via data attributes
-        if (this.$select.attr("data-placeholder")) {
-            options.nonSelectedText = this.$select.data("placeholder");
-        }
-
-        this.options = this.mergeOptions($.extend({}, options, this.$select.data()));
-
-        // Initialization.
-        // We have to clone to create a new reference.
-        this.originalOptions = this.$select.clone()[0].options;
-        this.query = '';
-        this.searchTimeout = null;
-        this.lastToggledInput = null
-
-        this.options.multiple = this.$select.attr('multiple') === "multiple";
-        this.options.onChange = $.proxy(this.options.onChange, this);
-        this.options.onDropdownShow = $.proxy(this.options.onDropdownShow, this);
-        this.options.onDropdownHide = $.proxy(this.options.onDropdownHide, this);
-        this.options.onDropdownShown = $.proxy(this.options.onDropdownShown, this);
-        this.options.onDropdownHidden = $.proxy(this.options.onDropdownHidden, this);
-
-        // Build select all if enabled.
-        this.buildContainer();
-        this.buildButton();
-        this.buildDropdown();
-        this.buildSelectAll();
-        this.buildDropdownOptions();
-        this.buildFilter();
-
-        this.updateButtonText();
-        this.updateSelectAll();
-
-        if (this.options.disableIfEmpty && $('option', this.$select).length <= 0) {
-            this.disable();
-        }
-
-        this.$select.hide().after(this.$container);
-    };
-
-    Multiselect.prototype = {
-
-        defaults: {
-            /**
-             * Default text function will either print 'None selected' in case no
-             * option is selected or a list of the selected options up to a length
-             * of 3 selected options.
-             *
-             * @param {jQuery} options
-             * @param {jQuery} select
-             * @returns {String}
-             */
-            buttonText: function(options, select) {
-                if (options.length === 0) {
-                    return this.nonSelectedText;
-                }
-                else if (this.allSelectedText
-                    && options.length === $('option', $(select)).length
-                    && $('option', $(select)).length !== 1
-                    && this.multiple) {
-
-                    if (this.selectAllNumber) {
-                        return this.allSelectedText + ' (' + options.length + ')';
-                    }
-                    else {
-                        return this.allSelectedText;
-                    }
-                }
-                else if (options.length > this.numberDisplayed) {
-                    return options.length + ' ' + this.nSelectedText;
-                }
-                else {
-                    var selected = '';
-                    var delimiter = this.delimiterText;
-
-                    options.each(function() {
-                        var label = ($(this).attr('label') !== undefined) ? $(this).attr('label') : $(this).text();
-                        selected += label + delimiter;
-                    });
-
-                    return selected.substr(0, selected.length - 2);
-                }
-            },
-            /**
-             * Updates the title of the button similar to the buttonText function.
-             *
-             * @param {jQuery} options
-             * @param {jQuery} select
-             * @returns {@exp;selected@call;substr}
-             */
-            buttonTitle: function(options, select) {
-                if (options.length === 0) {
-                    return this.nonSelectedText;
-                }
-                else {
-                    var selected = '';
-                    var delimiter = this.delimiterText;
-
-                    options.each(function () {
-                        var label = ($(this).attr('label') !== undefined) ? $(this).attr('label') : $(this).text();
-                        selected += label + delimiter;
-                    });
-                    return selected.substr(0, selected.length - 2);
-                }
-            },
-            /**
-             * Create a label.
-             *
-             * @param {jQuery} element
-             * @returns {String}
-             */
-            optionLabel: function(element){
-                return $(element).attr('label') || $(element).text();
-            },
-            /**
-             * Triggered on change of the multiselect.
-             *
-             * Not triggered when selecting/deselecting options manually.
-             *
-             * @param {jQuery} option
-             * @param {Boolean} checked
-             */
-            onChange : function(option, checked) {
-
-            },
-            /**
-             * Triggered when the dropdown is shown.
-             *
-             * @param {jQuery} event
-             */
-            onDropdownShow: function(event) {
-
-            },
-            /**
-             * Triggered when the dropdown is hidden.
-             *
-             * @param {jQuery} event
-             */
-            onDropdownHide: function(event) {
-
-            },
-            /**
-             * Triggered after the dropdown is shown.
-             *
-             * @param {jQuery} event
-             */
-            onDropdownShown: function(event) {
-
-            },
-            /**
-             * Triggered after the dropdown is hidden.
-             *
-             * @param {jQuery} event
-             */
-            onDropdownHidden: function(event) {
-
-            },
-            /**
-             * Triggered on select all.
-             */
-            onSelectAll: function() {
-
-            },
-            enableHTML: false,
-            buttonClass: 'btn btn-outline-secondary',
-            inheritClass: false,
-            buttonWidth: 'auto',
-            buttonContainer: '<div class="btn-group" />',
-            dropRight: false,
-            selectedClass: 'selected',
-            // Maximum height of the dropdown menu.
-            // If maximum height is exceeded a scrollbar will be displayed.
-            maxHeight: 200,
-            checkboxName: false,
-            includeSelectAllOption: false,
-            includeSelectAllIfMoreThan: 0,
-            selectAllText: ' Select all',
-            selectAllValue: 'multiselect-all',
-            selectAllName: false,
-            selectAllNumber: true,
-            enableFiltering: false,
-            enableCaseInsensitiveFiltering: false,
-            enableClickableOptGroups: false,
-            filterPlaceholder: 'Search',
-            // possible options: 'text', 'value', 'both'
-            filterBehavior: 'text',
-            includeFilterClearBtn: true,
-            preventInputChangeEvent: false,
-            nonSelectedText: 'None selected',
-            nSelectedText: 'selected',
-            allSelectedText: 'All selected',
-            numberDisplayed: 3,
-            disableIfEmpty: false,
-            delimiterText: ', ',
-            templates: {
-                button: '<button type="button" class="multiselect dropdown-toggle" data-toggle="dropdown"><span class="multiselect-selected-text"></span></button>',
-                ul: '<ul class="multiselect-container dropdown-menu" style="z-index: 2000"></ul>',
-                filter: '<li class="multiselect-item filter dropdown-item"><div class="input-group"><span class="input-group-prepend"><i class="fa fa-search"></i></span><input class="form-control multiselect-search" type="text"></div></li>',
-                filterClearBtn: '<span class="input-group-btn"><button class="btn btn-secondary multiselect-clear-filter" type="button"><i class="fa fa-minus-circle"></i></button></span>',
-                li: '<li class="dropdown-item p-1"><a tabindex="0" class="text-dark"><div class="form-check"><label></label></div></a></li>',
-                divider: '<li class="multiselect-item dropdown-divider"></li>',
-                liGroup: '<li class="multiselect-item multiselect-group"><label></label></li>'
-            }
-        },
-
-        constructor: Multiselect,
-
-        /**
-         * Builds the container of the multiselect.
-         */
-        buildContainer: function() {
-            this.$container = $(this.options.buttonContainer);
-            this.$container.on('show.bs.dropdown', this.options.onDropdownShow);
-            this.$container.on('hide.bs.dropdown', this.options.onDropdownHide);
-            this.$container.on('shown.bs.dropdown', this.options.onDropdownShown);
-            this.$container.on('hidden.bs.dropdown', this.options.onDropdownHidden);
-        },
-
-        /**
-         * Builds the button of the multiselect.
-         */
-        buildButton: function() {
-            this.$button = $(this.options.templates.button).addClass(this.options.buttonClass);
-            if (this.$select.attr('class') && this.options.inheritClass) {
-                this.$button.addClass(this.$select.attr('class'));
-            }
-            // Adopt active state.
-            if (this.$select.prop('disabled')) {
-                this.disable();
-            }
-            else {
-                this.enable();
-            }
-
-            // Manually add button width if set.
-            if (this.options.buttonWidth && this.options.buttonWidth !== 'auto') {
-                this.$button.css({
-                    'width' : this.options.buttonWidth,
-                    'overflow' : 'hidden',
-                    'text-overflow' : 'ellipsis'
-                });
-                this.$container.css({
-                    'width': this.options.buttonWidth
-                });
-            }
-
-            // Keep the tab index from the select.
-            var tabindex = this.$select.attr('tabindex');
-            if (tabindex) {
-                this.$button.attr('tabindex', tabindex);
-            }
-
-            this.$container.append(this.$button);
-        },
-
-        /**
-         * Builds the ul representing the dropdown menu.
-         */
-        buildDropdown: function() {
-
-            // Build ul.
-            this.$ul = $(this.options.templates.ul);
-
-            if (this.options.dropRight) {
-                this.$ul.addClass('pull-right');
-            }
-
-            // Set max height of dropdown menu to activate auto scrollbar.
-            if (this.options.maxHeight) {
-                // TODO: Add a class for this option to move the css declarations.
-                this.$ul.css({
-                    'max-height': this.options.maxHeight + 'px',
-                    'overflow-y': 'auto',
-                    'overflow-x': 'hidden'
-                });
-            }
-
-            this.$container.append(this.$ul);
-        },
-
-        /**
-         * Build the dropdown options and binds all nessecary events.
-         *
-         * Uses createDivider and createOptionValue to create the necessary options.
-         */
-        buildDropdownOptions: function() {
-
-            this.$select.children().each($.proxy(function(index, element) {
-
-                var $element = $(element);
-                // Support optgroups and options without a group simultaneously.
-                var tag = $element.prop('tagName')
-                    .toLowerCase();
-
-                if ($element.prop('value') === this.options.selectAllValue) {
-                    return;
-                }
-
-                if (tag === 'optgroup') {
-                    this.createOptgroup(element);
-                }
-                else if (tag === 'option') {
-
-                    if ($element.data('role') === 'divider') {
-                        this.createDivider();
-                    }
-                    else {
-                        this.createOptionValue(element);
-                    }
-
-                }
-
-                // Other illegal tags will be ignored.
-            }, this));
-
-            // Bind the change event on the dropdown elements.
-            $('li input', this.$ul).on('change', $.proxy(function(event) {
-                var $target = $(event.target);
-
-                var checked = $target.prop('checked') || false;
-                var isSelectAllOption = $target.val() === this.options.selectAllValue;
-
-                // Apply or unapply the configured selected class.
-                if (this.options.selectedClass) {
-                    if (checked) {
-                        $target.closest('li')
-                            .addClass(this.options.selectedClass);
-                    }
-                    else {
-                        $target.closest('li')
-                            .removeClass(this.options.selectedClass);
-                    }
-                }
-
-                // Get the corresponding option.
-                var value = $target.val();
-                var $option = this.getOptionByValue(value);
-
-                var $optionsNotThis = $('option', this.$select).not($option);
-                var $checkboxesNotThis = $('input', this.$container).not($target);
-
-                if (isSelectAllOption) {
-                    if (checked) {
-                        this.selectAll();
-                    }
-                    else {
-                        this.deselectAll();
-                    }
-                }
-
-                if(!isSelectAllOption){
-                    if (checked) {
-                        $option.prop('selected', true);
-
-                        if (this.options.multiple) {
-                            // Simply select additional option.
-                            $option.prop('selected', true);
-                        }
-                        else {
-                            // Unselect all other options and corresponding checkboxes.
-                            if (this.options.selectedClass) {
-                                $($checkboxesNotThis).closest('li').removeClass(this.options.selectedClass);
-                            }
-
-                            $($checkboxesNotThis).prop('checked', false);
-                            $optionsNotThis.prop('selected', false);
-
-                            // It's a single selection, so close.
-                            this.$button.click();
-                        }
-
-                        if (this.options.selectedClass === "active") {
-                            $optionsNotThis.closest("a").css("outline", "");
-                        }
-                    }
-                    else {
-                        // Unselect option.
-                        $option.prop('selected', false);
-                    }
-                }
-
-                this.$select.change();
-
-                this.updateButtonText();
-                this.updateSelectAll();
-
-                this.options.onChange($option, checked);
-
-                if(this.options.preventInputChangeEvent) {
-                    return false;
-                }
-            }, this));
-
-            $('li a', this.$ul).on('mousedown', function(e) {
-                if (e.shiftKey) {
-                    // Prevent selecting text by Shift+click
-                    return false;
-                }
-            });
-
-            $('li a', this.$ul).on('touchstart click', $.proxy(function(event) {
-                event.stopPropagation();
-
-                var $target = $(event.target);
-
-                if (event.shiftKey && this.options.multiple) {
-                    if($target.is("label")){ // Handles checkbox selection manually (see https://github.com/davidstutz/bootstrap-multiselect/issues/431)
-                        event.preventDefault();
-                        $target = $target.find("input");
-                        $target.prop("checked", !$target.prop("checked"));
-                    }
-                    var checked = $target.prop('checked') || false;
-
-                    if (this.lastToggledInput !== null && this.lastToggledInput !== $target) { // Make sure we actually have a range
-                        var from = $target.closest("li").index();
-                        var to = this.lastToggledInput.closest("li").index();
-
-                        if (from > to) { // Swap the indices
-                            var tmp = to;
-                            to = from;
-                            from = tmp;
-                        }
-
-                        // Make sure we grab all elements since slice excludes the last index
-                        ++to;
-
-                        // Change the checkboxes and underlying options
-                        var range = this.$ul.find("li").slice(from, to).find("input");
-
-                        range.prop('checked', checked);
-
-                        if (this.options.selectedClass) {
-                            range.closest('li')
-                                .toggleClass(this.options.selectedClass, checked);
-                        }
-
-                        for (var i = 0, j = range.length; i < j; i++) {
-                            var $checkbox = $(range[i]);
-
-                            var $option = this.getOptionByValue($checkbox.val());
-
-                            $option.prop('selected', checked);
-                        }
-                    }
-
-                    // Trigger the select "change" event
-                    $target.trigger("change");
-                }
-
-                // Remembers last clicked option
-                if($target.is("input") && !$target.closest("li").is(".multiselect-item")){
-                    this.lastToggledInput = $target;
-                }
-
-                $target.blur();
-            }, this));
-
-            // Keyboard support.
-            this.$container.off('keydown.multiselect').on('keydown.multiselect', $.proxy(function(event) {
-                if ($('input[type="text"]', this.$container).is(':focus')) {
-                    return;
-                }
-
-                if (event.keyCode === 9 && this.$container.hasClass('open')) {
-                    this.$button.click();
-                }
-                else {
-                    var $items = $(this.$container).find("li:not(.divider):not(.disabled) a").filter(":visible");
-
-                    if (!$items.length) {
-                        return;
-                    }
-
-                    var index = $items.index($items.filter(':focus'));
-
-                    // Navigation up.
-                    if (event.keyCode === 38 && index > 0) {
-                        index--;
-                    }
-                    // Navigate down.
-                    else if (event.keyCode === 40 && index < $items.length - 1) {
-                        index++;
-                    }
-                    else if (!~index) {
-                        index = 0;
-                    }
-
-                    var $current = $items.eq(index);
-                    $current.focus();
-
-                    if (event.keyCode === 32 || event.keyCode === 13) {
-                        var $checkbox = $current.find('input');
-
-                        $checkbox.prop("checked", !$checkbox.prop("checked"));
-                        $checkbox.change();
-                    }
-
-                    event.stopPropagation();
-                    event.preventDefault();
-                }
-            }, this));
-
-            if(this.options.enableClickableOptGroups && this.options.multiple) {
-                $('li.multiselect-group', this.$ul).on('click', $.proxy(function(event) {
-                    event.stopPropagation();
-
-                    var group = $(event.target).parent();
-
-                    // Search all option in optgroup
-                    var $options = group.nextUntil('li.multiselect-group');
-                    var $visibleOptions = $options.filter(":visible:not(.disabled)");
-
-                    // check or uncheck items
-                    var allChecked = true;
-                    var optionInputs = $visibleOptions.find('input');
-                    optionInputs.each(function() {
-                        allChecked = allChecked && $(this).prop('checked');
-                    });
-
-                    optionInputs.prop('checked', !allChecked).trigger('change');
-                }, this));
-            }
-        },
-
-        /**
-         * Create an option using the given select option.
-         *
-         * @param {jQuery} element
-         */
-        createOptionValue: function(element) {
-            var $element = $(element);
-            if ($element.is(':selected')) {
-                $element.prop('selected', true);
-            }
-
-            // Support the label attribute on options.
-            var label = this.options.optionLabel(element);
-            var value = $element.val();
-            var inputType = this.options.multiple ? "checkbox" : "radio";
-
-            var $li = $(this.options.templates.li);
-            var $label = $('label', $li);
-            $label.addClass(inputType).addClass('form-check-label');
-
-            if (this.options.enableHTML) {
-                $label.html(" " + label);
-            }
-            else {
-                $label.text(" " + label);
-            }
-
-            var $checkbox = $('<input/>').attr('type', inputType).addClass('form-check-input').uniqueId();
-            $label.attr('for', $checkbox.attr('id'));
-            if (this.options.checkboxName) {
-                $checkbox.attr('name', this.options.checkboxName);
-            }
-            $label.before($checkbox);
-
-            var selected = $element.prop('selected') || false;
-            $checkbox.val(value);
-
-            if (value === this.options.selectAllValue) {
-                $li.addClass("multiselect-item multiselect-all");
-                $checkbox.parent().parent()
-                    .addClass('multiselect-all');
-            }
-
-            $label.attr('title', $element.attr('title'));
-
-            this.$ul.append($li);
-
-            if ($element.is(':disabled')) {
-                $checkbox.attr('disabled', 'disabled')
-                    .prop('disabled', true)
-                    .closest('a')
-                    .attr("tabindex", "-1")
-                    .closest('li')
-                    .addClass('disabled');
-            }
-
-            $checkbox.prop('checked', selected);
-
-            if (selected && this.options.selectedClass) {
-                $checkbox.closest('li')
-                    .addClass(this.options.selectedClass);
-            }
-        },
-
-        /**
-         * Creates a divider using the given select option.
-         *
-         * @param {jQuery} element
-         */
-        createDivider: function(element) {
-            var $divider = $(this.options.templates.divider);
-            this.$ul.append($divider);
-        },
-
-        /**
-         * Creates an optgroup.
-         *
-         * @param {jQuery} group
-         */
-        createOptgroup: function(group) {
-            var groupName = $(group).prop('label');
-
-            // Add a header for the group.
-            var $li = $(this.options.templates.liGroup);
-
-            if (this.options.enableHTML) {
-                $('label', $li).html(groupName);
-            }
-            else {
-                $('label', $li).text(groupName);
-            }
-
-            if (this.options.enableClickableOptGroups) {
-                $li.addClass('multiselect-group-clickable');
-            }
-
-            this.$ul.append($li);
-
-            if ($(group).is(':disabled')) {
-                $li.addClass('disabled');
-            }
-
-            // Add the options of the group.
-            $('option', group).each($.proxy(function(index, element) {
-                this.createOptionValue(element);
-            }, this));
-        },
-
-        /**
-         * Build the selct all.
-         *
-         * Checks if a select all has already been created.
-         */
-        buildSelectAll: function() {
-            if (typeof this.options.selectAllValue === 'number') {
-                this.options.selectAllValue = this.options.selectAllValue.toString();
-            }
-
-            var alreadyHasSelectAll = this.hasSelectAll();
-
-            if (!alreadyHasSelectAll && this.options.includeSelectAllOption && this.options.multiple
-                && $('option', this.$select).length > this.options.includeSelectAllIfMoreThan) {
-
-                // Check whether to add a divider after the select all.
-                if (this.options.includeSelectAllDivider) {
-                    this.$ul.prepend($(this.options.templates.divider));
-                }
-
-                var $li = $(this.options.templates.li);
-                var $label = $('label', $li).addClass("form-check-label");
-
-                if (this.options.enableHTML) {
-                    $label.html(" " + this.options.selectAllText);
-                }
-                else {
-                    $label.text(" " + this.options.selectAllText);
-                }
-
-                var $checkbox = $('<input type="checkbox" class="form-check-input" />').uniqueId();
-                $label.attr('for', $checkbox.attr('id'));;
-                $label.before($checkbox);
-                if (this.options.selectAllName) {
-                    $checkbox.attr('name', this.options.selectAllName);
-                }
-
-                $checkbox.val(this.options.selectAllValue);
-
-                $li.addClass("multiselect-item multiselect-all");
-                $checkbox.parent().parent()
-                    .addClass('multiselect-all');
-
-                this.$ul.prepend($li);
-
-                $checkbox.prop('checked', false);
-            }
-        },
-
-        /**
-         * Builds the filter.
-         */
-        buildFilter: function() {
-
-            // Build filter if filtering OR case insensitive filtering is enabled and the number of options exceeds (or equals) enableFilterLength.
-            if (this.options.enableFiltering || this.options.enableCaseInsensitiveFiltering) {
-                var enableFilterLength = Math.max(this.options.enableFiltering, this.options.enableCaseInsensitiveFiltering);
-
-                if (this.$select.find('option').length >= enableFilterLength) {
-
-                    this.$filter = $(this.options.templates.filter);
-                    $('input', this.$filter).attr('placeholder', this.options.filterPlaceholder);
-
-                    // Adds optional filter clear button
-                    if(this.options.includeFilterClearBtn){
-                        var clearBtn = $(this.options.templates.filterClearBtn);
-                        clearBtn.on('click', $.proxy(function(event){
-                            clearTimeout(this.searchTimeout);
-                            this.$filter.find('.multiselect-search').val('');
-                            $('li', this.$ul).show().removeClass("filter-hidden");
-                            this.updateSelectAll();
-                        }, this));
-                        this.$filter.find('.input-group').append(clearBtn);
-                    }
-
-                    this.$ul.prepend(this.$filter);
-
-                    this.$filter.val(this.query).on('click', function(event) {
-                        event.stopPropagation();
-                    }).on('input keydown', $.proxy(function(event) {
-                        // Cancel enter key default behaviour
-                        if (event.which === 13) {
-                            event.preventDefault();
-                        }
-
-                        // This is useful to catch "keydown" events after the browser has updated the control.
-                        clearTimeout(this.searchTimeout);
-
-                        this.searchTimeout = this.asyncFunction($.proxy(function() {
-
-                            if (this.query !== event.target.value) {
-                                this.query = event.target.value;
-
-                                var currentGroup, currentGroupVisible;
-                                $.each($('li', this.$ul), $.proxy(function(index, element) {
-                                    var value = $('input', element).length > 0 ? $('input', element).val() : "";
-                                    var text = $('label', element).text();
-
-                                    var filterCandidate = '';
-                                    if ((this.options.filterBehavior === 'text')) {
-                                        filterCandidate = text;
-                                    }
-                                    else if ((this.options.filterBehavior === 'value')) {
-                                        filterCandidate = value;
-                                    }
-                                    else if (this.options.filterBehavior === 'both') {
-                                        filterCandidate = text + '\n' + value;
-                                    }
-
-                                    if (value !== this.options.selectAllValue && text) {
-                                        // By default lets assume that element is not
-                                        // interesting for this search.
-                                        var showElement = false;
-
-                                        if (this.options.enableCaseInsensitiveFiltering && filterCandidate.toLowerCase().indexOf(this.query.toLowerCase()) > -1) {
-                                            showElement = true;
-                                        }
-                                        else if (filterCandidate.indexOf(this.query) > -1) {
-                                            showElement = true;
-                                        }
-
-                                        // Toggle current element (group or group item) according to showElement boolean.
-                                        $(element).toggle(showElement).toggleClass('filter-hidden', !showElement);
-
-                                        // Differentiate groups and group items.
-                                        if ($(element).hasClass('multiselect-group')) {
-                                            // Remember group status.
-                                            currentGroup = element;
-                                            currentGroupVisible = showElement;
-                                        }
-                                        else {
-                                            // Show group name when at least one of its items is visible.
-                                            if (showElement) {
-                                                $(currentGroup).show().removeClass('filter-hidden');
-                                            }
-
-                                            // Show all group items when group name satisfies filter.
-                                            if (!showElement && currentGroupVisible) {
-                                                $(element).show().removeClass('filter-hidden');
-                                            }
-                                        }
-                                    }
-                                }, this));
-                            }
-
-                            this.updateSelectAll();
-                        }, this), 300, this);
-                    }, this));
-                }
-            }
-        },
-
-        /**
-         * Unbinds the whole plugin.
-         */
-        destroy: function() {
-            this.$container.remove();
-            this.$select.show();
-            this.$select.data('multiselect', null);
-        },
-
-        /**
-         * Refreshs the multiselect based on the selected options of the select.
-         */
-        refresh: function() {
-            $('option', this.$select).each($.proxy(function(index, element) {
-                var $input = $('li input', this.$ul).filter(function() {
-                    return $(this).val() === $(element).val();
-                });
-
-                if ($(element).is(':selected')) {
-                    $input.prop('checked', true);
-
-                    if (this.options.selectedClass) {
-                        $input.closest('li')
-                            .addClass(this.options.selectedClass);
-                    }
-                }
-                else {
-                    $input.prop('checked', false);
-
-                    if (this.options.selectedClass) {
-                        $input.closest('li')
-                            .removeClass(this.options.selectedClass);
-                    }
-                }
-
-                if ($(element).is(":disabled")) {
-                    $input.attr('disabled', 'disabled')
-                        .prop('disabled', true)
-                        .closest('li')
-                        .addClass('disabled');
-                }
-                else {
-                    $input.prop('disabled', false)
-                        .closest('li')
-                        .removeClass('disabled');
-                }
-            }, this));
-
-            this.updateButtonText();
-            this.updateSelectAll();
-        },
-
-        /**
-         * Select all options of the given values.
-         *
-         * If triggerOnChange is set to true, the on change event is triggered if
-         * and only if one value is passed.
-         *
-         * @param {Array} selectValues
-         * @param {Boolean} triggerOnChange
-         */
-        select: function(selectValues, triggerOnChange) {
-            if(!$.isArray(selectValues)) {
-                selectValues = [selectValues];
-            }
-
-            for (var i = 0; i < selectValues.length; i++) {
-                var value = selectValues[i];
-
-                if (value === null || value === undefined) {
-                    continue;
-                }
-
-                var $option = this.getOptionByValue(value);
-                var $checkbox = this.getInputByValue(value);
-
-                if($option === undefined || $checkbox === undefined) {
-                    continue;
-                }
-
-                if (!this.options.multiple) {
-                    this.deselectAll(false);
-                }
-
-                if (this.options.selectedClass) {
-                    $checkbox.closest('li')
-                        .addClass(this.options.selectedClass);
-                }
-
-                $checkbox.prop('checked', true);
-                $option.prop('selected', true);
-
-                if (triggerOnChange) {
-                    this.options.onChange($option, true);
-                }
-            }
-
-            this.updateButtonText();
-            this.updateSelectAll();
-        },
-
-        /**
-         * Clears all selected items.
-         */
-        clearSelection: function () {
-            this.deselectAll(false);
-            this.updateButtonText();
-            this.updateSelectAll();
-        },
-
-        /**
-         * Deselects all options of the given values.
-         *
-         * If triggerOnChange is set to true, the on change event is triggered, if
-         * and only if one value is passed.
-         *
-         * @param {Array} deselectValues
-         * @param {Boolean} triggerOnChange
-         */
-        deselect: function(deselectValues, triggerOnChange) {
-            if(!$.isArray(deselectValues)) {
-                deselectValues = [deselectValues];
-            }
-
-            for (var i = 0; i < deselectValues.length; i++) {
-                var value = deselectValues[i];
-
-                if (value === null || value === undefined) {
-                    continue;
-                }
-
-                var $option = this.getOptionByValue(value);
-                var $checkbox = this.getInputByValue(value);
-
-                if($option === undefined || $checkbox === undefined) {
-                    continue;
-                }
-
-                if (this.options.selectedClass) {
-                    $checkbox.closest('li')
-                        .removeClass(this.options.selectedClass);
-                }
-
-                $checkbox.prop('checked', false);
-                $option.prop('selected', false);
-
-                if (triggerOnChange) {
-                    this.options.onChange($option, false);
-                }
-            }
-
-            this.updateButtonText();
-            this.updateSelectAll();
-        },
-
-        /**
-         * Selects all enabled & visible options.
-         *
-         * If justVisible is true or not specified, only visible options are selected.
-         *
-         * @param {Boolean} justVisible
-         * @param {Boolean} triggerOnSelectAll
-         */
-        selectAll: function (justVisible, triggerOnSelectAll) {
-            var justVisible = typeof justVisible === 'undefined' ? true : justVisible;
-            var allCheckboxes = $("li input[type='checkbox']:enabled", this.$ul);
-            var visibleCheckboxes = allCheckboxes.filter(":visible");
-            var allCheckboxesCount = allCheckboxes.length;
-            var visibleCheckboxesCount = visibleCheckboxes.length;
-
-            if(justVisible) {
-                visibleCheckboxes.prop('checked', true);
-                $("li:not(.divider):not(.disabled)", this.$ul).filter(":visible").addClass(this.options.selectedClass);
-            }
-            else {
-                allCheckboxes.prop('checked', true);
-                $("li:not(.divider):not(.disabled)", this.$ul).addClass(this.options.selectedClass);
-            }
-
-            if (allCheckboxesCount === visibleCheckboxesCount || justVisible === false) {
-                $("option:enabled", this.$select).prop('selected', true);
-            }
-            else {
-                var values = visibleCheckboxes.map(function() {
-                    return $(this).val();
-                }).get();
-
-                $("option:enabled", this.$select).filter(function(index) {
-                    return $.inArray($(this).val(), values) !== -1;
-                }).prop('selected', true);
-            }
-
-            if (triggerOnSelectAll) {
-                this.options.onSelectAll();
-            }
-        },
-
-        /**
-         * Deselects all options.
-         *
-         * If justVisible is true or not specified, only visible options are deselected.
-         *
-         * @param {Boolean} justVisible
-         */
-        deselectAll: function (justVisible) {
-            var justVisible = typeof justVisible === 'undefined' ? true : justVisible;
-
-            if(justVisible) {
-                var visibleCheckboxes = $("li input[type='checkbox']:not(:disabled)", this.$ul).filter(":visible");
-                visibleCheckboxes.prop('checked', false);
-
-                var values = visibleCheckboxes.map(function() {
-                    return $(this).val();
-                }).get();
-
-                $("option:enabled", this.$select).filter(function(index) {
-                    return $.inArray($(this).val(), values) !== -1;
-                }).prop('selected', false);
-
-                if (this.options.selectedClass) {
-                    $("li:not(.divider):not(.disabled)", this.$ul).filter(":visible").removeClass(this.options.selectedClass);
-                }
-            }
-            else {
-                $("li input[type='checkbox']:enabled", this.$ul).prop('checked', false);
-                $("option:enabled", this.$select).prop('selected', false);
-
-                if (this.options.selectedClass) {
-                    $("li:not(.divider):not(.disabled)", this.$ul).removeClass(this.options.selectedClass);
-                }
-            }
-        },
-
-        /**
-         * Rebuild the plugin.
-         *
-         * Rebuilds the dropdown, the filter and the select all option.
-         */
-        rebuild: function() {
-            this.$ul.html('');
-
-            // Important to distinguish between radios and checkboxes.
-            this.options.multiple = this.$select.attr('multiple') === "multiple";
-
-            this.buildSelectAll();
-            this.buildDropdownOptions();
-            this.buildFilter();
-
-            this.updateButtonText();
-            this.updateSelectAll();
-
-            if (this.options.disableIfEmpty && $('option', this.$select).length <= 0) {
-                this.disable();
-            }
-            else {
-                this.enable();
-            }
-
-            if (this.options.dropRight) {
-                this.$ul.addClass('pull-right');
-            }
-        },
-
-        /**
-         * The provided data will be used to build the dropdown.
-         */
-        dataprovider: function(dataprovider) {
-
-            var groupCounter = 0;
-            var $select = this.$select.empty();
-
-            $.each(dataprovider, function (index, option) {
-                var $tag;
-
-                if ($.isArray(option.children)) { // create optiongroup tag
-                    groupCounter++;
-
-                    $tag = $('<optgroup/>').attr({
-                        label: option.label || 'Group ' + groupCounter,
-                        disabled: !!option.disabled
-                    });
-
-                    forEach(option.children, function(subOption) { // add children option tags
-                        $tag.append($('<option/>').attr({
-                            value: subOption.value,
-                            label: subOption.label || subOption.value,
-                            title: subOption.title,
-                            selected: !!subOption.selected,
-                            disabled: !!subOption.disabled
-                        }));
-                    });
-                }
-                else {
-                    $tag = $('<option/>').attr({
-                        value: option.value,
-                        label: option.label || option.value,
-                        title: option.title,
-                        selected: !!option.selected,
-                        disabled: !!option.disabled
-                    });
-                }
-
-                $select.append($tag);
-            });
-
-            this.rebuild();
-        },
-
-        /**
-         * Enable the multiselect.
-         */
-        enable: function() {
-            this.$select.prop('disabled', false);
-            this.$button.prop('disabled', false)
-                .removeClass('disabled');
-        },
-
-        /**
-         * Disable the multiselect.
-         */
-        disable: function() {
-            this.$select.prop('disabled', true);
-            this.$button.prop('disabled', true)
-                .addClass('disabled');
-        },
-
-        /**
-         * Set the options.
-         *
-         * @param {Array} options
-         */
-        setOptions: function(options) {
-            this.options = this.mergeOptions(options);
-        },
-
-        /**
-         * Merges the given options with the default options.
-         *
-         * @param {Array} options
-         * @returns {Array}
-         */
-        mergeOptions: function(options) {
-            return $.extend(true, {}, this.defaults, this.options, options);
-        },
-
-        /**
-         * Checks whether a select all checkbox is present.
-         *
-         * @returns {Boolean}
-         */
-        hasSelectAll: function() {
-            return $('li.multiselect-all', this.$ul).length > 0;
-        },
-
-        /**
-         * Updates the select all checkbox based on the currently displayed and selected checkboxes.
-         */
-        updateSelectAll: function() {
-            if (this.hasSelectAll()) {
-                var allBoxes = $("li:not(.multiselect-item):not(.filter-hidden) input:enabled", this.$ul);
-                var allBoxesLength = allBoxes.length;
-                var checkedBoxesLength = allBoxes.filter(":checked").length;
-                var selectAllLi  = $("li.multiselect-all", this.$ul);
-                var selectAllInput = selectAllLi.find("input");
-
-                if (checkedBoxesLength > 0 && checkedBoxesLength === allBoxesLength) {
-                    selectAllInput.prop("checked", true);
-                    selectAllLi.addClass(this.options.selectedClass);
-                    this.options.onSelectAll();
-                }
-                else {
-                    selectAllInput.prop("checked", false);
-                    selectAllLi.removeClass(this.options.selectedClass);
-                }
-            }
-        },
-
-        /**
-         * Update the button text and its title based on the currently selected options.
-         */
-        updateButtonText: function() {
-            var options = this.getSelected();
-
-            // First update the displayed button text.
-            if (this.options.enableHTML) {
-                $('.multiselect .multiselect-selected-text', this.$container).html(this.options.buttonText(options, this.$select));
-            }
-            else {
-                $('.multiselect .multiselect-selected-text', this.$container).text(this.options.buttonText(options, this.$select));
-            }
-
-            // Now update the title attribute of the button.
-            $('.multiselect', this.$container).attr('title', this.options.buttonTitle(options, this.$select));
-        },
-
-        /**
-         * Get all selected options.
-         *
-         * @returns {jQUery}
-         */
-        getSelected: function() {
-            return $('option', this.$select).filter(":selected");
-        },
-
-        /**
-         * Gets a select option by its value.
-         *
-         * @param {String} value
-         * @returns {jQuery}
-         */
-        getOptionByValue: function (value) {
-
-            var options = $('option', this.$select);
-            var valueToCompare = value.toString();
-
-            for (var i = 0; i < options.length; i = i + 1) {
-                var option = options[i];
-                if (option.value === valueToCompare) {
-                    return $(option);
-                }
-            }
-        },
-
-        /**
-         * Get the input (radio/checkbox) by its value.
-         *
-         * @param {String} value
-         * @returns {jQuery}
-         */
-        getInputByValue: function (value) {
-
-            var checkboxes = $('li input', this.$ul);
-            var valueToCompare = value.toString();
-
-            for (var i = 0; i < checkboxes.length; i = i + 1) {
-                var checkbox = checkboxes[i];
-                if (checkbox.value === valueToCompare) {
-                    return $(checkbox);
-                }
-            }
-        },
-
-        /**
-         * Used for knockout integration.
-         */
-        updateOriginalOptions: function() {
-            this.originalOptions = this.$select.clone()[0].options;
-        },
-
-        asyncFunction: function(callback, timeout, self) {
-            var args = Array.prototype.slice.call(arguments, 3);
-            return setTimeout(function() {
-                callback.apply(self || window, args);
-            }, timeout);
-        },
-
-        setAllSelectedText: function(allSelectedText) {
-            this.options.allSelectedText = allSelectedText;
-            this.updateButtonText();
-        }
-    };
-
-    $.fn.multiselect = function(option, parameter, extraOptions) {
-        return this.each(function() {
-            var data = $(this).data('multiselect');
-            var options = typeof option === 'object' && option;
-
-            // Initialize the multiselect.
-            if (!data) {
-                data = new Multiselect(this, options);
-                $(this).data('multiselect', data);
-            }
-
-            // Call multiselect method.
-            if (typeof option === 'string') {
-                data[option](parameter, extraOptions);
-
-                if (option === 'destroy') {
-                    $(this).data('multiselect', false);
-                }
-            }
-        });
-    };
-
-    $.fn.multiselect.Constructor = Multiselect;
-
-    $(function() {
-        $("select[data-role=multiselect]").multiselect();
-    });
-
-}(window.jQuery);
-
-/*
-* jquery.datafilter plugin
-* Copyright 2011- 2018 Jay Brummels & Jonathan Sharp
-* Licensed under MIT (https://github.com/unscrum/jaymvc/LICENSE)
-*/
-(function ($) {
-
-    function encodeName(name) {
-        return 'data-' + name.replace(/([a-z0-9])([A-Z])/g, '$1-$2').toLowerCase();
-    }
-
-    function encodeValue(value) {
-        if (value) {
-            value = value.replace(/\\/g, '\\\\').replace(/\"/g, '\\"');
-        }
-        return value || '';
-    }
-
-    function decodeName(name) {
-        name = name.replace(/^data-/ig, '').toLowerCase();
-        return $.map(name.split('-'), function (n, i) {
-            return (i > 0 ? n.substr(0, 1).toUpperCase() + n.substr(1) : n);
-        }).join('');
-    }
-
-    function generateSelector(attr, value, comparison) {
-        if (arguments.length === 0) {
-            attr = value = '';
-            comparison = '*=';
-        } else if (arguments.length === 1) {
-            value = '';
-            comparison = '*=';
-        } else if (arguments.length === 2) {
-            comparison = '=';
-        }
-        var name = encodeName(decodeName(attr));
-        var val = encodeValue(value);
-        var selector = name + comparison + '"' + val + '"';
-        return '[' + selector + ']';
-    }
-
-    function executeFindOfFilter(type, args) {
-        // Multiple attribute seletions
-        var selector;
-        if (typeof args[0] == 'object') {
-            selector = '';
-            for (var i = 0; i < args.length; i++) {
-                selector += generateSelector.apply({}, args[i]);
-            }
-            if (selector === '') {
-                return this.pushStack([]);
-            }
-            return this[type](selector);
-        }
-        selector = generateSelector.apply({}, args);
-        if (selector === '') {
-            return this.pushStack([]);
-        }
-        return this[type](selector);
-    }
-
-    /*
-    $('body').dataFilter('criteria', 'MTA', '$=');
-	
-    $('body').dataFilter(['criteria', 'MTA'], ['foo'], []);	
-    */
-    $.fn.dataFilter = function (/*attr, value, comparison*/) {
-        return executeFindOfFilter.call(this, 'filter', arguments.length === 1 ? arguments[0] : arguments);
-    };
-
-    // $().datasetFind('criteria', 'MTA');
-    $.fn.dataFind = function (/*attr, value, comparison*/) {
-        return executeFindOfFilter.call(this, 'find', arguments.length === 1 ? arguments[0] : arguments);
-    };
-})(jQuery);
 /*!
  * lockr.js
  * Licensed under MIT (https://codeclimate.com/github/tsironis/lockr/LICENSE/source)
@@ -32315,6 +27994,4336 @@ var jay = {
     return hooks;
 
 })));
+//     Underscore.js 1.8.3
+//     http://underscorejs.org
+//     (c) 2009-2015 Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
+//     Underscore may be freely distributed under the MIT license.
+
+(function () {
+
+    // Baseline setup
+    // --------------
+
+    // Establish the root object, `window` in the browser, or `exports` on the server.
+    var root = this;
+
+    // Save the previous value of the `_` variable.
+    var previousUnderscore = root._;
+
+    // Save bytes in the minified (but not gzipped) version:
+    var ArrayProto = Array.prototype, ObjProto = Object.prototype, FuncProto = Function.prototype;
+
+    // Create quick reference variables for speed access to core prototypes.
+    var
+        push = ArrayProto.push,
+        slice = ArrayProto.slice,
+        toString = ObjProto.toString,
+        hasOwnProperty = ObjProto.hasOwnProperty;
+
+    // All **ECMAScript 5** native function implementations that we hope to use
+    // are declared here.
+    var
+        nativeIsArray = Array.isArray,
+        nativeKeys = Object.keys,
+        nativeBind = FuncProto.bind,
+        nativeCreate = Object.create;
+
+    // Naked function reference for surrogate-prototype-swapping.
+    var Ctor = function () { };
+
+    // Create a safe reference to the Underscore object for use below.
+    var _ = function (obj) {
+        if (obj instanceof _) return obj;
+        if (!(this instanceof _)) return new _(obj);
+        this._wrapped = obj;
+    };
+
+    // Export the Underscore object for **Node.js**, with
+    // backwards-compatibility for the old `require()` API. If we're in
+    // the browser, add `_` as a global object.
+    if (typeof exports !== 'undefined') {
+        if (typeof module !== 'undefined' && module.exports) {
+            exports = module.exports = _;
+        }
+        exports._ = _;
+    } else {
+        root._ = _;
+    }
+
+    // Current version.
+    _.VERSION = '1.8.3';
+
+    // Internal function that returns an efficient (for current engines) version
+    // of the passed-in callback, to be repeatedly applied in other Underscore
+    // functions.
+    var optimizeCb = function (func, context, argCount) {
+        if (context === void 0) return func;
+        switch (argCount == null ? 3 : argCount) {
+        case 1: return function (value) {
+            return func.call(context, value);
+        };
+        case 2: return function (value, other) {
+            return func.call(context, value, other);
+        };
+        case 3: return function (value, index, collection) {
+            return func.call(context, value, index, collection);
+        };
+        case 4: return function (accumulator, value, index, collection) {
+            return func.call(context, accumulator, value, index, collection);
+        };
+        }
+        return function () {
+            return func.apply(context, arguments);
+        };
+    };
+
+    // A mostly-internal function to generate callbacks that can be applied
+    // to each element in a collection, returning the desired result — either
+    // identity, an arbitrary callback, a property matcher, or a property accessor.
+    var cb = function (value, context, argCount) {
+        if (value == null) return _.identity;
+        if (_.isFunction(value)) return optimizeCb(value, context, argCount);
+        if (_.isObject(value)) return _.matcher(value);
+        return _.property(value);
+    };
+    _.iteratee = function (value, context) {
+        return cb(value, context, Infinity);
+    };
+
+    // An internal function for creating assigner functions.
+    var createAssigner = function (keysFunc, undefinedOnly) {
+        return function (obj) {
+            var length = arguments.length;
+            if (length < 2 || obj == null) return obj;
+            for (var index = 1; index < length; index++) {
+                var source = arguments[index],
+                    keys = keysFunc(source),
+                    l = keys.length;
+                for (var i = 0; i < l; i++) {
+                    var key = keys[i];
+                    if (!undefinedOnly || obj[key] === void 0) obj[key] = source[key];
+                }
+            }
+            return obj;
+        };
+    };
+
+    // An internal function for creating a new object that inherits from another.
+    var baseCreate = function (prototype) {
+        if (!_.isObject(prototype)) return {};
+        if (nativeCreate) return nativeCreate(prototype);
+        Ctor.prototype = prototype;
+        var result = new Ctor;
+        Ctor.prototype = null;
+        return result;
+    };
+
+    var property = function (key) {
+        return function (obj) {
+            return obj == null ? void 0 : obj[key];
+        };
+    };
+
+    // Helper for collection methods to determine whether a collection
+    // should be iterated as an array or as an object
+    // Related: http://people.mozilla.org/~jorendorff/es6-draft.html#sec-tolength
+    // Avoids a very nasty iOS 8 JIT bug on ARM-64. #2094
+    var MAX_ARRAY_INDEX = Math.pow(2, 53) - 1;
+    var getLength = property('length');
+    var isArrayLike = function (collection) {
+        var length = getLength(collection);
+        return typeof length == 'number' && length >= 0 && length <= MAX_ARRAY_INDEX;
+    };
+
+    // Collection Functions
+    // --------------------
+
+    // The cornerstone, an `each` implementation, aka `forEach`.
+    // Handles raw objects in addition to array-likes. Treats all
+    // sparse array-likes as if they were dense.
+    _.each = _.forEach = function (obj, iteratee, context) {
+        iteratee = optimizeCb(iteratee, context);
+        var i, length;
+        if (isArrayLike(obj)) {
+            for (i = 0, length = obj.length; i < length; i++) {
+                iteratee(obj[i], i, obj);
+            }
+        } else {
+            var keys = _.keys(obj);
+            for (i = 0, length = keys.length; i < length; i++) {
+                iteratee(obj[keys[i]], keys[i], obj);
+            }
+        }
+        return obj;
+    };
+
+    // Return the results of applying the iteratee to each element.
+    _.map = _.collect = function (obj, iteratee, context) {
+        iteratee = cb(iteratee, context);
+        var keys = !isArrayLike(obj) && _.keys(obj),
+            length = (keys || obj).length,
+            results = Array(length);
+        for (var index = 0; index < length; index++) {
+            var currentKey = keys ? keys[index] : index;
+            results[index] = iteratee(obj[currentKey], currentKey, obj);
+        }
+        return results;
+    };
+
+    // Create a reducing function iterating left or right.
+    function createReduce(dir) {
+        // Optimized iterator function as using arguments.length
+        // in the main function will deoptimize the, see #1991.
+        function iterator(obj, iteratee, memo, keys, index, length) {
+            for (; index >= 0 && index < length; index += dir) {
+                var currentKey = keys ? keys[index] : index;
+                memo = iteratee(memo, obj[currentKey], currentKey, obj);
+            }
+            return memo;
+        }
+
+        return function (obj, iteratee, memo, context) {
+            iteratee = optimizeCb(iteratee, context, 4);
+            var keys = !isArrayLike(obj) && _.keys(obj),
+                length = (keys || obj).length,
+                index = dir > 0 ? 0 : length - 1;
+            // Determine the initial value if none is provided.
+            if (arguments.length < 3) {
+                memo = obj[keys ? keys[index] : index];
+                index += dir;
+            }
+            return iterator(obj, iteratee, memo, keys, index, length);
+        };
+    }
+
+    // **Reduce** builds up a single result from a list of values, aka `inject`,
+    // or `foldl`.
+    _.reduce = _.foldl = _.inject = createReduce(1);
+
+    // The right-associative version of reduce, also known as `foldr`.
+    _.reduceRight = _.foldr = createReduce(-1);
+
+    // Return the first value which passes a truth test. Aliased as `detect`.
+    _.find = _.detect = function (obj, predicate, context) {
+        var key;
+        if (isArrayLike(obj)) {
+            key = _.findIndex(obj, predicate, context);
+        } else {
+            key = _.findKey(obj, predicate, context);
+        }
+        if (key !== void 0 && key !== -1) return obj[key];
+    };
+
+    // Return all the elements that pass a truth test.
+    // Aliased as `select`.
+    _.filter = _.select = function (obj, predicate, context) {
+        var results = [];
+        predicate = cb(predicate, context);
+        _.each(obj, function (value, index, list) {
+            if (predicate(value, index, list)) results.push(value);
+        });
+        return results;
+    };
+
+    // Return all the elements for which a truth test fails.
+    _.reject = function (obj, predicate, context) {
+        return _.filter(obj, _.negate(cb(predicate)), context);
+    };
+
+    // Determine whether all of the elements match a truth test.
+    // Aliased as `all`.
+    _.every = _.all = function (obj, predicate, context) {
+        predicate = cb(predicate, context);
+        var keys = !isArrayLike(obj) && _.keys(obj),
+            length = (keys || obj).length;
+        for (var index = 0; index < length; index++) {
+            var currentKey = keys ? keys[index] : index;
+            if (!predicate(obj[currentKey], currentKey, obj)) return false;
+        }
+        return true;
+    };
+
+    // Determine if at least one element in the object matches a truth test.
+    // Aliased as `any`.
+    _.some = _.any = function (obj, predicate, context) {
+        predicate = cb(predicate, context);
+        var keys = !isArrayLike(obj) && _.keys(obj),
+            length = (keys || obj).length;
+        for (var index = 0; index < length; index++) {
+            var currentKey = keys ? keys[index] : index;
+            if (predicate(obj[currentKey], currentKey, obj)) return true;
+        }
+        return false;
+    };
+
+    // Determine if the array or object contains a given item (using `===`).
+    // Aliased as `includes` and `include`.
+    _.contains = _.includes = _.include = function (obj, item, fromIndex, guard) {
+        if (!isArrayLike(obj)) obj = _.values(obj);
+        if (typeof fromIndex != 'number' || guard) fromIndex = 0;
+        return _.indexOf(obj, item, fromIndex) >= 0;
+    };
+
+    // Invoke a method (with arguments) on every item in a collection.
+    _.invoke = function (obj, method) {
+        var args = slice.call(arguments, 2);
+        var isFunc = _.isFunction(method);
+        return _.map(obj, function (value) {
+            var func = isFunc ? method : value[method];
+            return func == null ? func : func.apply(value, args);
+        });
+    };
+
+    // Convenience version of a common use case of `map`: fetching a property.
+    _.pluck = function (obj, key) {
+        return _.map(obj, _.property(key));
+    };
+
+    // Convenience version of a common use case of `filter`: selecting only objects
+    // containing specific `key:value` pairs.
+    _.where = function (obj, attrs) {
+        return _.filter(obj, _.matcher(attrs));
+    };
+
+    // Convenience version of a common use case of `find`: getting the first object
+    // containing specific `key:value` pairs.
+    _.findWhere = function (obj, attrs) {
+        return _.find(obj, _.matcher(attrs));
+    };
+
+    // Return the maximum element (or element-based computation).
+    _.max = function (obj, iteratee, context) {
+        var result = -Infinity, lastComputed = -Infinity,
+            value, computed;
+        if (iteratee == null && obj != null) {
+            obj = isArrayLike(obj) ? obj : _.values(obj);
+            for (var i = 0, length = obj.length; i < length; i++) {
+                value = obj[i];
+                if (value > result) {
+                    result = value;
+                }
+            }
+        } else {
+            iteratee = cb(iteratee, context);
+            _.each(obj, function (value, index, list) {
+                computed = iteratee(value, index, list);
+                if (computed > lastComputed || computed === -Infinity && result === -Infinity) {
+                    result = value;
+                    lastComputed = computed;
+                }
+            });
+        }
+        return result;
+    };
+
+    // Return the minimum element (or element-based computation).
+    _.min = function (obj, iteratee, context) {
+        var result = Infinity, lastComputed = Infinity,
+            value, computed;
+        if (iteratee == null && obj != null) {
+            obj = isArrayLike(obj) ? obj : _.values(obj);
+            for (var i = 0, length = obj.length; i < length; i++) {
+                value = obj[i];
+                if (value < result) {
+                    result = value;
+                }
+            }
+        } else {
+            iteratee = cb(iteratee, context);
+            _.each(obj, function (value, index, list) {
+                computed = iteratee(value, index, list);
+                if (computed < lastComputed || computed === Infinity && result === Infinity) {
+                    result = value;
+                    lastComputed = computed;
+                }
+            });
+        }
+        return result;
+    };
+
+    // Shuffle a collection, using the modern version of the
+    // [Fisher-Yates shuffle](http://en.wikipedia.org/wiki/Fisher–Yates_shuffle).
+    _.shuffle = function (obj) {
+        var set = isArrayLike(obj) ? obj : _.values(obj);
+        var length = set.length;
+        var shuffled = Array(length);
+        for (var index = 0, rand; index < length; index++) {
+            rand = _.random(0, index);
+            if (rand !== index) shuffled[index] = shuffled[rand];
+            shuffled[rand] = set[index];
+        }
+        return shuffled;
+    };
+
+    // Sample **n** random values from a collection.
+    // If **n** is not specified, returns a single random element.
+    // The internal `guard` argument allows it to work with `map`.
+    _.sample = function (obj, n, guard) {
+        if (n == null || guard) {
+            if (!isArrayLike(obj)) obj = _.values(obj);
+            return obj[_.random(obj.length - 1)];
+        }
+        return _.shuffle(obj).slice(0, Math.max(0, n));
+    };
+
+    // Sort the object's values by a criterion produced by an iteratee.
+    _.sortBy = function (obj, iteratee, context) {
+        iteratee = cb(iteratee, context);
+        return _.pluck(_.map(obj, function (value, index, list) {
+            return {
+                value: value,
+                index: index,
+                criteria: iteratee(value, index, list)
+            };
+        }).sort(function (left, right) {
+            var a = left.criteria;
+            var b = right.criteria;
+            if (a !== b) {
+                if (a > b || a === void 0) return 1;
+                if (a < b || b === void 0) return -1;
+            }
+            return left.index - right.index;
+        }), 'value');
+    };
+
+    // An internal function used for aggregate "group by" operations.
+    var group = function (behavior) {
+        return function (obj, iteratee, context) {
+            var result = {};
+            iteratee = cb(iteratee, context);
+            _.each(obj, function (value, index) {
+                var key = iteratee(value, index, obj);
+                behavior(result, value, key);
+            });
+            return result;
+        };
+    };
+
+    // Groups the object's values by a criterion. Pass either a string attribute
+    // to group by, or a function that returns the criterion.
+    _.groupBy = group(function (result, value, key) {
+        if (_.has(result, key)) result[key].push(value); else result[key] = [value];
+    });
+
+    // Indexes the object's values by a criterion, similar to `groupBy`, but for
+    // when you know that your index values will be unique.
+    _.indexBy = group(function (result, value, key) {
+        result[key] = value;
+    });
+
+    // Counts instances of an object that group by a certain criterion. Pass
+    // either a string attribute to count by, or a function that returns the
+    // criterion.
+    _.countBy = group(function (result, value, key) {
+        if (_.has(result, key)) result[key]++; else result[key] = 1;
+    });
+
+    // Safely create a real, live array from anything iterable.
+    _.toArray = function (obj) {
+        if (!obj) return [];
+        if (_.isArray(obj)) return slice.call(obj);
+        if (isArrayLike(obj)) return _.map(obj, _.identity);
+        return _.values(obj);
+    };
+
+    // Return the number of elements in an object.
+    _.size = function (obj) {
+        if (obj == null) return 0;
+        return isArrayLike(obj) ? obj.length : _.keys(obj).length;
+    };
+
+    // Split a collection into two arrays: one whose elements all satisfy the given
+    // predicate, and one whose elements all do not satisfy the predicate.
+    _.partition = function (obj, predicate, context) {
+        predicate = cb(predicate, context);
+        var pass = [], fail = [];
+        _.each(obj, function (value, key, obj) {
+            (predicate(value, key, obj) ? pass : fail).push(value);
+        });
+        return [pass, fail];
+    };
+
+    // Array Functions
+    // ---------------
+
+    // Get the first element of an array. Passing **n** will return the first N
+    // values in the array. Aliased as `head` and `take`. The **guard** check
+    // allows it to work with `_.map`.
+    _.first = _.head = _.take = function (array, n, guard) {
+        if (array == null) return void 0;
+        if (n == null || guard) return array[0];
+        return _.initial(array, array.length - n);
+    };
+
+    // Returns everything but the last entry of the array. Especially useful on
+    // the arguments object. Passing **n** will return all the values in
+    // the array, excluding the last N.
+    _.initial = function (array, n, guard) {
+        return slice.call(array, 0, Math.max(0, array.length - (n == null || guard ? 1 : n)));
+    };
+
+    // Get the last element of an array. Passing **n** will return the last N
+    // values in the array.
+    _.last = function (array, n, guard) {
+        if (array == null) return void 0;
+        if (n == null || guard) return array[array.length - 1];
+        return _.rest(array, Math.max(0, array.length - n));
+    };
+
+    // Returns everything but the first entry of the array. Aliased as `tail` and `drop`.
+    // Especially useful on the arguments object. Passing an **n** will return
+    // the rest N values in the array.
+    _.rest = _.tail = _.drop = function (array, n, guard) {
+        return slice.call(array, n == null || guard ? 1 : n);
+    };
+
+    // Trim out all falsy values from an array.
+    _.compact = function (array) {
+        return _.filter(array, _.identity);
+    };
+
+    // Internal implementation of a recursive `flatten` function.
+    var flatten = function (input, shallow, strict, startIndex) {
+        var output = [], idx = 0;
+        for (var i = startIndex || 0, length = getLength(input) ; i < length; i++) {
+            var value = input[i];
+            if (isArrayLike(value) && (_.isArray(value) || _.isArguments(value))) {
+                //flatten current level of array or arguments object
+                if (!shallow) value = flatten(value, shallow, strict);
+                var j = 0, len = value.length;
+                output.length += len;
+                while (j < len) {
+                    output[idx++] = value[j++];
+                }
+            } else if (!strict) {
+                output[idx++] = value;
+            }
+        }
+        return output;
+    };
+
+    // Flatten out an array, either recursively (by default), or just one level.
+    _.flatten = function (array, shallow) {
+        return flatten(array, shallow, false);
+    };
+
+    // Return a version of the array that does not contain the specified value(s).
+    _.without = function (array) {
+        return _.difference(array, slice.call(arguments, 1));
+    };
+
+    // Produce a duplicate-free version of the array. If the array has already
+    // been sorted, you have the option of using a faster algorithm.
+    // Aliased as `unique`.
+    _.uniq = _.unique = function (array, isSorted, iteratee, context) {
+        if (!_.isBoolean(isSorted)) {
+            context = iteratee;
+            iteratee = isSorted;
+            isSorted = false;
+        }
+        if (iteratee != null) iteratee = cb(iteratee, context);
+        var result = [];
+        var seen = [];
+        for (var i = 0, length = getLength(array) ; i < length; i++) {
+            var value = array[i],
+                computed = iteratee ? iteratee(value, i, array) : value;
+            if (isSorted) {
+                if (!i || seen !== computed) result.push(value);
+                seen = computed;
+            } else if (iteratee) {
+                if (!_.contains(seen, computed)) {
+                    seen.push(computed);
+                    result.push(value);
+                }
+            } else if (!_.contains(result, value)) {
+                result.push(value);
+            }
+        }
+        return result;
+    };
+
+    // Produce an array that contains the union: each distinct element from all of
+    // the passed-in arrays.
+    _.union = function () {
+        return _.uniq(flatten(arguments, true, true));
+    };
+
+    // Produce an array that contains every item shared between all the
+    // passed-in arrays.
+    _.intersection = function (array) {
+        var result = [];
+        var argsLength = arguments.length;
+        for (var i = 0, length = getLength(array) ; i < length; i++) {
+            var item = array[i];
+            if (_.contains(result, item)) continue;
+            for (var j = 1; j < argsLength; j++) {
+                if (!_.contains(arguments[j], item)) break;
+            }
+            if (j === argsLength) result.push(item);
+        }
+        return result;
+    };
+
+    // Take the difference between one array and a number of other arrays.
+    // Only the elements present in just the first array will remain.
+    _.difference = function (array) {
+        var rest = flatten(arguments, true, true, 1);
+        return _.filter(array, function (value) {
+            return !_.contains(rest, value);
+        });
+    };
+
+    // Zip together multiple lists into a single array -- elements that share
+    // an index go together.
+    _.zip = function () {
+        return _.unzip(arguments);
+    };
+
+    // Complement of _.zip. Unzip accepts an array of arrays and groups
+    // each array's elements on shared indices
+    _.unzip = function (array) {
+        var length = array && _.max(array, getLength).length || 0;
+        var result = Array(length);
+
+        for (var index = 0; index < length; index++) {
+            result[index] = _.pluck(array, index);
+        }
+        return result;
+    };
+
+    // Converts lists into objects. Pass either a single array of `[key, value]`
+    // pairs, or two parallel arrays of the same length -- one of keys, and one of
+    // the corresponding values.
+    _.object = function (list, values) {
+        var result = {};
+        for (var i = 0, length = getLength(list) ; i < length; i++) {
+            if (values) {
+                result[list[i]] = values[i];
+            } else {
+                result[list[i][0]] = list[i][1];
+            }
+        }
+        return result;
+    };
+
+    // Generator function to create the findIndex and findLastIndex functions
+    function createPredicateIndexFinder(dir) {
+        return function (array, predicate, context) {
+            predicate = cb(predicate, context);
+            var length = getLength(array);
+            var index = dir > 0 ? 0 : length - 1;
+            for (; index >= 0 && index < length; index += dir) {
+                if (predicate(array[index], index, array)) return index;
+            }
+            return -1;
+        };
+    }
+
+    // Returns the first index on an array-like that passes a predicate test
+    _.findIndex = createPredicateIndexFinder(1);
+    _.findLastIndex = createPredicateIndexFinder(-1);
+
+    // Use a comparator function to figure out the smallest index at which
+    // an object should be inserted so as to maintain order. Uses binary search.
+    _.sortedIndex = function (array, obj, iteratee, context) {
+        iteratee = cb(iteratee, context, 1);
+        var value = iteratee(obj);
+        var low = 0, high = getLength(array);
+        while (low < high) {
+            var mid = Math.floor((low + high) / 2);
+            if (iteratee(array[mid]) < value) low = mid + 1; else high = mid;
+        }
+        return low;
+    };
+
+    // Generator function to create the indexOf and lastIndexOf functions
+    function createIndexFinder(dir, predicateFind, sortedIndex) {
+        return function (array, item, idx) {
+            var i = 0, length = getLength(array);
+            if (typeof idx == 'number') {
+                if (dir > 0) {
+                    i = idx >= 0 ? idx : Math.max(idx + length, i);
+                } else {
+                    length = idx >= 0 ? Math.min(idx + 1, length) : idx + length + 1;
+                }
+            } else if (sortedIndex && idx && length) {
+                idx = sortedIndex(array, item);
+                return array[idx] === item ? idx : -1;
+            }
+            if (item !== item) {
+                idx = predicateFind(slice.call(array, i, length), _.isNaN);
+                return idx >= 0 ? idx + i : -1;
+            }
+            for (idx = dir > 0 ? i : length - 1; idx >= 0 && idx < length; idx += dir) {
+                if (array[idx] === item) return idx;
+            }
+            return -1;
+        };
+    }
+
+    // Return the position of the first occurrence of an item in an array,
+    // or -1 if the item is not included in the array.
+    // If the array is large and already in sort order, pass `true`
+    // for **isSorted** to use binary search.
+    _.indexOf = createIndexFinder(1, _.findIndex, _.sortedIndex);
+    _.lastIndexOf = createIndexFinder(-1, _.findLastIndex);
+
+    // Generate an integer Array containing an arithmetic progression. A port of
+    // the native Python `range()` function. See
+    // [the Python documentation](http://docs.python.org/library/functions.html#range).
+    _.range = function (start, stop, step) {
+        if (stop == null) {
+            stop = start || 0;
+            start = 0;
+        }
+        step = step || 1;
+
+        var length = Math.max(Math.ceil((stop - start) / step), 0);
+        var range = Array(length);
+
+        for (var idx = 0; idx < length; idx++, start += step) {
+            range[idx] = start;
+        }
+
+        return range;
+    };
+
+    // Function (ahem) Functions
+    // ------------------
+
+    // Determines whether to execute a function as a constructor
+    // or a normal function with the provided arguments
+    var executeBound = function (sourceFunc, boundFunc, context, callingContext, args) {
+        if (!(callingContext instanceof boundFunc)) return sourceFunc.apply(context, args);
+        var self = baseCreate(sourceFunc.prototype);
+        var result = sourceFunc.apply(self, args);
+        if (_.isObject(result)) return result;
+        return self;
+    };
+
+    // Create a function bound to a given object (assigning `this`, and arguments,
+    // optionally). Delegates to **ECMAScript 5**'s native `Function.bind` if
+    // available.
+    _.bind = function (func, context) {
+        if (nativeBind && func.bind === nativeBind) return nativeBind.apply(func, slice.call(arguments, 1));
+        if (!_.isFunction(func)) throw new TypeError('Bind must be called on a function');
+        var args = slice.call(arguments, 2);
+        var bound = function () {
+            return executeBound(func, bound, context, this, args.concat(slice.call(arguments)));
+        };
+        return bound;
+    };
+
+    // Partially apply a function by creating a version that has had some of its
+    // arguments pre-filled, without changing its dynamic `this` context. _ acts
+    // as a placeholder, allowing any combination of arguments to be pre-filled.
+    _.partial = function (func) {
+        var boundArgs = slice.call(arguments, 1);
+        var bound = function () {
+            var position = 0, length = boundArgs.length;
+            var args = Array(length);
+            for (var i = 0; i < length; i++) {
+                args[i] = boundArgs[i] === _ ? arguments[position++] : boundArgs[i];
+            }
+            while (position < arguments.length) args.push(arguments[position++]);
+            return executeBound(func, bound, this, this, args);
+        };
+        return bound;
+    };
+
+    // Bind a number of an object's methods to that object. Remaining arguments
+    // are the method names to be bound. Useful for ensuring that all callbacks
+    // defined on an object belong to it.
+    _.bindAll = function (obj) {
+        var i, length = arguments.length, key;
+        if (length <= 1) throw new Error('bindAll must be passed function names');
+        for (i = 1; i < length; i++) {
+            key = arguments[i];
+            obj[key] = _.bind(obj[key], obj);
+        }
+        return obj;
+    };
+
+    // Memoize an expensive function by storing its results.
+    _.memoize = function (func, hasher) {
+        var memoize = function (key) {
+            var cache = memoize.cache;
+            var address = '' + (hasher ? hasher.apply(this, arguments) : key);
+            if (!_.has(cache, address)) cache[address] = func.apply(this, arguments);
+            return cache[address];
+        };
+        memoize.cache = {};
+        return memoize;
+    };
+
+    // Delays a function for the given number of milliseconds, and then calls
+    // it with the arguments supplied.
+    _.delay = function (func, wait) {
+        var args = slice.call(arguments, 2);
+        return setTimeout(function () {
+            return func.apply(null, args);
+        }, wait);
+    };
+
+    // Defers a function, scheduling it to run after the current call stack has
+    // cleared.
+    _.defer = _.partial(_.delay, _, 1);
+
+    // Returns a function, that, when invoked, will only be triggered at most once
+    // during a given window of time. Normally, the throttled function will run
+    // as much as it can, without ever going more than once per `wait` duration;
+    // but if you'd like to disable the execution on the leading edge, pass
+    // `{leading: false}`. To disable execution on the trailing edge, ditto.
+    _.throttle = function (func, wait, options) {
+        var context, args, result;
+        var timeout = null;
+        var previous = 0;
+        if (!options) options = {};
+        var later = function () {
+            previous = options.leading === false ? 0 : _.now();
+            timeout = null;
+            result = func.apply(context, args);
+            if (!timeout) context = args = null;
+        };
+        return function () {
+            var now = _.now();
+            if (!previous && options.leading === false) previous = now;
+            var remaining = wait - (now - previous);
+            context = this;
+            args = arguments;
+            if (remaining <= 0 || remaining > wait) {
+                if (timeout) {
+                    clearTimeout(timeout);
+                    timeout = null;
+                }
+                previous = now;
+                result = func.apply(context, args);
+                if (!timeout) context = args = null;
+            } else if (!timeout && options.trailing !== false) {
+                timeout = setTimeout(later, remaining);
+            }
+            return result;
+        };
+    };
+
+    // Returns a function, that, as long as it continues to be invoked, will not
+    // be triggered. The function will be called after it stops being called for
+    // N milliseconds. If `immediate` is passed, trigger the function on the
+    // leading edge, instead of the trailing.
+    _.debounce = function (func, wait, immediate) {
+        var timeout, args, context, timestamp, result;
+
+        var later = function () {
+            var last = _.now() - timestamp;
+
+            if (last < wait && last >= 0) {
+                timeout = setTimeout(later, wait - last);
+            } else {
+                timeout = null;
+                if (!immediate) {
+                    result = func.apply(context, args);
+                    if (!timeout) context = args = null;
+                }
+            }
+        };
+
+        return function () {
+            context = this;
+            args = arguments;
+            timestamp = _.now();
+            var callNow = immediate && !timeout;
+            if (!timeout) timeout = setTimeout(later, wait);
+            if (callNow) {
+                result = func.apply(context, args);
+                context = args = null;
+            }
+
+            return result;
+        };
+    };
+
+    // Returns the first function passed as an argument to the second,
+    // allowing you to adjust arguments, run code before and after, and
+    // conditionally execute the original function.
+    _.wrap = function (func, wrapper) {
+        return _.partial(wrapper, func);
+    };
+
+    // Returns a negated version of the passed-in predicate.
+    _.negate = function (predicate) {
+        return function () {
+            return !predicate.apply(this, arguments);
+        };
+    };
+
+    // Returns a function that is the composition of a list of functions, each
+    // consuming the return value of the function that follows.
+    _.compose = function () {
+        var args = arguments;
+        var start = args.length - 1;
+        return function () {
+            var i = start;
+            var result = args[start].apply(this, arguments);
+            while (i--) result = args[i].call(this, result);
+            return result;
+        };
+    };
+
+    // Returns a function that will only be executed on and after the Nth call.
+    _.after = function (times, func) {
+        return function () {
+            if (--times < 1) {
+                return func.apply(this, arguments);
+            }
+        };
+    };
+
+    // Returns a function that will only be executed up to (but not including) the Nth call.
+    _.before = function (times, func) {
+        var memo;
+        return function () {
+            if (--times > 0) {
+                memo = func.apply(this, arguments);
+            }
+            if (times <= 1) func = null;
+            return memo;
+        };
+    };
+
+    // Returns a function that will be executed at most one time, no matter how
+    // often you call it. Useful for lazy initialization.
+    _.once = _.partial(_.before, 2);
+
+    // Object Functions
+    // ----------------
+
+    // Keys in IE < 9 that won't be iterated by `for key in ...` and thus missed.
+    var hasEnumBug = !{ toString: null }.propertyIsEnumerable('toString');
+    var nonEnumerableProps = ['valueOf', 'isPrototypeOf', 'toString',
+        'propertyIsEnumerable', 'hasOwnProperty', 'toLocaleString'];
+
+    function collectNonEnumProps(obj, keys) {
+        var nonEnumIdx = nonEnumerableProps.length;
+        var constructor = obj.constructor;
+        var proto = (_.isFunction(constructor) && constructor.prototype) || ObjProto;
+
+        // Constructor is a special case.
+        var prop = 'constructor';
+        if (_.has(obj, prop) && !_.contains(keys, prop)) keys.push(prop);
+
+        while (nonEnumIdx--) {
+            prop = nonEnumerableProps[nonEnumIdx];
+            if (prop in obj && obj[prop] !== proto[prop] && !_.contains(keys, prop)) {
+                keys.push(prop);
+            }
+        }
+    }
+
+    // Retrieve the names of an object's own properties.
+    // Delegates to **ECMAScript 5**'s native `Object.keys`
+    _.keys = function (obj) {
+        if (!_.isObject(obj)) return [];
+        if (nativeKeys) return nativeKeys(obj);
+        var keys = [];
+        for (var key in obj) if (_.has(obj, key)) keys.push(key);
+        // Ahem, IE < 9.
+        if (hasEnumBug) collectNonEnumProps(obj, keys);
+        return keys;
+    };
+
+    // Retrieve all the property names of an object.
+    _.allKeys = function (obj) {
+        if (!_.isObject(obj)) return [];
+        var keys = [];
+        for (var key in obj) keys.push(key);
+        // Ahem, IE < 9.
+        if (hasEnumBug) collectNonEnumProps(obj, keys);
+        return keys;
+    };
+
+    // Retrieve the values of an object's properties.
+    _.values = function (obj) {
+        var keys = _.keys(obj);
+        var length = keys.length;
+        var values = Array(length);
+        for (var i = 0; i < length; i++) {
+            values[i] = obj[keys[i]];
+        }
+        return values;
+    };
+
+    // Returns the results of applying the iteratee to each element of the object
+    // In contrast to _.map it returns an object
+    _.mapObject = function (obj, iteratee, context) {
+        iteratee = cb(iteratee, context);
+        var keys = _.keys(obj),
+            length = keys.length,
+            results = {},
+            currentKey;
+        for (var index = 0; index < length; index++) {
+            currentKey = keys[index];
+            results[currentKey] = iteratee(obj[currentKey], currentKey, obj);
+        }
+        return results;
+    };
+
+    // Convert an object into a list of `[key, value]` pairs.
+    _.pairs = function (obj) {
+        var keys = _.keys(obj);
+        var length = keys.length;
+        var pairs = Array(length);
+        for (var i = 0; i < length; i++) {
+            pairs[i] = [keys[i], obj[keys[i]]];
+        }
+        return pairs;
+    };
+
+    // Invert the keys and values of an object. The values must be serializable.
+    _.invert = function (obj) {
+        var result = {};
+        var keys = _.keys(obj);
+        for (var i = 0, length = keys.length; i < length; i++) {
+            result[obj[keys[i]]] = keys[i];
+        }
+        return result;
+    };
+
+    // Return a sorted list of the function names available on the object.
+    // Aliased as `methods`
+    _.functions = _.methods = function (obj) {
+        var names = [];
+        for (var key in obj) {
+            if (_.isFunction(obj[key])) names.push(key);
+        }
+        return names.sort();
+    };
+
+    // Extend a given object with all the properties in passed-in object(s).
+    _.extend = createAssigner(_.allKeys);
+
+    // Assigns a given object with all the own properties in the passed-in object(s)
+    // (https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object/assign)
+    _.extendOwn = _.assign = createAssigner(_.keys);
+
+    // Returns the first key on an object that passes a predicate test
+    _.findKey = function (obj, predicate, context) {
+        predicate = cb(predicate, context);
+        var keys = _.keys(obj), key;
+        for (var i = 0, length = keys.length; i < length; i++) {
+            key = keys[i];
+            if (predicate(obj[key], key, obj)) return key;
+        }
+    };
+
+    // Return a copy of the object only containing the whitelisted properties.
+    _.pick = function (object, oiteratee, context) {
+        var result = {}, obj = object, iteratee, keys;
+        if (obj == null) return result;
+        if (_.isFunction(oiteratee)) {
+            keys = _.allKeys(obj);
+            iteratee = optimizeCb(oiteratee, context);
+        } else {
+            keys = flatten(arguments, false, false, 1);
+            iteratee = function (value, key, obj) { return key in obj; };
+            obj = Object(obj);
+        }
+        for (var i = 0, length = keys.length; i < length; i++) {
+            var key = keys[i];
+            var value = obj[key];
+            if (iteratee(value, key, obj)) result[key] = value;
+        }
+        return result;
+    };
+
+    // Return a copy of the object without the blacklisted properties.
+    _.omit = function (obj, iteratee, context) {
+        if (_.isFunction(iteratee)) {
+            iteratee = _.negate(iteratee);
+        } else {
+            var keys = _.map(flatten(arguments, false, false, 1), String);
+            iteratee = function (value, key) {
+                return !_.contains(keys, key);
+            };
+        }
+        return _.pick(obj, iteratee, context);
+    };
+
+    // Fill in a given object with default properties.
+    _.defaults = createAssigner(_.allKeys, true);
+
+    // Creates an object that inherits from the given prototype object.
+    // If additional properties are provided then they will be added to the
+    // created object.
+    _.create = function (prototype, props) {
+        var result = baseCreate(prototype);
+        if (props) _.extendOwn(result, props);
+        return result;
+    };
+
+    // Create a (shallow-cloned) duplicate of an object.
+    _.clone = function (obj) {
+        if (!_.isObject(obj)) return obj;
+        return _.isArray(obj) ? obj.slice() : _.extend({}, obj);
+    };
+
+    // Invokes interceptor with the obj, and then returns obj.
+    // The primary purpose of this method is to "tap into" a method chain, in
+    // order to perform operations on intermediate results within the chain.
+    _.tap = function (obj, interceptor) {
+        interceptor(obj);
+        return obj;
+    };
+
+    // Returns whether an object has a given set of `key:value` pairs.
+    _.isMatch = function (object, attrs) {
+        var keys = _.keys(attrs), length = keys.length;
+        if (object == null) return !length;
+        var obj = Object(object);
+        for (var i = 0; i < length; i++) {
+            var key = keys[i];
+            if (attrs[key] !== obj[key] || !(key in obj)) return false;
+        }
+        return true;
+    };
+
+
+    // Internal recursive comparison function for `isEqual`.
+    var eq = function (a, b, aStack, bStack) {
+        // Identical objects are equal. `0 === -0`, but they aren't identical.
+        // See the [Harmony `egal` proposal](http://wiki.ecmascript.org/doku.php?id=harmony:egal).
+        if (a === b) return a !== 0 || 1 / a === 1 / b;
+        // A strict comparison is necessary because `null == undefined`.
+        if (a == null || b == null) return a === b;
+        // Unwrap any wrapped objects.
+        if (a instanceof _) a = a._wrapped;
+        if (b instanceof _) b = b._wrapped;
+        // Compare `[[Class]]` names.
+        var className = toString.call(a);
+        if (className !== toString.call(b)) return false;
+        switch (className) {
+            // Strings, numbers, regular expressions, dates, and booleans are compared by value.
+        case '[object RegExp]':
+        // RegExps are coerced to strings for comparison (Note: '' + /a/i === '/a/i')
+        case '[object String]':
+            // Primitives and their corresponding object wrappers are equivalent; thus, `"5"` is
+            // equivalent to `new String("5")`.
+            return '' + a === '' + b;
+        case '[object Number]':
+            // `NaN`s are equivalent, but non-reflexive.
+            // Object(NaN) is equivalent to NaN
+            if (+a !== +a) return +b !== +b;
+            // An `egal` comparison is performed for other numeric values.
+            return +a === 0 ? 1 / +a === 1 / b : +a === +b;
+        case '[object Date]':
+        case '[object Boolean]':
+            // Coerce dates and booleans to numeric primitive values. Dates are compared by their
+            // millisecond representations. Note that invalid dates with millisecond representations
+            // of `NaN` are not equivalent.
+            return +a === +b;
+        }
+
+        var areArrays = className === '[object Array]';
+        if (!areArrays) {
+            if (typeof a != 'object' || typeof b != 'object') return false;
+
+            // Objects with different constructors are not equivalent, but `Object`s or `Array`s
+            // from different frames are.
+            var aCtor = a.constructor, bCtor = b.constructor;
+            if (aCtor !== bCtor && !(_.isFunction(aCtor) && aCtor instanceof aCtor &&
+                    _.isFunction(bCtor) && bCtor instanceof bCtor)
+                && ('constructor' in a && 'constructor' in b)) {
+                return false;
+            }
+        }
+        // Assume equality for cyclic structures. The algorithm for detecting cyclic
+        // structures is adapted from ES 5.1 section 15.12.3, abstract operation `JO`.
+
+        // Initializing stack of traversed objects.
+        // It's done here since we only need them for objects and arrays comparison.
+        aStack = aStack || [];
+        bStack = bStack || [];
+        var length = aStack.length;
+        while (length--) {
+            // Linear search. Performance is inversely proportional to the number of
+            // unique nested structures.
+            if (aStack[length] === a) return bStack[length] === b;
+        }
+
+        // Add the first object to the stack of traversed objects.
+        aStack.push(a);
+        bStack.push(b);
+
+        // Recursively compare objects and arrays.
+        if (areArrays) {
+            // Compare array lengths to determine if a deep comparison is necessary.
+            length = a.length;
+            if (length !== b.length) return false;
+            // Deep compare the contents, ignoring non-numeric properties.
+            while (length--) {
+                if (!eq(a[length], b[length], aStack, bStack)) return false;
+            }
+        } else {
+            // Deep compare objects.
+            var keys = _.keys(a), key;
+            length = keys.length;
+            // Ensure that both objects contain the same number of properties before comparing deep equality.
+            if (_.keys(b).length !== length) return false;
+            while (length--) {
+                // Deep compare each member
+                key = keys[length];
+                if (!(_.has(b, key) && eq(a[key], b[key], aStack, bStack))) return false;
+            }
+        }
+        // Remove the first object from the stack of traversed objects.
+        aStack.pop();
+        bStack.pop();
+        return true;
+    };
+
+    // Perform a deep comparison to check if two objects are equal.
+    _.isEqual = function (a, b) {
+        return eq(a, b);
+    };
+
+    // Is a given array, string, or object empty?
+    // An "empty" object has no enumerable own-properties.
+    _.isEmpty = function (obj) {
+        if (obj == null) return true;
+        if (isArrayLike(obj) && (_.isArray(obj) || _.isString(obj) || _.isArguments(obj))) return obj.length === 0;
+        return _.keys(obj).length === 0;
+    };
+
+    // Is a given value a DOM element?
+    _.isElement = function (obj) {
+        return !!(obj && obj.nodeType === 1);
+    };
+
+    // Is a given value an array?
+    // Delegates to ECMA5's native Array.isArray
+    _.isArray = nativeIsArray || function (obj) {
+        return toString.call(obj) === '[object Array]';
+    };
+
+    // Is a given variable an object?
+    _.isObject = function (obj) {
+        var type = typeof obj;
+        return type === 'function' || type === 'object' && !!obj;
+    };
+
+    // Add some isType methods: isArguments, isFunction, isString, isNumber, isDate, isRegExp, isError.
+    _.each(['Arguments', 'Function', 'String', 'Number', 'Date', 'RegExp', 'Error'], function (name) {
+        _['is' + name] = function (obj) {
+            return toString.call(obj) === '[object ' + name + ']';
+        };
+    });
+
+    // Define a fallback version of the method in browsers (ahem, IE < 9), where
+    // there isn't any inspectable "Arguments" type.
+    if (!_.isArguments(arguments)) {
+        _.isArguments = function (obj) {
+            return _.has(obj, 'callee');
+        };
+    }
+
+    // Optimize `isFunction` if appropriate. Work around some typeof bugs in old v8,
+    // IE 11 (#1621), and in Safari 8 (#1929).
+    if (typeof /./ != 'function' && typeof Int8Array != 'object') {
+        _.isFunction = function (obj) {
+            return typeof obj == 'function' || false;
+        };
+    }
+
+    // Is a given object a finite number?
+    _.isFinite = function (obj) {
+        return isFinite(obj) && !isNaN(parseFloat(obj));
+    };
+
+    // Is the given value `NaN`? (NaN is the only number which does not equal itself).
+    _.isNaN = function (obj) {
+        return _.isNumber(obj) && obj !== +obj;
+    };
+
+    // Is a given value a boolean?
+    _.isBoolean = function (obj) {
+        return obj === true || obj === false || toString.call(obj) === '[object Boolean]';
+    };
+
+    // Is a given value equal to null?
+    _.isNull = function (obj) {
+        return obj === null;
+    };
+
+    // Is a given variable undefined?
+    _.isUndefined = function (obj) {
+        return obj === void 0;
+    };
+
+    // Shortcut function for checking if an object has a given property directly
+    // on itself (in other words, not on a prototype).
+    _.has = function (obj, key) {
+        return obj != null && hasOwnProperty.call(obj, key);
+    };
+
+    // Utility Functions
+    // -----------------
+
+    // Run Underscore.js in *noConflict* mode, returning the `_` variable to its
+    // previous owner. Returns a reference to the Underscore object.
+    _.noConflict = function () {
+        root._ = previousUnderscore;
+        return this;
+    };
+
+    // Keep the identity function around for default iteratees.
+    _.identity = function (value) {
+        return value;
+    };
+
+    // Predicate-generating functions. Often useful outside of Underscore.
+    _.constant = function (value) {
+        return function () {
+            return value;
+        };
+    };
+
+    _.noop = function () { };
+
+    _.property = property;
+
+    // Generates a function for a given object that returns a given property.
+    _.propertyOf = function (obj) {
+        return obj == null ? function () { } : function (key) {
+            return obj[key];
+        };
+    };
+
+    // Returns a predicate for checking whether an object has a given set of
+    // `key:value` pairs.
+    _.matcher = _.matches = function (attrs) {
+        attrs = _.extendOwn({}, attrs);
+        return function (obj) {
+            return _.isMatch(obj, attrs);
+        };
+    };
+
+    // Run a function **n** times.
+    _.times = function (n, iteratee, context) {
+        var accum = Array(Math.max(0, n));
+        iteratee = optimizeCb(iteratee, context, 1);
+        for (var i = 0; i < n; i++) accum[i] = iteratee(i);
+        return accum;
+    };
+
+    // Return a random integer between min and max (inclusive).
+    _.random = function (min, max) {
+        if (max == null) {
+            max = min;
+            min = 0;
+        }
+        return min + Math.floor(Math.random() * (max - min + 1));
+    };
+
+    // A (possibly faster) way to get the current timestamp as an integer.
+    _.now = Date.now || function () {
+        return new Date().getTime();
+    };
+
+    // List of HTML entities for escaping.
+    var escapeMap = {
+        '&': '&amp;',
+        '<': '&lt;',
+        '>': '&gt;',
+        '"': '&quot;',
+        "'": '&#x27;',
+        '`': '&#x60;'
+    };
+    var unescapeMap = _.invert(escapeMap);
+
+    // Functions for escaping and unescaping strings to/from HTML interpolation.
+    var createEscaper = function (map) {
+        var escaper = function (match) {
+            return map[match];
+        };
+        // Regexes for identifying a key that needs to be escaped
+        var source = '(?:' + _.keys(map).join('|') + ')';
+        var testRegexp = RegExp(source);
+        var replaceRegexp = RegExp(source, 'g');
+        return function (string) {
+            string = string == null ? '' : '' + string;
+            return testRegexp.test(string) ? string.replace(replaceRegexp, escaper) : string;
+        };
+    };
+    _.escape = createEscaper(escapeMap);
+    _.unescape = createEscaper(unescapeMap);
+
+    // If the value of the named `property` is a function then invoke it with the
+    // `object` as context; otherwise, return it.
+    _.result = function (object, property, fallback) {
+        var value = object == null ? void 0 : object[property];
+        if (value === void 0) {
+            value = fallback;
+        }
+        return _.isFunction(value) ? value.call(object) : value;
+    };
+
+    // Generate a unique integer id (unique within the entire client session).
+    // Useful for temporary DOM ids.
+    var idCounter = 0;
+    _.uniqueId = function (prefix) {
+        var id = ++idCounter + '';
+        return prefix ? prefix + id : id;
+    };
+
+    // By default, Underscore uses ERB-style template delimiters, change the
+    // following template settings to use alternative delimiters.
+    _.templateSettings = {
+        evaluate: /<%([\s\S]+?)%>/g,
+        interpolate: /<%=([\s\S]+?)%>/g,
+        escape: /<%-([\s\S]+?)%>/g
+    };
+
+    // When customizing `templateSettings`, if you don't want to define an
+    // interpolation, evaluation or escaping regex, we need one that is
+    // guaranteed not to match.
+    var noMatch = /(.)^/;
+
+    // Certain characters need to be escaped so that they can be put into a
+    // string literal.
+    var escapes = {
+        "'": "'",
+        '\\': '\\',
+        '\r': 'r',
+        '\n': 'n',
+        '\u2028': 'u2028',
+        '\u2029': 'u2029'
+    };
+
+    var escaper = /\\|'|\r|\n|\u2028|\u2029/g;
+
+    var escapeChar = function (match) {
+        return '\\' + escapes[match];
+    };
+
+    // JavaScript micro-templating, similar to John Resig's implementation.
+    // Underscore templating handles arbitrary delimiters, preserves whitespace,
+    // and correctly escapes quotes within interpolated code.
+    // NB: `oldSettings` only exists for backwards compatibility.
+    _.template = function (text, settings, oldSettings) {
+        if (!settings && oldSettings) settings = oldSettings;
+        settings = _.defaults({}, settings, _.templateSettings);
+
+        // Combine delimiters into one regular expression via alternation.
+        var matcher = RegExp([
+            (settings.escape || noMatch).source,
+            (settings.interpolate || noMatch).source,
+            (settings.evaluate || noMatch).source
+        ].join('|') + '|$', 'g');
+
+        // Compile the template source, escaping string literals appropriately.
+        var index = 0;
+        var source = "__p+='";
+        text.replace(matcher, function (match, escape, interpolate, evaluate, offset) {
+            source += text.slice(index, offset).replace(escaper, escapeChar);
+            index = offset + match.length;
+
+            if (escape) {
+                source += "'+\n((__t=(" + escape + "))==null?'':_.escape(__t))+\n'";
+            } else if (interpolate) {
+                source += "'+\n((__t=(" + interpolate + "))==null?'':__t)+\n'";
+            } else if (evaluate) {
+                source += "';\n" + evaluate + "\n__p+='";
+            }
+
+            // Adobe VMs need the match returned to produce the correct offest.
+            return match;
+        });
+        source += "';\n";
+
+        // If a variable is not specified, place data values in local scope.
+        if (!settings.variable) source = 'with(obj||{}){\n' + source + '}\n';
+
+        source = "var __t,__p='',__j=Array.prototype.join," +
+            "print=function(){__p+=__j.call(arguments,'');};\n" +
+            source + 'return __p;\n';
+
+        try {
+            var render = new Function(settings.variable || 'obj', '_', source);
+        } catch (e) {
+            e.source = source;
+            throw e;
+        }
+
+        var template = function (data) {
+            return render.call(this, data, _);
+        };
+
+        // Provide the compiled source as a convenience for precompilation.
+        var argument = settings.variable || 'obj';
+        template.source = 'function(' + argument + '){\n' + source + '}';
+
+        return template;
+    };
+
+    // Add a "chain" function. Start chaining a wrapped Underscore object.
+    _.chain = function (obj) {
+        var instance = _(obj);
+        instance._chain = true;
+        return instance;
+    };
+
+    // OOP
+    // ---------------
+    // If Underscore is called as a function, it returns a wrapped object that
+    // can be used OO-style. This wrapper holds altered versions of all the
+    // underscore functions. Wrapped objects may be chained.
+
+    // Helper function to continue chaining intermediate results.
+    var result = function (instance, obj) {
+        return instance._chain ? _(obj).chain() : obj;
+    };
+
+    // Add your own custom functions to the Underscore object.
+    _.mixin = function (obj) {
+        _.each(_.functions(obj), function (name) {
+            var func = _[name] = obj[name];
+            _.prototype[name] = function () {
+                var args = [this._wrapped];
+                push.apply(args, arguments);
+                return result(this, func.apply(_, args));
+            };
+        });
+    };
+
+    // Add all of the Underscore functions to the wrapper object.
+    _.mixin(_);
+
+    // Add all mutator Array functions to the wrapper.
+    _.each(['pop', 'push', 'reverse', 'shift', 'sort', 'splice', 'unshift'], function (name) {
+        var method = ArrayProto[name];
+        _.prototype[name] = function () {
+            var obj = this._wrapped;
+            method.apply(obj, arguments);
+            if ((name === 'shift' || name === 'splice') && obj.length === 0) delete obj[0];
+            return result(this, obj);
+        };
+    });
+
+    // Add all accessor Array functions to the wrapper.
+    _.each(['concat', 'join', 'slice'], function (name) {
+        var method = ArrayProto[name];
+        _.prototype[name] = function () {
+            return result(this, method.apply(this._wrapped, arguments));
+        };
+    });
+
+    // Extracts the result from a wrapped and chained object.
+    _.prototype.value = function () {
+        return this._wrapped;
+    };
+
+    // Provide unwrapping proxy for some methods used in engine operations
+    // such as arithmetic and JSON stringification.
+    _.prototype.valueOf = _.prototype.toJSON = _.prototype.value;
+
+    _.prototype.toString = function () {
+        return '' + this._wrapped;
+    };
+
+    // AMD registration happens at the end for compatibility with AMD loaders
+    // that may not enforce next-turn semantics on modules. Even though general
+    // practice for AMD registration is to be anonymous, underscore registers
+    // as a named module because, like jQuery, it is a base library that is
+    // popular enough to be bundled in a third party lib, but not be part of
+    // an AMD load request. Those cases could generate an error when an
+    // anonymous define() is called outside of a loader request.
+    if (typeof define === 'function' && define.amd) {
+        define('underscore', [], function () {
+            return _;
+        });
+    }
+}.call(this));
+/*!
+ * jay.utility (https://github.com/unscrum/jaymvc)
+ * Copyright 2018 Jay Brummels
+ * Licensed under MIT (https://github.com/unscrum/jaymvc/LICENSE)
+ */
+
+/**
+* This file contains jQuery utility methods. These are small distinct functions
+* that are more than likely not tied to the UI.
+*/
+(function($) {
+    // Debugging methods
+    $.fn.dumpStack = function(title, content) {
+        if (this.length === 0) {
+            log('dumpStack ' + (title ? '(' + title + ') ' : '') + 'empty');
+        } else {
+            log('dumpStack ' + (title ? '(' + title + ') ' : '') + this.length);
+            this.each(function(i) {
+                log(i +
+                    ': ' +
+                    this.tagName +
+                    (this.id ? '#' + this.id : '') +
+                    (this.className !== '' ? '.' + this.className.replace(/\s/g, '.') : '') +
+                    ($(this).is(':input') ? ' VAL[' + $(this).val() + ']' : '') +
+                    (title === true || content ? ' HTML[' + $(this).html().substr(0, 45) + '...]' : ''));
+            });
+            log('dumpStack (end)');
+        }
+        return this;
+    };
+
+
+    // Given two classes, will replace one with the second
+    // Third argument specifies if the first class is required for
+    // the second to be added
+    $.fn.swapClass = function(c1, c2, requireFirst) {
+        return this.each(function() {
+            if (requireFirst === false || $(this).hasClass(c1)) {
+                var c = $(this).attr('class');
+                c = c.replace(new RegExp('(^|\\\s+)' + c1 + '(\\\s+|$)'), '$1' + c2 + '$2');
+                $(this).attr('class', c);
+            }
+        });
+    };
+
+    // Returns a new jQuery collection with all unique elements
+    $.fn.unique = function() {
+        return this.pushStack($.unique(this));
+    };
+
+    /*
+    * This method is similar to clone with the exception that
+    * it will return an array of all of the clones of the element.
+    */
+    $.fn.duplicate = function(count, cloneEvents) {
+        var tmp = [];
+        for (var i = 0; i < count; i++) {
+            $.merge(tmp, this.clone(cloneEvents).get());
+        }
+        return this.pushStack(tmp);
+    };
+
+    // Returns an array of values
+    $.fn.values = function() {
+        var values = [];
+        this.each(function() {
+            values.push($(this).val());
+        });
+        return values;
+    };
+
+    // Returns a string of joined values
+    $.fn.joinValues = function(delim) {
+        return this.values().join(arguments.length === 0 ? ',' : delim);
+    };
+
+    // Returns the value of the first element that contains the specified attribute
+    // otherwise returns an empty string
+    $.fn.firstAttr = function(attr) {
+        var ret = '';
+        this.each(function() {
+            var r = $(this).attr(attr);
+            if (r !== '') {
+                ret = r;
+                return false;
+            }
+// ReSharper disable NotAllPathsReturnValue
+        });
+// ReSharper restore NotAllPathsReturnValue
+        return ret;
+    };
+
+    // Usage:
+    // $('a').wait(5000, ['hello', 'world'], function(a, b) {
+    //   alert( a + ' ' + b );
+    //   $(this).addClass('highlight-links');
+    // });
+    $.fn.wait = function(timeout, data, fn) {
+        if ($.isFunction(data)) {
+            fn = data;
+            data = [];
+        }
+// ReSharper disable InconsistentNaming
+        var _this = this;
+// ReSharper restore InconsistentNaming
+        setTimeout(function() {
+                _this.each(function() {
+                    fn.call(this, data);
+                });
+            },
+            timeout);
+        return this;
+    };
+
+    $.fn.selectRange = function (start, end) {
+        var e = this[0];
+        var $this = $(e);
+        if (arguments.length === 0) {
+            start = 0;
+            end = $this.val().length;
+        } else if (arguments.length === 1) {
+            end = start;
+            start = 0;
+        }
+        if (document.activeElement !== e) {
+            $this.focus();
+        }
+        if (e.setSelectionRange) { /* WebKit */
+            setTimeout(function(){
+                e.setSelectionRange(start, end);
+            }, 1);
+        }
+        else if (e.createTextRange) { /* IE */
+            var range = e.createTextRange();
+            range.collapse(true); range.moveEnd('character', end);
+            range.moveStart('character', start);
+            range.select();
+        }
+        else if (e.selectionStart && e.selectionEnd) {
+            e.selectionStart = start;
+            e.selectionEnd = end;
+        }
+        return this;
+    };
+
+    $.fn.selectRangeOnFocus = function () {
+        return this.each(function () {
+            $(this).on('focusin', function () {
+                $(this).selectRange();
+            });
+        });
+
+    };
+
+    $.fn.selectRangeOnFocusDestroy = function () {
+        return this.each(function () {
+            $(this).off('focusin');
+        });
+
+    };
+
+
+    // This method connects one dom event to another
+    /*
+    * This method is used to cross bind events. For example you can bind the click event of #element1
+    * to the updateList custom event of #element2 by doing:
+    * $('#element1').connect('click', '#element2', 'updateList');
+    */
+    $.fn.connect = function(/*[propagation, ]sourceEvent, target, targetEvent [, argsArray]*/) {
+        var sourceHandling = false;
+        var i = 0;
+        if (typeof arguments[0] === 'boolean' || typeof arguments[0] === 'object') {
+            sourceHandling = arguments[0];
+            i++;
+        }
+        var sourceEvent = arguments[i++],
+            target = arguments[i++],
+            targetEvent = arguments[i++] || null,
+            args = arguments[i] || null;
+
+        return this.on(sourceEvent,
+            function(evt) {
+// ReSharper disable InconsistentNaming
+                var _args = args;
+// ReSharper restore InconsistentNaming
+                // If the user didn't specify any arguments, pass through the events args
+                // (very useful for custom events)
+                if (_args === null) {
+                    _args = Array.prototype.slice.call(arguments, 1);
+                }
+                $(target || this).trigger(targetEvent || sourceEvent, _args || []);
+                if (typeof sourceHandling === 'object') {
+                    if (sourceHandling.stopPropagation === true) {
+                        evt.stopPropagation();
+                    }
+                    if (sourceHandling.preventDefault === true) {
+                        evt.preventDefault();
+                    }
+                    if (sourceHandling.stopImmediatePropagation === true) {
+                        evt.stopImmediatePropagation();
+                    }
+                }
+                return sourceEvent;
+            });
+    };
+    /*
+    * Clears all form inputs
+    */
+    $.fn.clearForm = function() {
+        return this.each(function() {
+            var $t = $(this);
+            var type = $t.attr('type');
+            var tag = this.tagName.toLowerCase(); // normalize case
+            // it's ok to reset the value attr of text inputs,
+            // password inputs, and textareas
+            if (type === 'text' || type === 'password' || tag === 'textarea' || tag === 'select') {
+                if (tag === 'select') {
+                    $t.attr('selectedIndex', -1);
+                }
+                $t.val('');
+                // checkboxes and radios need to have their checked state cleared
+                // but should *not* have their 'value' changed
+            } else if (type === 'checkbox' || type === 'radio') {
+                $t.attr('checked', false);
+            }
+        });
+    };
+
+    /*
+    *  This is the preferred method for gathering form input.
+    */
+    $.fn.getInputValues = function(extra, allFields) {
+        if (arguments.length === 1 && typeof extra === 'boolean') {
+            allFields = extra;
+            extra = null;
+        }
+        var data = {};
+        var elements = this;
+        if (this.is('form') || !this.is(':input')) {
+            elements = $(this).find(':input');
+        }
+        elements.each(function() {
+            var $t = $(this);
+            var $e = $t.is(':hidden') ? $t.parent() : $t;
+            if (allFields === true || $e.is(':visible')) {
+                // Find the closest element that has either a name attribute or an id attribute
+                var tmp = $t.closest('[name],[id]');
+                var id = tmp.attr('name') || tmp.attr('id');
+                if (($t.is(':checkbox,:radio') && !$t.is(':checked')) || ($t.is(':text') && $t.val() === '')) {
+                    return;
+                }
+
+                var val = $t.is(':checkbox') ? ($t.attr('value') !== 'on' ? $t.val() : $t.is(':checked')) : $t.val();
+                if (data[id] === undefined) {
+                    data[id] = val;
+                } else {
+                    data[id] = $.makeArray(data[id]);
+                    data[id].push(val);
+                }
+            }
+        });
+        if (extra) {
+            $.extend(data, extra);
+        }
+        return data;
+    };
+
+    $.fn.isTextType = function () {
+        var $t = $(this).first();
+        return $t.is('textarea') ||
+            $t.is(':text, :password') ||
+            $t.is(':input[type="color"]') ||
+            $t.is(':input[type="date"]') ||
+            $t.is(':input[type="datetime"]') ||
+            $t.is(':input[type="datetime-local"]') ||
+            $t.is(':input[type="email"]') ||
+            $t.is(':input[type="month"]') ||
+            $t.is(':input[type="number"]') ||
+            $t.is(':input[type="range"]') ||
+            $t.is(':input[type="search"]') ||
+            $t.is(':input[type="tel"]') ||
+            $t.is(':input[type="time"]') ||
+            $t.is(':input[type="url"]') ||
+            $t.is(':input[type="week"]');
+    };
+
+    $.fn.clearJsonValidation = function(){
+        $('span.form-text.text-danger', this).remove();
+        $('.form-control.is-invalid',this).removeClass('is-invalid');
+        return this.messageRemove();
+    };
+
+    $.fn.applyJsonValidation = function(dict){
+
+        if ($.isPlainObject(dict)) {
+            for (var key in dict) {
+                if (dict.hasOwnProperty(key)) {
+                    $(':input[name="' + key + '"]', this).addClass('is-invalid').closest('div.form-group')
+                        .append($('<span/>').addClass('form-text text-danger')
+                            .html(dict[key]));
+                }
+            }
+        } else {
+            this.message('error', dict);
+        }
+        return this;
+    };
+
+    $.fn.filterTextType = function() {
+        var ret = [];
+        this.each(function () {
+            if ($(this).isTextType() === true) {
+                ret.push(this);
+            }
+        });
+        return $(ret);
+    };
+
+    $.fn.isEmpty = function () {
+        var $t = $(this[0]);
+        return $t.has('*').length === 0 && $t.text().trim().length === 0;
+    };
+})(jQuery);
+
+/*!
+* jay.onaction plugin
+* Copyright 2011- 2018 Jay Brummels & Jonathan Sharp
+* Licensed under MIT (https://github.com/unscrum/jaymvc/LICENSE)
+*/
+
+
+/*
+* This is the main event handling pattern for these sites. All event handling is processed through event delegation
+* with the following pattern. Event handlers are defined but not bound to individual elements (decoupled) by calling
+* $.onAction('someAction', function() { ... }); Elements are then tagged for specific events by adding a css
+* class that starts with action- followed by the action name, so in our example above, the associated action would be
+* action-some-action. Multiple action handlers may be registered for a single action. If only one action handler should
+* be registered at a give time, you may setup that action by using $.singleOnAction(...) which will remove any
+* existing action handlers for that action. This is useful if a script is loaded or included multiple times on a page.
+*/
+(function ($) {
+
+// ReSharper disable InconsistentNaming
+    var ACTION = {
+// ReSharper restore InconsistentNaming
+        dataMap: {},
+        handlers: {}
+    };
+
+    // Given an action, execute all of the action handlers in the context of the target element
+    function handleAction(target, action, data) {
+        log('onAction:handleAction: ' + action);
+        var act = action.toLowerCase();
+        if (ACTION.handlers[act] && ACTION.handlers[act].length > 0) {
+            var handlers = ACTION.handlers[act];
+
+            // Has an actionData callback has been implemented to extract an elements data prior to event handling?
+            var dataMap = ACTION.dataMap[ACTION.dataMap[act] ? act : '*'];
+            data = $.extend(dataMap.call(target, { type: action, target: target }, data), data || {});
+
+            // Iterate over the action handlers and execute each one.
+            for (var i = 0, il = handlers.length; i < il; i++) {
+                if (handlers[i] !== null) {
+                    var settings = handlers[i][0];
+                    var ret = handlers[i][1].call(target, settings, { type: action, target: target }, $.extend(settings.data, data));
+                    // This handler is only executed once
+                    if (settings.one === true) {
+                        handlers[i] = null;
+                    }
+                    if (ret === false) {
+                        break;
+                    }
+                }
+            }
+        }
+        if(target !== document)
+            if ($(target).isTextType())
+                $( target ).data( 'onactionblur', false );
+    }
+
+    $.extend({
+        actionCssClass: function (klass) {
+            return klass.replace(/([a-z])([A-Z])/g, '$1-$2')
+						.replace(/([a-z])([0-9])/gi, '$1-$2')
+						.replace(/([0-9])([a-z])/g, '$1-$2')
+						.toLowerCase();
+        },
+        actionData: function (action, handler) {
+            var actions = action.split(/\s+/);
+            for (var i = 0, il = actions.length; i < il; i++) {
+                action = actions[i].toLowerCase();
+                ACTION.dataMap[action] = handler;
+            }
+        },
+// ReSharper disable InconsistentNaming
+        onAction: function (_action, callback, data) {
+// ReSharper restore InconsistentNaming
+            var settings = {
+                unique: false,
+                one: false,
+                action: '',
+                handler: null,
+                data: null
+            };
+            if (arguments.length === 1) {
+                settings = $.extend(settings, arguments[0]);
+            } else if (arguments.length >= 2) {
+                settings.action = _action;
+                settings.handler = callback;
+                settings.data = data;
+            }
+            var actions = settings.action.split(/\s+/);
+            for (var i = 0, il = actions.length; i < il; i++) {
+                settings.action = actions[i];
+                settings.actionClass = this.actionCssClass(settings.action);
+
+                var action = settings.action.toLowerCase();
+                if (!ACTION.handlers[action] || settings.unique === true) {
+                    ACTION.handlers[action] = [];
+                }
+                ACTION.handlers[action].push([settings, function (settings, evt, data) {
+                    return settings.handler.call(evt.target, evt, data);
+                } ]);
+            }
+        },
+        singleOnAction: function (action, callback, data) {
+            this.onAction({
+                action: action,
+                handler: callback,
+                data: data,
+                unique: true
+            });
+        },
+        doAction: function (action, data, target) {
+            handleAction(target || document, action, data);
+        }
+    });
+
+    // Our default datamap handler
+    $.actionData('*', function (evt, data) {
+        if (typeof data !== 'object') {
+            if (this.nodeType && this.nodeType === 1) {
+                return $(this).data();
+            } else {
+                return {};
+            }
+        }
+        return data;
+    });
+
+    $.fn.doAction = function (action, data) {
+        return this.each(function () {
+            handleAction(this, action, data);
+        });
+    };
+
+    $(document)
+// ReSharper disable InconsistentNaming
+		.on('focusin', function (evt, _target) {
+// ReSharper restore InconsistentNaming
+		    var target = _target || evt.target;
+		    // log('focus on ' + target);
+		    if ($(target).is(document))
+		        return;
+		    // Bind to change event for SELECT elements and syntetically bubble it
+		    if ($(target).is('select') && $(target).data('onactionchange') !== true) {
+		        log('onAction:binding change');
+		        $(target)
+					.data('onactionchange', true)
+					.change(function () {
+					    log('change event triggered');
+					    $(this).trigger('actionchange');
+					});
+		    }
+		    else if ($(target).isTextType() && $(target).data('onactionblur') !== true) {
+		        var onEnter = $(target).data('onEnter');
+		        if (onEnter === true){
+                    $(target).on('keypress', function (e) {
+                        if (e.which === 13){
+                            $(this).trigger('blur').off('keypress');
+                        }
+                    });
+                }
+		        $(target)
+                    .data('onactionblur', true)
+                    .one('blur', function () {
+                        $(this).trigger('actionblur');
+                    });
+		    }
+		})
+		.on('click actionchange actionblur', function (evt) {
+		    var ret = true;
+            var $target = $(evt.target);
+            if ( evt.type === 'click' && ( $target.isTextType() || $target.is('select') || $target.is('option') ) )
+// ReSharper disable InconsistentFunctionReturns
+		        return;
+// ReSharper restore InconsistentFunctionReturns
+		    // Construct a group of elements (target, parents) and walk
+		    // through the elements looking for the first action-* class
+            $target
+				.add($target.parents())
+				.each(function () {
+		            if (this.className && this.className.match) {
+				        var action = this.className.match(/(^|\s)action-([^\s]+)(\s|$)/);
+				        if (action) {
+				            action = action[2].replace(/[^a-z0-9]/gi, '').toLowerCase();
+				            var $t = $(this);
+				            if (!($t.attr('disabled') === 'disabled'))
+				            {
+                                log('onAction:actionCaptured: (' + evt.type + ')' + action + ' ' + this.tagName.toLowerCase() + '#' + ($t.attr('id') || '') + '');
+                                handleAction(this, action, $t.data());
+				            }
+				            ret = false;
+				            return false;
+				        }
+		            }
+// ReSharper disable NotAllPathsReturnValue
+		        });
+// ReSharper restore NotAllPathsReturnValue
+
+		    // Do not cancel click events on a checkbox or radio button
+            if (!$target.is(':checkbox,:radio,select')) {
+		        log(evt.type + ' returning ' + ret);
+		        if (ret === false) {
+		            evt.preventDefault();
+		        }
+		        return ret;
+		    }
+		});
+})(jQuery);
+
+/*!
+* jay.ondata plugin
+* Copyright 2011- 2018 Jay Brummels & Jonathan Sharp
+* Licensed under MIT (https://github.com/unscrum/jaymvc/LICENSE)
+*/
+
+(function ($) {
+    $.extend({
+        triggerDataEvent: function (event, data) {
+            if (typeof event == 'object') {
+                $.each(event, function (k, v) {
+                    $.triggerDataEvent(k, v);
+                });
+            } else {
+                $(document)
+                    .trigger('data' + jay.camelToPascal(event), [data]);
+
+            }
+        },
+        /*
+        * This method takes an event name (such as totalRecordCount), a selector to execute when that event occurs
+        * (such as .data-total-record-count), and finally a callback method to execute when the event is triggered.
+        */
+        onDataEvent: function (event, selector, callback) {
+            if ($.isFunction(selector)) {
+                callback = selector;
+                selector = document;
+            }
+            $(document).on('data' + jay.camelToPascal(event), function () {
+                // Strip off the 'native' jQuery event object
+                var args = Array.prototype.slice.call(arguments, 1);
+                $(selector).each(function () {
+                    callback.apply(this, args);
+                });
+            });
+        },
+
+        /*
+        * A generic method for binding a data event callback handler without specifying a DOM node.
+        * This allows for non DOM specific operations to take place.
+        */
+        onData: function (event, callback) {
+            $(document).on('data' + jay.camelToPascal(event), function () {
+                callback.apply({}, Array.prototype.slice.call(arguments, 1));
+            });
+        }
+    });
+})(jQuery);
+
+/*!
+* jay.loading plugin
+* Copyright 2011-2018 Jay Brummels
+* Licensed under MIT (https://github.com/unscrum/jaymvc/LICENSE)
+*/
+
+/**
+* This file extends jQuery to show loading icons either inside a contaner or convering one.  Requires font awesome
+*/
+(function ($) {
+    $.fn.showContentLoading = function (size, zindex) {
+        var sizes = {
+            sm: '<h5/>',
+            md: '<h4/>',
+            lg: '<h3/>',
+            xl: '<h2/>'
+        };
+        var $spinner = $('<i/>').addClass('fa fa-spin fa-spinner');
+        var $wrap = $(sizes[size] || sizes['lg']).addClass('m-1').html($spinner);
+        var $col = $('<div/>').addClass('col-12').html($wrap);
+        var $row = $('<div/>').addClass('row').html($col);
+        var $loading = $('<div/>').addClass('jay-loading p-5 position-absolute text-center').css({
+            'z-index': 103,
+            background:'rgba(167,167,167,0.65)'
+        }).html($row);
+
+        return this.hideContentLoading().each(function () {
+            var over = $loading.clone();
+            var zIndex = parseInt(zindex, 10) || 0;
+            if (zIndex) {
+                over.css('z-index', zindex);
+            }
+
+            var $element = $(this);
+            var target = $element.closest('div.modal');
+            if (target.length === 0) {
+                target = 'body';
+            } else {
+                over.css('z-index', zIndex > 1060 ? zIndex : 1060);
+            }
+            over
+                .on('reposition', function () {
+                    $(this)
+                        .css({
+                            width: $element.outerWidth(),
+                            height: $element.outerHeight()
+                        })
+                        .position({
+                            my: 'top left',
+                            at: 'top left',
+                            of: $element
+                        });
+                })
+                .appendTo(target)
+                .trigger('reposition') //trigger it twice for webkit, first time always has negative top.
+                .trigger('reposition');
+
+            var data = $element.data('loadingElements') || [];
+            data.push(over[0]);
+            $element.data('loadingElements', data);
+        });
+    };
+    $.fn.hideContentLoading = function () {
+        return this.each(function () {
+            var loading = $(this).data('loadingElements') || [];
+            var ln = loading.length;
+            while (ln >= 0) {
+                $(loading[--ln]).fadeOut('fast', function () {
+                    $(this).remove();
+                });
+            }
+        });
+    };
+    $.extend({
+        hideAllContentLoading: function() {
+            $('div.jay-loading').remove();
+        }
+    });
+
+    $(window).on('resize', function () {
+        $('div.jay-loading').trigger('reposition');
+    });
+
+    $.fn.addInlineLoading = function (txt) {
+        var $spinner = $('<i/>').addClass('fa fa-spin fa-spinner');
+        var $col = $('<span/>').addClass('col-12 m-2').html($spinner);
+        var $loading = $('<span/>').addClass('row').html($col);
+        if (txt) {
+            $spinner.addClass('float-left');
+            $col.append($('<span/>').html(txt).addClass('float-left mx-2'));
+        }
+        return this.html($loading);
+    };
+
+})(jQuery);
+
+/*!
+* jay.ajax plugin
+* Copyright 2011- 2018 Jay Brummels & Jonathan Sharp
+* Licensed under MIT (https://github.com/unscrum/jaymvc/LICENSE)
+*/
+/*
+* This is the main Ajax handling component for the entire project. It wraps all Ajax calls to and from the server
+* expecting a common envelope format that it unpacks and passes back the enclosed data.
+*/
+(function ($, jay) {
+    jay.ajaxPostHtml = function(options) {
+        var ajaxOptions = $.extend({
+            // Default values (overwriteable)
+            async: true,
+            cache: false,
+            dataType: 'html',
+            global: true,
+            type: 'POST',
+            target: this[0],
+            traditional: true
+        },
+        // Optional user options
+		options.ajax || {}, {
+		    url: options.url,
+		    data: options.data || {}
+		});
+
+		var failedAbortErrorDeferred = $.Deferred();
+        var jqXhr = $.ajax(ajaxOptions);
+
+        jqXhr.fail(function (xhr, status, error) {
+            if (xhr.status !== 0) {
+                if (xhr.status === 401) {
+                    self.location.replace(window.location.pathname);
+                } else {
+                    if (xhr.status === 403) {
+                        jay.alert('Access Denied.');
+                    }
+                    failedAbortErrorDeferred.reject(xhr, status, error);
+                }
+            }
+        });
+
+
+        failedAbortErrorDeferred.promise();
+
+        return $.extend(jqXhr, {
+            fail: failedAbortErrorDeferred.fail
+        });
+    };
+
+    jay.ajax = function (options) {
+        var ajaxOptions = $.extend({
+            // Default values (overwriteable)
+            async: true,
+            cache: false,
+            dataType: 'json',
+            global: true,
+            type: 'POST',
+            target: this[0],
+            traditional:true
+        },
+        // Optional user options
+		options.ajax || {}, {
+		    url: options.url,
+		    data: options.data || {}
+		});
+        var successErrorDeferred = $.Deferred();
+        var failedAbortErrorDeferred = $.Deferred();
+        var jqXhr = $.ajax(ajaxOptions);
+
+        jqXhr.done(function (json, status, xhr) {
+            if (json && json.status && json.status === 'success') {
+                successErrorDeferred.resolve(json.data, status, xhr);
+            } else {
+                successErrorDeferred.reject(json.data, 'error', xhr);
+            }
+        }).fail(function (xhr, status, error) {
+            if (xhr.status !== 0) {
+                if (xhr.status === 401) {
+                    self.location.replace(window.location.pathname);
+                } else {
+                    if (xhr.status === 403) {
+                            jay.alert('Access Denied.');
+                    }
+                    failedAbortErrorDeferred.reject(xhr, status, error);
+                }
+            }
+        });
+
+        successErrorDeferred.promise();
+        failedAbortErrorDeferred.promise();
+
+        return $.extend(jqXhr, {
+            fail: failedAbortErrorDeferred.fail
+        }, {
+            done: successErrorDeferred.done,
+            error: successErrorDeferred.fail
+        });
+    };
+
+    $.fn.jayLoad = function(url, data, func) {
+        var $t = $(this);
+        if (arguments.length === 2) {
+            func = data;
+            data = {};
+        }
+        jay.ajaxPostHtml({
+            url: url,
+            data: data
+        }).done(function(html) {
+            $t.html(html);
+            if (func && $.isFunction(func)) {
+                func.call($t);
+            }
+        });
+    };
+
+})(jQuery, jay);
+
+/*!
+* jay.message jQuery plugin
+* Copyright 2011-2018 Jay Brummels
+* Licensed under MIT (https://github.com/unscrum/jaymvc/LICENSE)
+*/
+(function ($) {
+    var stateClasses = {
+        success: { state: 'alert alert-success', icon: 'fa fa-thumbs-o-up' },
+        error: { state: 'alert alert-danger', icon: 'fa fa-exclamation-triangle' },
+        warning: { state: 'alert alert-warning', icon: 'fa fa-exclamation-triangle' },
+        loading: { state: 'alert alert-info', icon: 'fa fa-spinner fa-pulse' },
+        info: { state: 'alert alert-info', icon: 'fa fa-info-circle' }
+    };
+
+    /*
+    * call $(elm).message('message'), or $(elm).message('success', 'message');
+    * Types are error, success
+    * it will prepend the message to the elmement used
+    */
+    $.fn.message = function (type, message, timeout) {
+        if (arguments.length === 1) {
+            message = type;
+            type = 'info';
+        };
+        if (!stateClasses[type])
+            type = 'info';
+
+
+        var $i = $('<i></i>').addClass(stateClasses[type].icon);
+        var $p = $('<p></p>').addClass('mb-0').append($i).append('&nbsp;&nbsp;').append(message);
+
+        return this.messageRemove().each(function () {
+            $('<div></div>')
+                .addClass('message')
+                .addClass(stateClasses[type].state)
+                .html($p)
+                .prependTo($(this))
+                .one('click.message', function () {
+                    $(this).slideUp('slow', function () {
+                        $(this).remove();
+                    });
+                }).wait(timeout, function () {
+                    if ((parseInt(timeout, 10) || 0) > 0) {
+                        $(this).slideUp('fast', function () {
+                            $(this).messageRemove();
+                        });
+                    }
+                });
+        });
+    };
+
+    $.fn.messageRemove = function () {
+        return this.each(function () {
+            //Get rid
+            $('div.message', this).off('.message').remove();
+        });
+    };
+})(jQuery);
+
+/*!
+* jay.onvisible jQuery plugin
+* Copyright 2011-2018 Jay Brummels
+* Licensed under MIT (https://github.com/unscrum/jaymvc/LICENSE)
+*/
+(function ($, jay, window) {
+
+    $(function() {
+        window.setInterval(function() {
+
+            $('.on-visible:visible').removeClass('on-visible').each(function() {
+                var $t = $(this);
+                var data = $t.data();
+                log('triggering visibility action for', this, data.visibilityAction);
+                if (data && data.visibilityAction) {
+                    $t.doAction(data.visibilityAction);
+                }
+            });
+
+        }, 200);
+    });
+
+
+})(jQuery, jay, window);
+
+/*!
+* jay.modal jQuery plugin
+* Copyright 2011-2018 Jay Brummels
+* Licensed under MIT (https://github.com/unscrum/jaymvc/LICENSE)
+*/
+(function ($, jay) {
+    /*
+    * call jay.alert('message'), or jay.alert('title', 'message');
+    */
+    jay.alert = function (title, message, size) {
+        if (arguments.length === 1) {
+            message = title;
+            title = 'Alert';
+        };
+
+        jay.modal({
+            content: $('<p title="text-danger"></p>').html(message),
+            title: title,
+            size: size || 'small',
+            buttons: [
+                {
+                    label: 'Close',
+                    close: true
+                }
+            ]
+        });
+    };
+    /*
+    * call jay.modal( { title:'title',
+    *                        content: $('#contentID') } ); to load content into a modal from an ID
+    * or jay.modal( { title:'title',
+    *                            partialUrl: '/controller/action/',
+    *                           partialData: { id: 1, name: 'jay' } } ); to load the content in from a parital view with the data provided
+    * optionally set the first container in the partial view to have a data-modal-title="Title" attribute and call
+    * or jay.modal( { partialUrl: '/controller/action/',
+    *                               partialData: { id: 1, name: 'jay' } } );
+    * or jay.modal( { partialUrl: '/controller/action/'} ); for a partial that does not take any parameters.
+    * You can override the buttons by typing your own buttons collection:
+    * jay.modal( { partialUrl: '/controller/action/', buttons [ { label: 'Cancel',
+    *                                                             onClick: null,
+    *                                                             close: true},
+    *                                                           { label: 'Validate',
+    *                                                             onClick: function(evt, $modalContantArea, $modalWrapper){
+    *                                                               //CODE HERE TO Validate
+    *                                                               $modalWrapper.modal('hide') //To close when you are done inside of promise
+    *                                                              },
+    *                                                             close: false,
+    *                                                             cssClass: 'btn-danger'
+    *                                                           }
+    *                                                           { label: 'Save and Close',
+    *                                                             onClick: function(evt, $modalContantArea, $modalWrapper){
+    *                                                               //CODE HERE TO SAVE
+    *                                                              },
+    *                                                             close: true}
+    *                                                        ] );
+    * other options include :
+    * title: 'My Modal Window' //Title of the modal window
+    * open: function () { //code to run when it first opens (after the partial loads if using a partial) }
+    * close: function(){ //code to run after it closes }
+    * size: 'medium'  //small or large also work or override use your own width, height
+    */
+    jay.modal = function (options) {
+        options = $.extend({
+            title: 'Modal',
+            size: 'medium',
+            partialUrl: null,
+            partialData: {},
+            content: $('<div>content</div>'),
+            open: function () { log('modal open action'); },
+            close: function () { log('modal close action'); },
+            static: false
+        }, options);
+
+        var sizeClass = '';
+        if (options.size === 'large') {
+            sizeClass = ' modal-lg';
+        } else if (options.size === 'small') {
+            sizeClass = ' modal-sm';
+        } else if (options.size === 'xl') {
+            sizeClass = ' modal-xl';
+        }
+
+        var $modalDialog = $('<div/>').addClass('modal-dialog' + sizeClass).attr('role', 'document');
+        var $modalWrapper = $('<div/>').attr('role', 'dialog')
+            .addClass('modal fade')
+            .attr('tabindex', -1)
+            .append($modalDialog)
+            .appendTo('body');
+        var $modalHeader = $('<div/>')
+            .addClass('modal-header')
+            .append($('<h5>').addClass('modal-title').html(options.title))
+            .append('<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>');
+
+        var $content = $('<div class="jayModal modal-body"></div>');
+
+        var $modalContent = $('<div/>')
+            .addClass('modal-content')
+            .append($modalHeader)
+            .append($content)
+            .appendTo($modalDialog);
+
+        if (options.buttons && $.isArray(options.buttons)) {
+            var $modalFooter = $('<div/>').addClass('modal-footer');
+            var ln = options.buttons.length; //IE SUCKS so figure out how may up front
+            for (var i = 0; i < ln; i++) {
+                var isLastButton = i === (ln - 1);
+                var buttonClass = options.buttons[i].cssClass || (isLastButton ? 'btn-primary' : 'btn-light');
+
+
+                var $button = $('<button type="button"></button>').addClass('btn').addClass(buttonClass).html(options.buttons[i].label).appendTo($modalFooter);
+                if (options.buttons[i].disabled === true) {
+                    $button.attr('disabled', 'disabled');
+                }
+                if (options.buttons[i].onClick || $.isFunction(options.buttons[i].onClick)) {
+                    $button
+                        .data('buttonOption', options.buttons[i])
+                        .on('click', function (e) {
+                            var buttonOption = $(this).data('buttonOption');
+                            buttonOption.onClick.apply(this, [e, $content, $modalWrapper]);
+                            if (buttonOption.close === true) {
+                                $modalWrapper.modal('hide');
+                            }
+                        });
+                } else if (options.buttons[i].close === true) {
+                    $button.on('click', function () {
+                        $modalWrapper.modal('hide');
+                    });
+                }
+            }
+            $modalFooter.appendTo($modalContent);
+        }
+        $modalWrapper.on('hidden.bs.modal', function () {
+            options.close.apply($content, arguments);
+            $(this).remove(); //remove me from the dom.
+        });
+
+        var modalOptions = {
+            backdrop: options.static === true ? 'static' : true,
+            show: true
+        };
+
+        if (options.partialUrl) {
+            $content.append($('<div/>').css({ 'font-size': '200%', 'text-align': 'center' }).addInlineLoading('loading...'));
+            $modalWrapper.on('shown.bs.modal', function () {
+                jay.ajaxPostHtml({
+                    url: options.partialUrl,
+                    data: options.partialData || {}
+                }).done(function (html) {
+                    $content.html(html);
+                    options.open.apply($content);
+                }).fail(function () {
+                    $content.empty().message('error', jay.failMessage);
+                });
+            }).modal(modalOptions);
+
+        } else {
+            $content
+                .html(options.content.clone()[0]);
+            $modalWrapper.on('shown.bs.modal', function() {
+                options.open.apply($content);
+            }).modal(modalOptions);
+        }
+    };
+
+
+})(jQuery, jay);
+
+/*!
+* jquery.datafilter plugin
+* Copyright 2011- 2018 Jay Brummels & Jonathan Sharp
+* Licensed under MIT (https://github.com/unscrum/jaymvc/LICENSE)
+*/
+(function ($) {
+
+    function encodeName(name) {
+        return 'data-' + name.replace(/([a-z0-9])([A-Z])/g, '$1-$2').toLowerCase();
+    }
+
+    function encodeValue(value) {
+        if (value) {
+            value = value.replace(/\\/g, '\\\\').replace(/\"/g, '\\"');
+        }
+        return value || '';
+    }
+
+    function decodeName(name) {
+        name = name.replace(/^data-/ig, '').toLowerCase();
+        return $.map(name.split('-'), function (n, i) {
+            return (i > 0 ? n.substr(0, 1).toUpperCase() + n.substr(1) : n);
+        }).join('');
+    }
+
+    function generateSelector(attr, value, comparison) {
+        if (arguments.length === 0) {
+            attr = value = '';
+            comparison = '*=';
+        } else if (arguments.length === 1) {
+            value = '';
+            comparison = '*=';
+        } else if (arguments.length === 2) {
+            comparison = '=';
+        }
+        var name = encodeName(decodeName(attr));
+        var val = encodeValue(value);
+        var selector = name + comparison + '"' + val + '"';
+        return '[' + selector + ']';
+    }
+
+    function executeFindOfFilter(type, args) {
+        // Multiple attribute seletions
+        var selector;
+        if (typeof args[0] == 'object') {
+            selector = '';
+            for (var i = 0; i < args.length; i++) {
+                selector += generateSelector.apply({}, args[i]);
+            }
+            if (selector === '') {
+                return this.pushStack([]);
+            }
+            return this[type](selector);
+        }
+        selector = generateSelector.apply({}, args);
+        if (selector === '') {
+            return this.pushStack([]);
+        }
+        return this[type](selector);
+    }
+
+    /*
+    $('body').dataFilter('criteria', 'MTA', '$=');
+
+    $('body').dataFilter(['criteria', 'MTA'], ['foo'], []);
+    */
+    $.fn.dataFilter = function (/*attr, value, comparison*/) {
+        return executeFindOfFilter.call(this, 'filter', arguments.length === 1 ? arguments[0] : arguments);
+    };
+
+    // $().datasetFind('criteria', 'MTA');
+    $.fn.dataFind = function (/*attr, value, comparison*/) {
+        return executeFindOfFilter.call(this, 'find', arguments.length === 1 ? arguments[0] : arguments);
+    };
+})(jQuery);
+
+/*!
+ * jay.typeahead (https://github.com/unscrum/jaymvc)
+ * Copyright 2018 Jay Brummels
+ * Adapted from bootstrap3-typehead for bootstrap3 http://embed.plnkr.co/6XJ3sc/ by Bass Jobsen orginally licensed http://www.apache.org/licenses/LICENSE-2.0
+ * Licensed under MIT (https://github.com/unscrum/jaymvc/LICENSE)
+ */
+!function ($) {
+
+    /* TYPEAHEAD PUBLIC CLASS DEFINITION
+     * ================================= */
+
+    var Typeahead = function (element, options) {
+
+        var that = this;
+        that.$element = $(element).attr('autocomplete', 'off');
+        that.options = $.extend({}, {
+            items: 10,
+            alignWidth: true,
+            menu: '<ul class="typeahead dropdown-menu"></ul>',
+            item: '<li class="dropdown-item"><a href="#" class="text-dark"></a></li>',
+            valueField: 'id',
+            displayField: 'val',
+            postParam: 'q',
+            ajax: {
+                url: null,
+                timeout: 300,
+                triggerLength: 2
+            }
+        }, options);
+        that.$menu = $(that.options.menu).insertAfter(that.$element);
+        that.ajax = $.extend({}, that.options.ajax);
+        that.query = '';
+        that.shown = false;
+        that.listen();
+    };
+
+    Typeahead.prototype = {
+        constructor: Typeahead,
+        //=============================================================================================================
+        //  Utils
+        //  Check if an event is supported by the browser eg. 'keypress'
+        //  * This was included to handle the "exhaustive deprecation" of jQuery.browser in jQuery 1.8
+        //=============================================================================================================
+        select: function () {
+            var $selectedItem = this.$menu.find('.active');
+            if ($selectedItem.length) {
+                var data = $selectedItem.data();
+                var text = this.$menu.find('.active a').text();
+
+                this.$element
+                    .val(this.updater(text))
+                    .trigger('typeaheadsuccess', [data.value, text, data.all])
+                    .change();
+            }
+            return this.hide();
+        },
+        updater: function (item) {
+            return item;
+        },
+        show: function () {
+            var pos = $.extend({}, this.$element.position(), {
+                height: this.$element[0].offsetHeight
+            });
+
+            this.$menu.css({
+                top: pos.top + pos.height,
+                left: pos.left
+            });
+
+            if (this.options.alignWidth) {
+                var width = $(this.$element[0]).outerWidth();
+                this.$menu.css({
+                    'min-width': width
+                });
+            }
+
+            this.$menu.show();
+            this.shown = true;
+            return this;
+        },
+        hide: function () {
+            this.$menu.hide();
+            this.shown = false;
+            return this;
+        },
+        ajaxLookup: function () {
+
+            var query = $.trim(this.$element.val());
+
+            if (query === this.query) {
+                return this;
+            }
+
+            // Query changed
+            this.query = query;
+
+            // Cancel last timer if set
+            if (this.ajax.timerId) {
+                clearTimeout(this.ajax.timerId);
+                this.ajax.timerId = null;
+            }
+
+            if (!query || query.length < this.ajax.triggerLength) {
+                // cancel the ajax callback if in progress
+                if (this.ajax.xhr) {
+                    this.ajax.xhr.abort();
+                    this.ajax.xhr = null;
+                }
+
+                return this.shown ? this.hide() : this;
+            }
+
+            function execute() {
+                var that = this;
+
+                // Cancel last call if already in progress
+                if (that.ajax.xhr)
+                    that.ajax.xhr.abort();
+
+                var postData = {};
+                postData[that.options.postParam] = query;
+
+                that.$element.trigger('typeaheadstartingsearch', arguments);
+                this.ajax.xhr = jay.ajax({
+                    url: this.ajax.url,
+                    data: postData
+                }).done(function () {
+                    that.$element.trigger('typeaheadsearchdone', arguments);
+                    that.ajaxSource.apply(that, arguments);
+                }).error(function() {
+                    if (that.shown) {
+                         that.hide();
+                    }
+                    that.$element.trigger('typeaheadnoresults', arguments);
+                }).fail(function () {
+                    that.$element.trigger('typeaheadfail', arguments);
+                });
+                this.ajax.timerId = null;
+            }
+
+            // Query is good to send, set a timer
+            this.ajax.timerId = setTimeout($.proxy(execute, this), this.ajax.timeout);
+
+            return this;
+        },
+        ajaxSource: function (data) {
+            var that = this;
+            if (!that.ajax.xhr)
+                return null;
+
+            // Save for selection retreival
+            that.ajax.data = data;
+
+            // Manipulate objects
+            var items = that.grepper(that.ajax.data) || [];
+            that.ajax.xhr = null;
+            return that.render(items.slice(0, that.options.items)).show();
+        },
+        matcher: function (item) {
+            return ~item.toLowerCase().indexOf(this.query.toLowerCase());
+        },
+        highlighter: function (item) {
+            var query = this.query.replace(/[\-\[\]{}()*+?.,\\\^$|#\s]/g, '\\$&');
+            return item.replace(new RegExp('(' + query + ')', 'ig'), function ($1, match) {
+                return '<strong>' + match + '</strong>';
+            });
+        },
+        render: function (items) {
+            var that = this, display, isString = typeof that.options.displayField === 'string';
+
+            items = $(items).map(function (i, item) {
+                if (typeof item === 'object') {
+                    display = isString ? item[that.options.displayField] : that.options.displayField(item);
+                    i = $(that.options.item).attr('data-value', item[that.options.valueField]).data('all', item);
+                } else {
+                    display = item;
+                    i = $(that.options.item).attr('data-value', item).data('all', item);
+                }
+                i.find('a').html(that.highlighter(display));
+                return i[0];
+            });
+            items.first().addClass('active');
+
+            this.$menu.html(items);
+            return this;
+        },
+        //------------------------------------------------------------------
+        //  Filters relevent results
+        //
+        grepper: function (data) {
+            var that = this, items, display, isString = typeof that.options.displayField === 'string';
+
+            if (isString && data && data.length) {
+                if (data[0].hasOwnProperty(that.options.displayField)) {
+                    items = $.grep(data, function (item) {
+                        display = isString ? item[that.options.displayField] : that.options.displayField(item);
+                        return that.matcher(display);
+                    });
+                } else if (typeof data[0] === 'string') {
+                    items = $.grep(data, function (item) {
+                        return that.matcher(item);
+                    });
+                } else {
+                    log('null inner');
+                    return null;
+                }
+            } else {
+                return null;
+            }
+            return items;
+        },
+        next: function () {
+            var active = this.$menu.find('.active').removeClass('active'),
+                next = active.next();
+
+            if (!next.length) {
+                next = $(this.$menu.find('li')[0]);
+            }
+
+            next.addClass('active');
+        },
+        prev: function () {
+            var active = this.$menu.find('.active').removeClass('active'),
+                prev = active.prev();
+
+            if (!prev.length) {
+                prev = this.$menu.find('li').last();
+            }
+
+            prev.addClass('active');
+
+        },
+        listen: function () {
+            this.$element
+                .on('focus.typeahead', $.proxy(this.focus, this))
+                .on('blur.typeahead', $.proxy(this.blur, this))
+                .on('keypress.typeahead', $.proxy(this.keypress, this))
+                .on('keyup.typeahead', $.proxy(this.keyup, this))
+                .on('keydown.typeahead', $.proxy(this.keydown, this));
+
+            this.$menu
+                .on('click.typeahead', $.proxy(this.click, this))
+                .on('mouseenter.typeahead', 'li', $.proxy(this.mouseenter, this))
+                .on('mouseleave.typeahead', 'li', $.proxy(this.mouseleave, this));
+        },
+        move: function (e) {
+            if (!this.shown)
+                return;
+
+            switch (e.keyCode) {
+            case 9: // tab
+            case 13: // enter
+            case 27: // escape
+                e.preventDefault();
+                break;
+
+            case 38: // up arrow
+                e.preventDefault();
+                this.prev();
+                break;
+
+            case 40: // down arrow
+                e.preventDefault();
+                this.next();
+                break;
+            }
+
+            e.stopPropagation();
+        },
+        keydown: function (e) {
+            this.suppressKeyPressRepeat = ~$.inArray(e.keyCode, [40, 38, 9, 13, 27]);
+            this.move(e);
+        },
+        keypress: function (e) {
+            if (this.suppressKeyPressRepeat)
+                return;
+            this.move(e);
+        },
+        keyup: function (e) {
+            switch (e.keyCode) {
+            case 40: // down arrow
+            case 38: // up arrow
+            case 16: // shift
+            case 17: // ctrl
+            case 18: // alt
+                break;
+
+            case 9: // tab
+            case 13: // enter
+                if (!this.shown)
+                    return;
+                this.select();
+                break;
+
+            case 27: // escape
+                if (!this.shown)
+                    return;
+                this.hide();
+                break;
+
+            default:
+                this.ajaxLookup();
+            }
+            e.stopPropagation();
+            e.preventDefault();
+        },
+        focus: function () {
+            this.focused = true;
+        },
+        blur: function () {
+            this.focused = false;
+            if (!this.mousedover && this.shown)
+                this.hide();
+        },
+        click: function (e) {
+            e.stopPropagation();
+            e.preventDefault();
+            this.select();
+            this.$element.focus();
+        },
+        mouseenter: function (e) {
+            this.mousedover = true;
+            this.$menu.find('.active').removeClass('active');
+            $(e.currentTarget).addClass('active');
+        },
+        mouseleave: function () {
+            this.mousedover = false;
+            if (!this.focused && this.shown)
+                this.hide();
+        },
+        destroy: function () {
+            this.$element.off('.typeahead');
+            this.$menu.off('.typeahead').remove();
+            this.$element.removeData('typeahead');
+        }
+    };
+
+
+    /* TYPEAHEAD PLUGIN DEFINITION
+     * =========================== */
+
+    $.fn.typeahead = function (option) {
+        return this.each(function () {
+            var $this = $(this),
+                data = $this.data('typeahead'),
+                options = typeof option === 'object' && option;
+            if (!data)
+                $this.data('typeahead', (data = new Typeahead(this, options)));
+            if (typeof option === 'string')
+                data[option]();
+        });
+    };
+
+    $.fn.typeahead.Constructor = Typeahead;
+
+}(window.jQuery);
+
+/*!
+ * bootstrap.multiselect (https://github.com/unscrum/jaymvc)
+ * Copyright 2018 Jay Brummels
+ * Adapted from bootstrap-multislect-dropdown for bootstrap3 https://www.jquery-az.com/10-demos-of-bootstrap-multiselect-dropdown-by-using-jquery/
+ * Licensed under MIT (https://github.com/unscrum/jaymvc/LICENSE)
+ */
+!function ($) {
+    "use strict";// jshint ;_;
+
+
+    function forEach(array, callback) {
+        for (var index = 0; index < array.length; ++index) {
+            callback(array[index], index);
+        }
+    }
+
+    /**
+     * Constructor to create a new multiselect using the given select.
+     *
+     * @param {jQuery} select
+     * @param {Object} options
+     * @returns {Multiselect}
+     */
+    function Multiselect(select, options) {
+
+        this.$select = $(select);
+
+        // Placeholder via data attributes
+        if (this.$select.attr("data-placeholder")) {
+            options.nonSelectedText = this.$select.data("placeholder");
+        }
+
+        this.options = this.mergeOptions($.extend({}, options, this.$select.data()));
+
+        // Initialization.
+        // We have to clone to create a new reference.
+        this.originalOptions = this.$select.clone()[0].options;
+        this.query = '';
+        this.searchTimeout = null;
+        this.lastToggledInput = null
+
+        this.options.multiple = this.$select.attr('multiple') === "multiple";
+        this.options.onChange = $.proxy(this.options.onChange, this);
+        this.options.onDropdownShow = $.proxy(this.options.onDropdownShow, this);
+        this.options.onDropdownHide = $.proxy(this.options.onDropdownHide, this);
+        this.options.onDropdownShown = $.proxy(this.options.onDropdownShown, this);
+        this.options.onDropdownHidden = $.proxy(this.options.onDropdownHidden, this);
+
+        // Build select all if enabled.
+        this.buildContainer();
+        this.buildButton();
+        this.buildDropdown();
+        this.buildSelectAll();
+        this.buildDropdownOptions();
+        this.buildFilter();
+
+        this.updateButtonText();
+        this.updateSelectAll();
+
+        if (this.options.disableIfEmpty && $('option', this.$select).length <= 0) {
+            this.disable();
+        }
+
+        this.$select.hide().after(this.$container);
+    };
+
+    Multiselect.prototype = {
+
+        defaults: {
+            /**
+             * Default text function will either print 'None selected' in case no
+             * option is selected or a list of the selected options up to a length
+             * of 3 selected options.
+             *
+             * @param {jQuery} options
+             * @param {jQuery} select
+             * @returns {String}
+             */
+            buttonText: function(options, select) {
+                if (options.length === 0) {
+                    return this.nonSelectedText;
+                }
+                else if (this.allSelectedText
+                    && options.length === $('option', $(select)).length
+                    && $('option', $(select)).length !== 1
+                    && this.multiple) {
+
+                    if (this.selectAllNumber) {
+                        return this.allSelectedText + ' (' + options.length + ')';
+                    }
+                    else {
+                        return this.allSelectedText;
+                    }
+                }
+                else if (options.length > this.numberDisplayed) {
+                    return options.length + ' ' + this.nSelectedText;
+                }
+                else {
+                    var selected = '';
+                    var delimiter = this.delimiterText;
+
+                    options.each(function() {
+                        var label = ($(this).attr('label') !== undefined) ? $(this).attr('label') : $(this).text();
+                        selected += label + delimiter;
+                    });
+
+                    return selected.substr(0, selected.length - 2);
+                }
+            },
+            /**
+             * Updates the title of the button similar to the buttonText function.
+             *
+             * @param {jQuery} options
+             * @param {jQuery} select
+             * @returns {@exp;selected@call;substr}
+             */
+            buttonTitle: function(options, select) {
+                if (options.length === 0) {
+                    return this.nonSelectedText;
+                }
+                else {
+                    var selected = '';
+                    var delimiter = this.delimiterText;
+
+                    options.each(function () {
+                        var label = ($(this).attr('label') !== undefined) ? $(this).attr('label') : $(this).text();
+                        selected += label + delimiter;
+                    });
+                    return selected.substr(0, selected.length - 2);
+                }
+            },
+            /**
+             * Create a label.
+             *
+             * @param {jQuery} element
+             * @returns {String}
+             */
+            optionLabel: function(element){
+                return $(element).attr('label') || $(element).text();
+            },
+            /**
+             * Triggered on change of the multiselect.
+             *
+             * Not triggered when selecting/deselecting options manually.
+             *
+             * @param {jQuery} option
+             * @param {Boolean} checked
+             */
+            onChange : function(option, checked) {
+
+            },
+            /**
+             * Triggered when the dropdown is shown.
+             *
+             * @param {jQuery} event
+             */
+            onDropdownShow: function(event) {
+
+            },
+            /**
+             * Triggered when the dropdown is hidden.
+             *
+             * @param {jQuery} event
+             */
+            onDropdownHide: function(event) {
+
+            },
+            /**
+             * Triggered after the dropdown is shown.
+             *
+             * @param {jQuery} event
+             */
+            onDropdownShown: function(event) {
+
+            },
+            /**
+             * Triggered after the dropdown is hidden.
+             *
+             * @param {jQuery} event
+             */
+            onDropdownHidden: function(event) {
+
+            },
+            /**
+             * Triggered on select all.
+             */
+            onSelectAll: function() {
+
+            },
+            enableHTML: false,
+            buttonClass: 'btn btn-outline-secondary',
+            inheritClass: false,
+            buttonWidth: 'auto',
+            buttonContainer: '<div class="btn-group" />',
+            dropRight: false,
+            selectedClass: 'selected',
+            // Maximum height of the dropdown menu.
+            // If maximum height is exceeded a scrollbar will be displayed.
+            maxHeight: 200,
+            checkboxName: false,
+            includeSelectAllOption: false,
+            includeSelectAllIfMoreThan: 0,
+            selectAllText: ' Select all',
+            selectAllValue: 'multiselect-all',
+            selectAllName: false,
+            selectAllNumber: true,
+            enableFiltering: false,
+            enableCaseInsensitiveFiltering: false,
+            enableClickableOptGroups: false,
+            filterPlaceholder: 'Search',
+            // possible options: 'text', 'value', 'both'
+            filterBehavior: 'text',
+            includeFilterClearBtn: true,
+            preventInputChangeEvent: false,
+            nonSelectedText: 'None selected',
+            nSelectedText: 'selected',
+            allSelectedText: 'All selected',
+            numberDisplayed: 3,
+            disableIfEmpty: false,
+            delimiterText: ', ',
+            templates: {
+                button: '<button type="button" class="multiselect dropdown-toggle" data-toggle="dropdown"><span class="multiselect-selected-text"></span></button>',
+                ul: '<ul class="multiselect-container dropdown-menu" style="z-index: 2000"></ul>',
+                filter: '<li class="multiselect-item filter dropdown-item"><div class="input-group"><span class="input-group-prepend"><i class="fa fa-search"></i></span><input class="form-control multiselect-search" type="text"></div></li>',
+                filterClearBtn: '<span class="input-group-btn"><button class="btn btn-secondary multiselect-clear-filter" type="button"><i class="fa fa-minus-circle"></i></button></span>',
+                li: '<li class="dropdown-item p-1"><a tabindex="0" class="text-dark"><div class="form-check"><label></label></div></a></li>',
+                divider: '<li class="multiselect-item dropdown-divider"></li>',
+                liGroup: '<li class="multiselect-item multiselect-group"><label></label></li>'
+            }
+        },
+
+        constructor: Multiselect,
+
+        /**
+         * Builds the container of the multiselect.
+         */
+        buildContainer: function() {
+            this.$container = $(this.options.buttonContainer);
+            this.$container.on('show.bs.dropdown', this.options.onDropdownShow);
+            this.$container.on('hide.bs.dropdown', this.options.onDropdownHide);
+            this.$container.on('shown.bs.dropdown', this.options.onDropdownShown);
+            this.$container.on('hidden.bs.dropdown', this.options.onDropdownHidden);
+        },
+
+        /**
+         * Builds the button of the multiselect.
+         */
+        buildButton: function() {
+            this.$button = $(this.options.templates.button).addClass(this.options.buttonClass);
+            if (this.$select.attr('class') && this.options.inheritClass) {
+                this.$button.addClass(this.$select.attr('class'));
+            }
+            // Adopt active state.
+            if (this.$select.prop('disabled')) {
+                this.disable();
+            }
+            else {
+                this.enable();
+            }
+
+            // Manually add button width if set.
+            if (this.options.buttonWidth && this.options.buttonWidth !== 'auto') {
+                this.$button.css({
+                    'width' : this.options.buttonWidth,
+                    'overflow' : 'hidden',
+                    'text-overflow' : 'ellipsis'
+                });
+                this.$container.css({
+                    'width': this.options.buttonWidth
+                });
+            }
+
+            // Keep the tab index from the select.
+            var tabindex = this.$select.attr('tabindex');
+            if (tabindex) {
+                this.$button.attr('tabindex', tabindex);
+            }
+
+            this.$container.append(this.$button);
+        },
+
+        /**
+         * Builds the ul representing the dropdown menu.
+         */
+        buildDropdown: function() {
+
+            // Build ul.
+            this.$ul = $(this.options.templates.ul);
+
+            if (this.options.dropRight) {
+                this.$ul.addClass('pull-right');
+            }
+
+            // Set max height of dropdown menu to activate auto scrollbar.
+            if (this.options.maxHeight) {
+                // TODO: Add a class for this option to move the css declarations.
+                this.$ul.css({
+                    'max-height': this.options.maxHeight + 'px',
+                    'overflow-y': 'auto',
+                    'overflow-x': 'hidden'
+                });
+            }
+
+            this.$container.append(this.$ul);
+        },
+
+        /**
+         * Build the dropdown options and binds all nessecary events.
+         *
+         * Uses createDivider and createOptionValue to create the necessary options.
+         */
+        buildDropdownOptions: function() {
+
+            this.$select.children().each($.proxy(function(index, element) {
+
+                var $element = $(element);
+                // Support optgroups and options without a group simultaneously.
+                var tag = $element.prop('tagName')
+                    .toLowerCase();
+
+                if ($element.prop('value') === this.options.selectAllValue) {
+                    return;
+                }
+
+                if (tag === 'optgroup') {
+                    this.createOptgroup(element);
+                }
+                else if (tag === 'option') {
+
+                    if ($element.data('role') === 'divider') {
+                        this.createDivider();
+                    }
+                    else {
+                        this.createOptionValue(element);
+                    }
+
+                }
+
+                // Other illegal tags will be ignored.
+            }, this));
+
+            // Bind the change event on the dropdown elements.
+            $('li input', this.$ul).on('change', $.proxy(function(event) {
+                var $target = $(event.target);
+
+                var checked = $target.prop('checked') || false;
+                var isSelectAllOption = $target.val() === this.options.selectAllValue;
+
+                // Apply or unapply the configured selected class.
+                if (this.options.selectedClass) {
+                    if (checked) {
+                        $target.closest('li')
+                            .addClass(this.options.selectedClass);
+                    }
+                    else {
+                        $target.closest('li')
+                            .removeClass(this.options.selectedClass);
+                    }
+                }
+
+                // Get the corresponding option.
+                var value = $target.val();
+                var $option = this.getOptionByValue(value);
+
+                var $optionsNotThis = $('option', this.$select).not($option);
+                var $checkboxesNotThis = $('input', this.$container).not($target);
+
+                if (isSelectAllOption) {
+                    if (checked) {
+                        this.selectAll();
+                    }
+                    else {
+                        this.deselectAll();
+                    }
+                }
+
+                if(!isSelectAllOption){
+                    if (checked) {
+                        $option.prop('selected', true);
+
+                        if (this.options.multiple) {
+                            // Simply select additional option.
+                            $option.prop('selected', true);
+                        }
+                        else {
+                            // Unselect all other options and corresponding checkboxes.
+                            if (this.options.selectedClass) {
+                                $($checkboxesNotThis).closest('li').removeClass(this.options.selectedClass);
+                            }
+
+                            $($checkboxesNotThis).prop('checked', false);
+                            $optionsNotThis.prop('selected', false);
+
+                            // It's a single selection, so close.
+                            this.$button.click();
+                        }
+
+                        if (this.options.selectedClass === "active") {
+                            $optionsNotThis.closest("a").css("outline", "");
+                        }
+                    }
+                    else {
+                        // Unselect option.
+                        $option.prop('selected', false);
+                    }
+                }
+
+                this.$select.change();
+
+                this.updateButtonText();
+                this.updateSelectAll();
+
+                this.options.onChange($option, checked);
+
+                if(this.options.preventInputChangeEvent) {
+                    return false;
+                }
+            }, this));
+
+            $('li a', this.$ul).on('mousedown', function(e) {
+                if (e.shiftKey) {
+                    // Prevent selecting text by Shift+click
+                    return false;
+                }
+            });
+
+            $('li a', this.$ul).on('touchstart click', $.proxy(function(event) {
+                event.stopPropagation();
+
+                var $target = $(event.target);
+
+                if (event.shiftKey && this.options.multiple) {
+                    if($target.is("label")){ // Handles checkbox selection manually (see https://github.com/davidstutz/bootstrap-multiselect/issues/431)
+                        event.preventDefault();
+                        $target = $target.find("input");
+                        $target.prop("checked", !$target.prop("checked"));
+                    }
+                    var checked = $target.prop('checked') || false;
+
+                    if (this.lastToggledInput !== null && this.lastToggledInput !== $target) { // Make sure we actually have a range
+                        var from = $target.closest("li").index();
+                        var to = this.lastToggledInput.closest("li").index();
+
+                        if (from > to) { // Swap the indices
+                            var tmp = to;
+                            to = from;
+                            from = tmp;
+                        }
+
+                        // Make sure we grab all elements since slice excludes the last index
+                        ++to;
+
+                        // Change the checkboxes and underlying options
+                        var range = this.$ul.find("li").slice(from, to).find("input");
+
+                        range.prop('checked', checked);
+
+                        if (this.options.selectedClass) {
+                            range.closest('li')
+                                .toggleClass(this.options.selectedClass, checked);
+                        }
+
+                        for (var i = 0, j = range.length; i < j; i++) {
+                            var $checkbox = $(range[i]);
+
+                            var $option = this.getOptionByValue($checkbox.val());
+
+                            $option.prop('selected', checked);
+                        }
+                    }
+
+                    // Trigger the select "change" event
+                    $target.trigger("change");
+                }
+
+                // Remembers last clicked option
+                if($target.is("input") && !$target.closest("li").is(".multiselect-item")){
+                    this.lastToggledInput = $target;
+                }
+
+                $target.blur();
+            }, this));
+
+            // Keyboard support.
+            this.$container.off('keydown.multiselect').on('keydown.multiselect', $.proxy(function(event) {
+                if ($('input[type="text"]', this.$container).is(':focus')) {
+                    return;
+                }
+
+                if (event.keyCode === 9 && this.$container.hasClass('open')) {
+                    this.$button.click();
+                }
+                else {
+                    var $items = $(this.$container).find("li:not(.divider):not(.disabled) a").filter(":visible");
+
+                    if (!$items.length) {
+                        return;
+                    }
+
+                    var index = $items.index($items.filter(':focus'));
+
+                    // Navigation up.
+                    if (event.keyCode === 38 && index > 0) {
+                        index--;
+                    }
+                    // Navigate down.
+                    else if (event.keyCode === 40 && index < $items.length - 1) {
+                        index++;
+                    }
+                    else if (!~index) {
+                        index = 0;
+                    }
+
+                    var $current = $items.eq(index);
+                    $current.focus();
+
+                    if (event.keyCode === 32 || event.keyCode === 13) {
+                        var $checkbox = $current.find('input');
+
+                        $checkbox.prop("checked", !$checkbox.prop("checked"));
+                        $checkbox.change();
+                    }
+
+                    event.stopPropagation();
+                    event.preventDefault();
+                }
+            }, this));
+
+            if(this.options.enableClickableOptGroups && this.options.multiple) {
+                $('li.multiselect-group', this.$ul).on('click', $.proxy(function(event) {
+                    event.stopPropagation();
+
+                    var group = $(event.target).parent();
+
+                    // Search all option in optgroup
+                    var $options = group.nextUntil('li.multiselect-group');
+                    var $visibleOptions = $options.filter(":visible:not(.disabled)");
+
+                    // check or uncheck items
+                    var allChecked = true;
+                    var optionInputs = $visibleOptions.find('input');
+                    optionInputs.each(function() {
+                        allChecked = allChecked && $(this).prop('checked');
+                    });
+
+                    optionInputs.prop('checked', !allChecked).trigger('change');
+                }, this));
+            }
+        },
+
+        /**
+         * Create an option using the given select option.
+         *
+         * @param {jQuery} element
+         */
+        createOptionValue: function(element) {
+            var $element = $(element);
+            if ($element.is(':selected')) {
+                $element.prop('selected', true);
+            }
+
+            // Support the label attribute on options.
+            var label = this.options.optionLabel(element);
+            var value = $element.val();
+            var inputType = this.options.multiple ? "checkbox" : "radio";
+
+            var $li = $(this.options.templates.li);
+            var $label = $('label', $li);
+            $label.addClass(inputType).addClass('form-check-label');
+
+            if (this.options.enableHTML) {
+                $label.html(" " + label);
+            }
+            else {
+                $label.text(" " + label);
+            }
+
+            var $checkbox = $('<input/>').attr('type', inputType).addClass('form-check-input').uniqueId();
+            $label.attr('for', $checkbox.attr('id'));
+            if (this.options.checkboxName) {
+                $checkbox.attr('name', this.options.checkboxName);
+            }
+            $label.before($checkbox);
+
+            var selected = $element.prop('selected') || false;
+            $checkbox.val(value);
+
+            if (value === this.options.selectAllValue) {
+                $li.addClass("multiselect-item multiselect-all");
+                $checkbox.parent().parent()
+                    .addClass('multiselect-all');
+            }
+
+            $label.attr('title', $element.attr('title'));
+
+            this.$ul.append($li);
+
+            if ($element.is(':disabled')) {
+                $checkbox.attr('disabled', 'disabled')
+                    .prop('disabled', true)
+                    .closest('a')
+                    .attr("tabindex", "-1")
+                    .closest('li')
+                    .addClass('disabled');
+            }
+
+            $checkbox.prop('checked', selected);
+
+            if (selected && this.options.selectedClass) {
+                $checkbox.closest('li')
+                    .addClass(this.options.selectedClass);
+            }
+        },
+
+        /**
+         * Creates a divider using the given select option.
+         *
+         * @param {jQuery} element
+         */
+        createDivider: function(element) {
+            var $divider = $(this.options.templates.divider);
+            this.$ul.append($divider);
+        },
+
+        /**
+         * Creates an optgroup.
+         *
+         * @param {jQuery} group
+         */
+        createOptgroup: function(group) {
+            var groupName = $(group).prop('label');
+
+            // Add a header for the group.
+            var $li = $(this.options.templates.liGroup);
+
+            if (this.options.enableHTML) {
+                $('label', $li).html(groupName);
+            }
+            else {
+                $('label', $li).text(groupName);
+            }
+
+            if (this.options.enableClickableOptGroups) {
+                $li.addClass('multiselect-group-clickable');
+            }
+
+            this.$ul.append($li);
+
+            if ($(group).is(':disabled')) {
+                $li.addClass('disabled');
+            }
+
+            // Add the options of the group.
+            $('option', group).each($.proxy(function(index, element) {
+                this.createOptionValue(element);
+            }, this));
+        },
+
+        /**
+         * Build the selct all.
+         *
+         * Checks if a select all has already been created.
+         */
+        buildSelectAll: function() {
+            if (typeof this.options.selectAllValue === 'number') {
+                this.options.selectAllValue = this.options.selectAllValue.toString();
+            }
+
+            var alreadyHasSelectAll = this.hasSelectAll();
+
+            if (!alreadyHasSelectAll && this.options.includeSelectAllOption && this.options.multiple
+                && $('option', this.$select).length > this.options.includeSelectAllIfMoreThan) {
+
+                // Check whether to add a divider after the select all.
+                if (this.options.includeSelectAllDivider) {
+                    this.$ul.prepend($(this.options.templates.divider));
+                }
+
+                var $li = $(this.options.templates.li);
+                var $label = $('label', $li).addClass("form-check-label");
+
+                if (this.options.enableHTML) {
+                    $label.html(" " + this.options.selectAllText);
+                }
+                else {
+                    $label.text(" " + this.options.selectAllText);
+                }
+
+                var $checkbox = $('<input type="checkbox" class="form-check-input" />').uniqueId();
+                $label.attr('for', $checkbox.attr('id'));;
+                $label.before($checkbox);
+                if (this.options.selectAllName) {
+                    $checkbox.attr('name', this.options.selectAllName);
+                }
+
+                $checkbox.val(this.options.selectAllValue);
+
+                $li.addClass("multiselect-item multiselect-all");
+                $checkbox.parent().parent()
+                    .addClass('multiselect-all');
+
+                this.$ul.prepend($li);
+
+                $checkbox.prop('checked', false);
+            }
+        },
+
+        /**
+         * Builds the filter.
+         */
+        buildFilter: function() {
+
+            // Build filter if filtering OR case insensitive filtering is enabled and the number of options exceeds (or equals) enableFilterLength.
+            if (this.options.enableFiltering || this.options.enableCaseInsensitiveFiltering) {
+                var enableFilterLength = Math.max(this.options.enableFiltering, this.options.enableCaseInsensitiveFiltering);
+
+                if (this.$select.find('option').length >= enableFilterLength) {
+
+                    this.$filter = $(this.options.templates.filter);
+                    $('input', this.$filter).attr('placeholder', this.options.filterPlaceholder);
+
+                    // Adds optional filter clear button
+                    if(this.options.includeFilterClearBtn){
+                        var clearBtn = $(this.options.templates.filterClearBtn);
+                        clearBtn.on('click', $.proxy(function(event){
+                            clearTimeout(this.searchTimeout);
+                            this.$filter.find('.multiselect-search').val('');
+                            $('li', this.$ul).show().removeClass("filter-hidden");
+                            this.updateSelectAll();
+                        }, this));
+                        this.$filter.find('.input-group').append(clearBtn);
+                    }
+
+                    this.$ul.prepend(this.$filter);
+
+                    this.$filter.val(this.query).on('click', function(event) {
+                        event.stopPropagation();
+                    }).on('input keydown', $.proxy(function(event) {
+                        // Cancel enter key default behaviour
+                        if (event.which === 13) {
+                            event.preventDefault();
+                        }
+
+                        // This is useful to catch "keydown" events after the browser has updated the control.
+                        clearTimeout(this.searchTimeout);
+
+                        this.searchTimeout = this.asyncFunction($.proxy(function() {
+
+                            if (this.query !== event.target.value) {
+                                this.query = event.target.value;
+
+                                var currentGroup, currentGroupVisible;
+                                $.each($('li', this.$ul), $.proxy(function(index, element) {
+                                    var value = $('input', element).length > 0 ? $('input', element).val() : "";
+                                    var text = $('label', element).text();
+
+                                    var filterCandidate = '';
+                                    if ((this.options.filterBehavior === 'text')) {
+                                        filterCandidate = text;
+                                    }
+                                    else if ((this.options.filterBehavior === 'value')) {
+                                        filterCandidate = value;
+                                    }
+                                    else if (this.options.filterBehavior === 'both') {
+                                        filterCandidate = text + '\n' + value;
+                                    }
+
+                                    if (value !== this.options.selectAllValue && text) {
+                                        // By default lets assume that element is not
+                                        // interesting for this search.
+                                        var showElement = false;
+
+                                        if (this.options.enableCaseInsensitiveFiltering && filterCandidate.toLowerCase().indexOf(this.query.toLowerCase()) > -1) {
+                                            showElement = true;
+                                        }
+                                        else if (filterCandidate.indexOf(this.query) > -1) {
+                                            showElement = true;
+                                        }
+
+                                        // Toggle current element (group or group item) according to showElement boolean.
+                                        $(element).toggle(showElement).toggleClass('filter-hidden', !showElement);
+
+                                        // Differentiate groups and group items.
+                                        if ($(element).hasClass('multiselect-group')) {
+                                            // Remember group status.
+                                            currentGroup = element;
+                                            currentGroupVisible = showElement;
+                                        }
+                                        else {
+                                            // Show group name when at least one of its items is visible.
+                                            if (showElement) {
+                                                $(currentGroup).show().removeClass('filter-hidden');
+                                            }
+
+                                            // Show all group items when group name satisfies filter.
+                                            if (!showElement && currentGroupVisible) {
+                                                $(element).show().removeClass('filter-hidden');
+                                            }
+                                        }
+                                    }
+                                }, this));
+                            }
+
+                            this.updateSelectAll();
+                        }, this), 300, this);
+                    }, this));
+                }
+            }
+        },
+
+        /**
+         * Unbinds the whole plugin.
+         */
+        destroy: function() {
+            this.$container.remove();
+            this.$select.show();
+            this.$select.data('multiselect', null);
+        },
+
+        /**
+         * Refreshs the multiselect based on the selected options of the select.
+         */
+        refresh: function() {
+            $('option', this.$select).each($.proxy(function(index, element) {
+                var $input = $('li input', this.$ul).filter(function() {
+                    return $(this).val() === $(element).val();
+                });
+
+                if ($(element).is(':selected')) {
+                    $input.prop('checked', true);
+
+                    if (this.options.selectedClass) {
+                        $input.closest('li')
+                            .addClass(this.options.selectedClass);
+                    }
+                }
+                else {
+                    $input.prop('checked', false);
+
+                    if (this.options.selectedClass) {
+                        $input.closest('li')
+                            .removeClass(this.options.selectedClass);
+                    }
+                }
+
+                if ($(element).is(":disabled")) {
+                    $input.attr('disabled', 'disabled')
+                        .prop('disabled', true)
+                        .closest('li')
+                        .addClass('disabled');
+                }
+                else {
+                    $input.prop('disabled', false)
+                        .closest('li')
+                        .removeClass('disabled');
+                }
+            }, this));
+
+            this.updateButtonText();
+            this.updateSelectAll();
+        },
+
+        /**
+         * Select all options of the given values.
+         *
+         * If triggerOnChange is set to true, the on change event is triggered if
+         * and only if one value is passed.
+         *
+         * @param {Array} selectValues
+         * @param {Boolean} triggerOnChange
+         */
+        select: function(selectValues, triggerOnChange) {
+            if(!$.isArray(selectValues)) {
+                selectValues = [selectValues];
+            }
+
+            for (var i = 0; i < selectValues.length; i++) {
+                var value = selectValues[i];
+
+                if (value === null || value === undefined) {
+                    continue;
+                }
+
+                var $option = this.getOptionByValue(value);
+                var $checkbox = this.getInputByValue(value);
+
+                if($option === undefined || $checkbox === undefined) {
+                    continue;
+                }
+
+                if (!this.options.multiple) {
+                    this.deselectAll(false);
+                }
+
+                if (this.options.selectedClass) {
+                    $checkbox.closest('li')
+                        .addClass(this.options.selectedClass);
+                }
+
+                $checkbox.prop('checked', true);
+                $option.prop('selected', true);
+
+                if (triggerOnChange) {
+                    this.options.onChange($option, true);
+                }
+            }
+
+            this.updateButtonText();
+            this.updateSelectAll();
+        },
+
+        /**
+         * Clears all selected items.
+         */
+        clearSelection: function () {
+            this.deselectAll(false);
+            this.updateButtonText();
+            this.updateSelectAll();
+        },
+
+        /**
+         * Deselects all options of the given values.
+         *
+         * If triggerOnChange is set to true, the on change event is triggered, if
+         * and only if one value is passed.
+         *
+         * @param {Array} deselectValues
+         * @param {Boolean} triggerOnChange
+         */
+        deselect: function(deselectValues, triggerOnChange) {
+            if(!$.isArray(deselectValues)) {
+                deselectValues = [deselectValues];
+            }
+
+            for (var i = 0; i < deselectValues.length; i++) {
+                var value = deselectValues[i];
+
+                if (value === null || value === undefined) {
+                    continue;
+                }
+
+                var $option = this.getOptionByValue(value);
+                var $checkbox = this.getInputByValue(value);
+
+                if($option === undefined || $checkbox === undefined) {
+                    continue;
+                }
+
+                if (this.options.selectedClass) {
+                    $checkbox.closest('li')
+                        .removeClass(this.options.selectedClass);
+                }
+
+                $checkbox.prop('checked', false);
+                $option.prop('selected', false);
+
+                if (triggerOnChange) {
+                    this.options.onChange($option, false);
+                }
+            }
+
+            this.updateButtonText();
+            this.updateSelectAll();
+        },
+
+        /**
+         * Selects all enabled & visible options.
+         *
+         * If justVisible is true or not specified, only visible options are selected.
+         *
+         * @param {Boolean} justVisible
+         * @param {Boolean} triggerOnSelectAll
+         */
+        selectAll: function (justVisible, triggerOnSelectAll) {
+            var justVisible = typeof justVisible === 'undefined' ? true : justVisible;
+            var allCheckboxes = $("li input[type='checkbox']:enabled", this.$ul);
+            var visibleCheckboxes = allCheckboxes.filter(":visible");
+            var allCheckboxesCount = allCheckboxes.length;
+            var visibleCheckboxesCount = visibleCheckboxes.length;
+
+            if(justVisible) {
+                visibleCheckboxes.prop('checked', true);
+                $("li:not(.divider):not(.disabled)", this.$ul).filter(":visible").addClass(this.options.selectedClass);
+            }
+            else {
+                allCheckboxes.prop('checked', true);
+                $("li:not(.divider):not(.disabled)", this.$ul).addClass(this.options.selectedClass);
+            }
+
+            if (allCheckboxesCount === visibleCheckboxesCount || justVisible === false) {
+                $("option:enabled", this.$select).prop('selected', true);
+            }
+            else {
+                var values = visibleCheckboxes.map(function() {
+                    return $(this).val();
+                }).get();
+
+                $("option:enabled", this.$select).filter(function(index) {
+                    return $.inArray($(this).val(), values) !== -1;
+                }).prop('selected', true);
+            }
+
+            if (triggerOnSelectAll) {
+                this.options.onSelectAll();
+            }
+        },
+
+        /**
+         * Deselects all options.
+         *
+         * If justVisible is true or not specified, only visible options are deselected.
+         *
+         * @param {Boolean} justVisible
+         */
+        deselectAll: function (justVisible) {
+            var justVisible = typeof justVisible === 'undefined' ? true : justVisible;
+
+            if(justVisible) {
+                var visibleCheckboxes = $("li input[type='checkbox']:not(:disabled)", this.$ul).filter(":visible");
+                visibleCheckboxes.prop('checked', false);
+
+                var values = visibleCheckboxes.map(function() {
+                    return $(this).val();
+                }).get();
+
+                $("option:enabled", this.$select).filter(function(index) {
+                    return $.inArray($(this).val(), values) !== -1;
+                }).prop('selected', false);
+
+                if (this.options.selectedClass) {
+                    $("li:not(.divider):not(.disabled)", this.$ul).filter(":visible").removeClass(this.options.selectedClass);
+                }
+            }
+            else {
+                $("li input[type='checkbox']:enabled", this.$ul).prop('checked', false);
+                $("option:enabled", this.$select).prop('selected', false);
+
+                if (this.options.selectedClass) {
+                    $("li:not(.divider):not(.disabled)", this.$ul).removeClass(this.options.selectedClass);
+                }
+            }
+        },
+
+        /**
+         * Rebuild the plugin.
+         *
+         * Rebuilds the dropdown, the filter and the select all option.
+         */
+        rebuild: function() {
+            this.$ul.html('');
+
+            // Important to distinguish between radios and checkboxes.
+            this.options.multiple = this.$select.attr('multiple') === "multiple";
+
+            this.buildSelectAll();
+            this.buildDropdownOptions();
+            this.buildFilter();
+
+            this.updateButtonText();
+            this.updateSelectAll();
+
+            if (this.options.disableIfEmpty && $('option', this.$select).length <= 0) {
+                this.disable();
+            }
+            else {
+                this.enable();
+            }
+
+            if (this.options.dropRight) {
+                this.$ul.addClass('pull-right');
+            }
+        },
+
+        /**
+         * The provided data will be used to build the dropdown.
+         */
+        dataprovider: function(dataprovider) {
+
+            var groupCounter = 0;
+            var $select = this.$select.empty();
+
+            $.each(dataprovider, function (index, option) {
+                var $tag;
+
+                if ($.isArray(option.children)) { // create optiongroup tag
+                    groupCounter++;
+
+                    $tag = $('<optgroup/>').attr({
+                        label: option.label || 'Group ' + groupCounter,
+                        disabled: !!option.disabled
+                    });
+
+                    forEach(option.children, function(subOption) { // add children option tags
+                        $tag.append($('<option/>').attr({
+                            value: subOption.value,
+                            label: subOption.label || subOption.value,
+                            title: subOption.title,
+                            selected: !!subOption.selected,
+                            disabled: !!subOption.disabled
+                        }));
+                    });
+                }
+                else {
+                    $tag = $('<option/>').attr({
+                        value: option.value,
+                        label: option.label || option.value,
+                        title: option.title,
+                        selected: !!option.selected,
+                        disabled: !!option.disabled
+                    });
+                }
+
+                $select.append($tag);
+            });
+
+            this.rebuild();
+        },
+
+        /**
+         * Enable the multiselect.
+         */
+        enable: function() {
+            this.$select.prop('disabled', false);
+            this.$button.prop('disabled', false)
+                .removeClass('disabled');
+        },
+
+        /**
+         * Disable the multiselect.
+         */
+        disable: function() {
+            this.$select.prop('disabled', true);
+            this.$button.prop('disabled', true)
+                .addClass('disabled');
+        },
+
+        /**
+         * Set the options.
+         *
+         * @param {Array} options
+         */
+        setOptions: function(options) {
+            this.options = this.mergeOptions(options);
+        },
+
+        /**
+         * Merges the given options with the default options.
+         *
+         * @param {Array} options
+         * @returns {Array}
+         */
+        mergeOptions: function(options) {
+            return $.extend(true, {}, this.defaults, this.options, options);
+        },
+
+        /**
+         * Checks whether a select all checkbox is present.
+         *
+         * @returns {Boolean}
+         */
+        hasSelectAll: function() {
+            return $('li.multiselect-all', this.$ul).length > 0;
+        },
+
+        /**
+         * Updates the select all checkbox based on the currently displayed and selected checkboxes.
+         */
+        updateSelectAll: function() {
+            if (this.hasSelectAll()) {
+                var allBoxes = $("li:not(.multiselect-item):not(.filter-hidden) input:enabled", this.$ul);
+                var allBoxesLength = allBoxes.length;
+                var checkedBoxesLength = allBoxes.filter(":checked").length;
+                var selectAllLi  = $("li.multiselect-all", this.$ul);
+                var selectAllInput = selectAllLi.find("input");
+
+                if (checkedBoxesLength > 0 && checkedBoxesLength === allBoxesLength) {
+                    selectAllInput.prop("checked", true);
+                    selectAllLi.addClass(this.options.selectedClass);
+                    this.options.onSelectAll();
+                }
+                else {
+                    selectAllInput.prop("checked", false);
+                    selectAllLi.removeClass(this.options.selectedClass);
+                }
+            }
+        },
+
+        /**
+         * Update the button text and its title based on the currently selected options.
+         */
+        updateButtonText: function() {
+            var options = this.getSelected();
+
+            // First update the displayed button text.
+            if (this.options.enableHTML) {
+                $('.multiselect .multiselect-selected-text', this.$container).html(this.options.buttonText(options, this.$select));
+            }
+            else {
+                $('.multiselect .multiselect-selected-text', this.$container).text(this.options.buttonText(options, this.$select));
+            }
+
+            // Now update the title attribute of the button.
+            $('.multiselect', this.$container).attr('title', this.options.buttonTitle(options, this.$select));
+        },
+
+        /**
+         * Get all selected options.
+         *
+         * @returns {jQUery}
+         */
+        getSelected: function() {
+            return $('option', this.$select).filter(":selected");
+        },
+
+        /**
+         * Gets a select option by its value.
+         *
+         * @param {String} value
+         * @returns {jQuery}
+         */
+        getOptionByValue: function (value) {
+
+            var options = $('option', this.$select);
+            var valueToCompare = value.toString();
+
+            for (var i = 0; i < options.length; i = i + 1) {
+                var option = options[i];
+                if (option.value === valueToCompare) {
+                    return $(option);
+                }
+            }
+        },
+
+        /**
+         * Get the input (radio/checkbox) by its value.
+         *
+         * @param {String} value
+         * @returns {jQuery}
+         */
+        getInputByValue: function (value) {
+
+            var checkboxes = $('li input', this.$ul);
+            var valueToCompare = value.toString();
+
+            for (var i = 0; i < checkboxes.length; i = i + 1) {
+                var checkbox = checkboxes[i];
+                if (checkbox.value === valueToCompare) {
+                    return $(checkbox);
+                }
+            }
+        },
+
+        /**
+         * Used for knockout integration.
+         */
+        updateOriginalOptions: function() {
+            this.originalOptions = this.$select.clone()[0].options;
+        },
+
+        asyncFunction: function(callback, timeout, self) {
+            var args = Array.prototype.slice.call(arguments, 3);
+            return setTimeout(function() {
+                callback.apply(self || window, args);
+            }, timeout);
+        },
+
+        setAllSelectedText: function(allSelectedText) {
+            this.options.allSelectedText = allSelectedText;
+            this.updateButtonText();
+        }
+    };
+
+    $.fn.multiselect = function(option, parameter, extraOptions) {
+        return this.each(function() {
+            var data = $(this).data('multiselect');
+            var options = typeof option === 'object' && option;
+
+            // Initialize the multiselect.
+            if (!data) {
+                data = new Multiselect(this, options);
+                $(this).data('multiselect', data);
+            }
+
+            // Call multiselect method.
+            if (typeof option === 'string') {
+                data[option](parameter, extraOptions);
+
+                if (option === 'destroy') {
+                    $(this).data('multiselect', false);
+                }
+            }
+        });
+    };
+
+    $.fn.multiselect.Constructor = Multiselect;
+
+    $(function() {
+        $("select[data-role=multiselect]").multiselect();
+    });
+
+}(window.jQuery);
+
 /*!
  * bootstrap.datetimepicker for Bootstrap 4
  * Copyright 2018 Jay Brummels

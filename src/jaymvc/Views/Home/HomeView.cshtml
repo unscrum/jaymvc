@@ -14,9 +14,9 @@
     </script>
 }
 @section nocontainer{
-    <div class="sticky-top bg-light p-2" style="top:55px">  
+    <div class="sticky-top bg-light p-2" style="top:55px">
         <div class="text-center">
-            <button class="btn btn-outline-secondary action-scroll-to" data-where="#todosWrapper">Todos</button>                
+            <button class="btn btn-outline-secondary action-scroll-to" data-where="#todosWrapper">Todos</button>
         </div>
     </div>
 }
@@ -25,10 +25,10 @@
 <div id="welcome">
     <div class="jumbotron">
         <h4 class="display-4">Welcome @Model.Name</h4>
-        <p class="lead">This is a sample hybid javascript and dotnet core mvc 2.1 site.</p>
+        <p class="lead">This is a sample hybrid javascript and dotnet core mvc 2.1 site.</p>
         <hr class="my-4">
-        <p>Below is a simple todo list.  It demonstrates the plugins for typeahead, scroll to, edit, delete, jay.modal, jay.ajax, json envelopes, jay.alert, content loading and other custom javascript plug ins that make this site responsive..</p>
-        <p>for the type ahead of assignee please use the last name "Brummels" to see how it works.</p>
+        <p>Below is a simple todo list.  It demonstrates the plugins for typeahead, scroll to, edit, delete, jay.modal, jay.ajax, json envelopes, jay.alert, jay.loading and other custom javascript plug ins that make this site responsive.</p>
+        <p class="text-muted">for the type ahead of assignee please use the last name "Brummels" to see how it works.</p>
     </div>
 </div>
 
@@ -42,7 +42,7 @@
         <div class="card-body">
             <p class="card-text">Todos will show up below if you have any.  <a href="#" class="action-refresh" data-target="#todos">Refresh</a></p>
             <div id="todos" data-url="@Url.PartialTodos()" class="on-visible" data-visibility-action="load">
-            
+
             </div>
         </div>
     </div>

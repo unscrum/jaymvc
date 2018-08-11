@@ -1,62 +1,13 @@
-﻿/*
-* jquery.jay plugin
+﻿/*!
+* jay.loading plugin
 * Copyright 2011-2018 Jay Brummels
 * Licensed under MIT (https://github.com/unscrum/jaymvc/LICENSE)
 */
 
 /**
-* This file contains jQuery methods specific to Jay. These are smaller functions 
-* tied to the UI. (Also see jquery.utility.js)
+* This file extends jQuery to show loading icons either inside a contaner or convering one.  Requires font awesome
 */
 (function ($) {
-
-    $.fn.selectRange = function (start, end) {
-        var e = this[0];
-        var $this = $(e);
-        if (arguments.length === 0) {
-            start = 0;
-            end = $this.val().length;
-        } else if (arguments.length === 1) {
-            end = start;
-            start = 0;
-        }
-        if (document.activeElement !== e) {
-            $this.focus();
-        }
-        if (e.setSelectionRange) { /* WebKit */
-            setTimeout(function(){
-                e.setSelectionRange(start, end);
-            }, 1);
-        }
-        else if (e.createTextRange) { /* IE */
-            var range = e.createTextRange();
-            range.collapse(true); range.moveEnd('character', end);
-            range.moveStart('character', start);
-            range.select();
-        }
-        else if (e.selectionStart && e.selectionEnd) {
-            e.selectionStart = start;
-            e.selectionEnd = end;
-        }
-        return this;
-    };
-
-    $.fn.selectRangeOnFocus = function () {
-        return this.each(function () {
-            $(this).on('focusin', function () {
-                $(this).selectRange();
-            });
-        });
-
-    };
-
-    $.fn.selectRangeOnFocusDestroy = function () {
-        return this.each(function () {
-            $(this).off('focusin');
-        });
-
-    };
-
     $.fn.showContentLoading = function (size, zindex) {
         var sizes = {
             sm: '<h5/>',
@@ -140,5 +91,5 @@
         }
         return this.html($loading);
     };
-    
+
 })(jQuery);

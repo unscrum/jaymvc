@@ -1,4 +1,4 @@
-﻿/*
+﻿/*!
 * jay.message jQuery plugin
 * Copyright 2011-2018 Jay Brummels
 * Licensed under MIT (https://github.com/unscrum/jaymvc/LICENSE)

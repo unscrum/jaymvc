@@ -5,7 +5,7 @@
  * Licensed under MIT (https://github.com/unscrum/jaymvc/LICENSE)
  */
 !function ($) {
-    
+
     /* TYPEAHEAD PUBLIC CLASS DEFINITION
      * ================================= */
 
@@ -133,7 +133,7 @@
                     }
                     that.$element.trigger('typeaheadnoresults', arguments);
                 }).fail(function () {
-                    that.$element.trigger('typeaheadfail', arguments);                    
+                    that.$element.trigger('typeaheadfail', arguments);
                 });
                 this.ajax.timerId = null;
             }
@@ -216,7 +216,7 @@
             if (!next.length) {
                 next = $(this.$menu.find('li')[0]);
             }
-            
+
             next.addClass('active');
         },
         prev: function () {
@@ -237,7 +237,7 @@
                 .on('keypress.typeahead', $.proxy(this.keypress, this))
                 .on('keyup.typeahead', $.proxy(this.keyup, this))
                 .on('keydown.typeahead', $.proxy(this.keydown, this));
-            
+
             this.$menu
                 .on('click.typeahead', $.proxy(this.click, this))
                 .on('mouseenter.typeahead', 'li', $.proxy(this.mouseenter, this))
@@ -350,7 +350,7 @@
                 data[option]();
         });
     };
-    
+
     $.fn.typeahead.Constructor = Typeahead;
 
 }(window.jQuery);

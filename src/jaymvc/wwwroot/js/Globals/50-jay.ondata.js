@@ -1,5 +1,5 @@
-﻿/*
-* jquery.ondata plugin
+﻿/*!
+* jay.ondata plugin
 * Copyright 2011- 2018 Jay Brummels & Jonathan Sharp
 * Licensed under MIT (https://github.com/unscrum/jaymvc/LICENSE)
 */

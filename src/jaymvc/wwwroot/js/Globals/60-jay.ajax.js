@@ -1,10 +1,10 @@
-﻿/*
-* jquery.ajax plugin
+﻿/*!
+* jay.ajax plugin
 * Copyright 2011- 2018 Jay Brummels & Jonathan Sharp
 * Licensed under MIT (https://github.com/unscrum/jaymvc/LICENSE)
 */
 /*
-* This is the main Ajax handling component for the entire project. It wraps all Ajax calls to and from the server 
+* This is the main Ajax handling component for the entire project. It wraps all Ajax calls to and from the server
 * expecting a common envelope format that it unpacks and passes back the enclosed data.
 */
 (function ($, jay) {
@@ -18,7 +18,7 @@
             type: 'POST',
             target: this[0],
             traditional: true
-        },            
+        },
         // Optional user options
 		options.ajax || {}, {
 		    url: options.url,
@@ -41,7 +41,7 @@
             }
         });
 
-     
+
         failedAbortErrorDeferred.promise();
 
         return $.extend(jqXhr, {
@@ -115,5 +115,5 @@
             }
         });
     };
-    
+
 })(jQuery, jay);

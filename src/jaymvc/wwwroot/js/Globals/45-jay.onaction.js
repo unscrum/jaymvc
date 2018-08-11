@@ -1,5 +1,5 @@
-﻿/*
-* jquery.onaction plugin
+﻿/*!
+* jay.onaction plugin
 * Copyright 2011- 2018 Jay Brummels & Jonathan Sharp
 * Licensed under MIT (https://github.com/unscrum/jaymvc/LICENSE)
 */
@@ -7,11 +7,11 @@
 
 /*
 * This is the main event handling pattern for these sites. All event handling is processed through event delegation
-* with the following pattern. Event handlers are defined but not bound to individual elements (decoupled) by calling 
-* $.onAction('someAction', function() { ... }); Elements are then tagged for specific events by adding a css 
+* with the following pattern. Event handlers are defined but not bound to individual elements (decoupled) by calling
+* $.onAction('someAction', function() { ... }); Elements are then tagged for specific events by adding a css
 * class that starts with action- followed by the action name, so in our example above, the associated action would be
 * action-some-action. Multiple action handlers may be registered for a single action. If only one action handler should
-* be registered at a give time, you may setup that action by using $.singleOnAction(...) which will remove any 
+* be registered at a give time, you may setup that action by using $.singleOnAction(...) which will remove any
 * existing action handlers for that action. This is useful if a script is loaded or included multiple times on a page.
 */
 (function ($) {
@@ -49,7 +49,7 @@
                 }
             }
         }
-        if(target !== document) 
+        if(target !== document)
             if ($(target).isTextType())
                 $( target ).data( 'onactionblur', false );
     }
@@ -154,7 +154,7 @@
                     $(target).on('keypress', function (e) {
                         if (e.which === 13){
                             $(this).trigger('blur').off('keypress');
-                        } 
+                        }
                     });
                 }
 		        $(target)
@@ -171,7 +171,7 @@
 // ReSharper disable InconsistentFunctionReturns
 		        return;
 // ReSharper restore InconsistentFunctionReturns
-		    // Construct a group of elements (target, parents) and walk 
+		    // Construct a group of elements (target, parents) and walk
 		    // through the elements looking for the first action-* class
             $target
 				.add($target.parents())

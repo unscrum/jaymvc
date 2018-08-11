@@ -1,4 +1,4 @@
-﻿/*
+﻿/*!
 * jquery.datafilter plugin
 * Copyright 2011- 2018 Jay Brummels & Jonathan Sharp
 * Licensed under MIT (https://github.com/unscrum/jaymvc/LICENSE)
@@ -61,8 +61,8 @@
 
     /*
     $('body').dataFilter('criteria', 'MTA', '$=');
-	
-    $('body').dataFilter(['criteria', 'MTA'], ['foo'], []);	
+
+    $('body').dataFilter(['criteria', 'MTA'], ['foo'], []);
     */
     $.fn.dataFilter = function (/*attr, value, comparison*/) {
         return executeFindOfFilter.call(this, 'filter', arguments.length === 1 ? arguments[0] : arguments);

@@ -1,4 +1,4 @@
-﻿/*
+﻿/*!
 * jay.modal jQuery plugin
 * Copyright 2011-2018 Jay Brummels
 * Licensed under MIT (https://github.com/unscrum/jaymvc/LICENSE)
@@ -26,13 +26,13 @@
         });
     };
     /*
-    * call jay.modal( { title:'title', 
+    * call jay.modal( { title:'title',
     *                        content: $('#contentID') } ); to load content into a modal from an ID
-    * or jay.modal( { title:'title', 
-    *                            partialUrl: '/controller/action/', 
+    * or jay.modal( { title:'title',
+    *                            partialUrl: '/controller/action/',
     *                           partialData: { id: 1, name: 'jay' } } ); to load the content in from a parital view with the data provided
     * optionally set the first container in the partial view to have a data-modal-title="Title" attribute and call
-    * or jay.modal( { partialUrl: '/controller/action/', 
+    * or jay.modal( { partialUrl: '/controller/action/',
     *                               partialData: { id: 1, name: 'jay' } } );
     * or jay.modal( { partialUrl: '/controller/action/'} ); for a partial that does not take any parameters.
     * You can override the buttons by typing your own buttons collection:
@@ -46,13 +46,13 @@
     *                                                              },
     *                                                             close: false,
     *                                                             cssClass: 'btn-danger'
-    *                                                           }  
+    *                                                           }
     *                                                           { label: 'Save and Close',
     *                                                             onClick: function(evt, $modalContantArea, $modalWrapper){
     *                                                               //CODE HERE TO SAVE
     *                                                              },
-    *                                                             close: true}  
-    *                                                        ] ); 
+    *                                                             close: true}
+    *                                                        ] );
     * other options include :
     * title: 'My Modal Window' //Title of the modal window
     * open: function () { //code to run when it first opens (after the partial loads if using a partial) }
@@ -90,7 +90,7 @@
             .addClass('modal-header')
             .append($('<h5>').addClass('modal-title').html(options.title))
             .append('<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>');
-           
+
         var $content = $('<div class="jayModal modal-body"></div>');
 
         var $modalContent = $('<div/>')
@@ -152,7 +152,7 @@
                     $content.empty().message('error', jay.failMessage);
                 });
             }).modal(modalOptions);
-            
+
         } else {
             $content
                 .html(options.content.clone()[0]);
