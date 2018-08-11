@@ -8,21 +8,18 @@
     <PackageReference Include="Microsoft.AspNetCore.All" Version="2.1.0" />
   </ItemGroup>
   <ItemGroup>
-    <DotNetCliToolReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Tools" Version="2.0.2" />
-  </ItemGroup>
-  <ItemGroup>
     <Content Remove="wwwroot\**\Components\*" />
     <Content Remove="wwwroot\**\Globals\*" />
-    <Content Remove="wwwroot\js\globals.js" />
-    <Content Remove="wwwroot\css\globals.css" />
+    <Content Remove="wwwroot\js\jaymvc.js" />
+    <Content Remove="wwwroot\css\jaymvc.css" />
     <Content Remove="bundleconfig.json" />
     <Content Remove="appsettings.Development.json" />
   </ItemGroup>
   <ItemGroup>
     <None Include="wwwroot\**\Components\*" />
     <None Include="wwwroot\**\Globals\*" />
-    <None Include="wwwroot\js\globals.js" />
-    <None Include="wwwroot\css\globals.css" />
+    <None Include="wwwroot\js\jaymvc.js" />
+    <None Include="wwwroot\css\jaymvc.css" />
     <None Include="bundleconfig.json" />
     <None Include="appsettings.Development.json" />
   </ItemGroup>

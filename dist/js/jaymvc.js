@@ -29874,10 +29874,10 @@ var jay = {
 
 
 /*
-* This is the main event handling pattern for these sites. All event handling is processed through event delegation
+* This is the main event handling pattern for the site. All event handling is processed through event delegation
 * with the following pattern. Event handlers are defined but not bound to individual elements (decoupled) by calling
 * $.onAction('someAction', function() { ... }); Elements are then tagged for specific events by adding a css
-* class that starts with action- followed by the action name, so in our example above, the associated action would be
+* class that starts with action- followed by the action name, so in the example above, the associated action would be
 * action-some-action. Multiple action handlers may be registered for a single action. If only one action handler should
 * be registered at a give time, you may setup that action by using $.singleOnAction(...) which will remove any
 * existing action handlers for that action. This is useful if a script is loaded or included multiple times on a page.
@@ -30092,6 +30092,7 @@ var jay = {
 
             }
         },
+        
         /*
         * This method takes an event name (such as totalRecordCount), a selector to execute when that event occurs
         * (such as .data-total-record-count), and finally a callback method to execute when the event is triggered.
@@ -30129,7 +30130,7 @@ var jay = {
 */
 
 /**
-* This file extends jQuery to show loading icons either inside a contaner or convering one.  Requires font awesome
+* This plugin extends jQuery to show loading icons either inside a container or covering one.  Requires font awesome
 */
 (function ($) {
     $.fn.showContentLoading = function (size, zindex) {
@@ -30224,7 +30225,7 @@ var jay = {
 * Licensed under MIT (https://github.com/unscrum/jaymvc/LICENSE)
 */
 /*
-* This is the main Ajax handling component for the entire project. It wraps all Ajax calls to and from the server
+* This is the main Ajax handling component for the entire site. It wraps all Ajax calls to and from the server
 * expecting a common envelope format that it unpacks and passes back the enclosed data.
 */
 (function ($, jay) {

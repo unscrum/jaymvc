@@ -1,14 +1,41 @@
 # jayMVC
 javascript and dotnetcore mvc 2.1 hybrid framework
 
-## Not included
-Many of the plugins require Font Awesome 4.7 icons, but it is not bundled with jayMVC.  Insead use a CDN like:
+## Why another MVC framework?
+My goal is to let server side MVC do its job and have a responsive, sexy UI. It seems in frameworks like angular, if you are a FullStack developer you spend time in dotnet making Controllers with injected Services that return Models and then in JS you make more Controllers, that inject services to call the dotnet Controllers and then create templates in javascript to draw the Model that was created in C#. But sometimes you use Razor Views to launch SPAs.  Are you dizzy yet?.  
+
+What I don't like about pure jQuery or jQuery UI is that everything is bound to a DOM element by ID or class, and if a designer goes in and changes a class, it could break the whole application.  
+
+The goal here is to decouple jQuery from the DOM and instead create functions and events by **NAME** and in turn call or trigger them by **NAME** and when absolutely necessary to tie to DOM Element have a single way to bind the **NAME** to a DOM element in one place, so if a designer goes in, and changes a class, it can be fixed in one place, not several $("foo.someclassthatchanged") all over the JS application.
+
+
+Also I believe in having minimal amounts of javascript, that can be templated and driven by the DOM.  Check out the MVC sample application [plugins](https://github.com/unscrum/jaymvc/tree/master/src/jaymvc/wwwroot/js/Views).  The plugins for the sample application like delete, edit, load, scrollTo, and wireUpTypeAhead, may be all you need for an entire application, because they take HTML5 Data attributes as input.  For example you could use the delete plugin to delete rows out of a table, but it could be a table of **Cars** or another table of **Trucks** or another table of **People**.
+
+the DOM might pass in different titles, messages, urls and button labels but effectively the JS is the same.
+
+The buttons below would be in 3 tables with a class of *cars*, *trucks* and *people* respectively, and could all be serviced by [wwwroot/js/Views/delete.js](https://raw.githubusercontent.com/unscrum/jaymvc/master/src/jaymvc/wwwroot/js/Views/delete.js)
+
+    <button class="btn btn-link action-delete" data-title="Delete Car" data-message="Are you sure you want to delete this car?" data-url="/cars/delete/1" data-target="table.cars" ><i class=fa fa-trash-o"></i></button>
+
+    ...
+
+    <button class="btn btn-link action-delete" data-title="Delete Truck" data-message="Are you sure you want to delete this truck?" data-url="/trucks/delete/13" data-target="table.trucks" ><i class=fa fa-trash-o"></i></button>
+
+
+    ...
+
+    <button class="btn btn-link action-delete" data-title="Delete Person" data-message="Are you sure you want to delete this person?" data-url="/people/delete/12" data-target="table.people"><i class=fa fa-trash-o"></i></button>
+
+
+
+## Whats not included?
+Many of the plugins require Font Awesome 4.7 icons, but it is not bundled with jayMVC.  Instead use a CDN like:
 
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
 
 
-## Included
-a single download file of jaymvc.js or jaymvc.min.js includes the following open source and custom libraries
+## Whats included?
+A single download file of jaymvc.js or jaymvc.min.js includes the following open source and custom libraries.
 * jQuery 3.2.1
 * popper 1.12.9
 * bootstrap 4.1.1
@@ -271,4 +298,4 @@ A simple jayAlert can be called as well, which wraps jayModal with a *small* mod
     jay.alert('title','message');
 
 ## Putting it all together
-Take a look at the sample MVC site that includes some plugins written on the jayMVC framework.  The site will allow you to add, edit and delete ToDo items.  It also illustrates the Bootstrap 4 Typeahead and Bootsrap 4 DateTime Picker.
+Take a look at the sample MVC site that includes some plugins written on the jayMVC framework.  The site will allow you to add, edit and delete ToDo items.  It also illustrates the Bootstrap 4 Typeahead and Bootstrap 4 DateTime Picker.
