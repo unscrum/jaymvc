@@ -123,7 +123,7 @@ Optionally hide all *loading* panes
 ## jayAjax
 This is the main AJAX handling component for the entire site. It wraps all AJAX calls to and from the server expecting a common envelope format that it unpacks and passes back the enclosed data.  
 
-It expects a backend envelope. See a C# example  [JsonEnvelope](https://github.com/unscrum/jaymvc/blob/master/src/jaymvc/Framework/JsonEnvelope.cs)
+It expects a backend envelope. See a C# example  [JsonEnvelope](jaymvc/src/jaymvc/Framework/JsonEnvelope.cs)
 
 Make an AJAX call expecting *JSON* back doing a *POST*. It automatically handles Forbidden and Unauthorized, but delegates out 3 callbacks.
 
