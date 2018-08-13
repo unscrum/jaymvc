@@ -2,9 +2,9 @@
 javascript and dotnetcore mvc 2.1 hybrid framework
 
 ## Why another MVC framework?
-My goal is to let server side MVC do its job and have a responsive, sexy UI. It seems in frameworks like angular, if you are a FullStack developer you spend time in dotnet making Controllers with injected Services that return Models and then in JS you make more Controllers, that inject services to call the dotnet Controllers and then create templates in javascript to draw the Model that was created in C#. But sometimes you use Razor Views to launch SPAs.  Are you dizzy yet?.  
+My goal is to let server side MVC do its job, yet still have a responsive, sexy UI. It seems in frameworks like angular, if you are a FullStack developer you spend time in dotnet making Controllers with injected Services that return Models and then in JS you make more Controllers, that inject Services to call the dotnet Controllers and then create Templates in javascript to draw the Model that was created in C#. But sometimes you use Razor Views to launch SPAs.  Are you dizzy yet?.
 
-What I don't like about pure jQuery or jQuery UI is that everything is bound to a DOM element by ID or class, and if a designer goes in and changes a class, it could break the whole application.  
+What I don't like about pure jQuery or jQuery UI is that everything is bound to a DOM element by ID or class, and if a designer goes in and changes a class, it could break the whole application.
 
 The goal here is to decouple jQuery from the DOM and instead create functions and events by **NAME** and in turn call or trigger them by **NAME** and when absolutely necessary to tie to DOM Element have a single way to bind the **NAME** to a DOM element in one place, so if a designer goes in, and changes a class, it can be fixed in one place, not several $("foo.someclassthatchanged") all over the JS application.
 
@@ -79,7 +79,7 @@ Elements are then tagged for specific events by adding a css class that starts w
 
      class="action-some-action"
 
-HTML5 data attributes as well as jQuery.data() is also parsed and passed into the function.  
+HTML5 data attributes as well as jQuery.data() is also parsed and passed into the function.
 
 Given:
 
@@ -128,7 +128,7 @@ Optionally events can be bound to the $(document) itself by:
     $.onData('eventName', function(){...//Callback});
 
 ## jayLoading
-This plugin extends jQuery to show loading icons either inside a container or covering one.  
+This plugin extends jQuery to show loading icons either inside a container or covering one.
 ** Requires FontAwesome **
 
 Empty an element and add a loading spinner and optional text
@@ -148,7 +148,7 @@ Optionally hide all *loading* panes
     $.hideAllContentLoading(); //hide all content loading panes
 
 ## jayAjax
-This is the main AJAX handling component for the entire site. It wraps all AJAX calls to and from the server expecting a common envelope format that it unpacks and passes back the enclosed data.  
+This is the main AJAX handling component for the entire site. It wraps all AJAX calls to and from the server expecting a common envelope format that it unpacks and passes back the enclosed data.
 
 It expects a backend envelope. See a C# example  [JsonEnvelope](https://raw.githubusercontent.com/unscrum/jaymvc/master/src/jaymvc/Framework/JsonEnvelope.cs)
 
@@ -162,7 +162,7 @@ Make an AJAX call expecting *JSON* back doing a *POST*. It automatically handles
     }).done(function(obj){
       //the url returned an envelope with success
     }).error(function(objOrMsg){
-      //the url returned an envelope with errors     
+      //the url returned an envelope with errors
     }).fail(function(){
       // the url responded with a non success code (500 or other error status code)
     });
@@ -189,7 +189,7 @@ Make an AJAX call doing a *POST* to get an *HTML* snippet back and automatically
       });
 
 ## jayMessage
-This is a responsive way to add bootstrap alerts into the DOM, prepended to the element passed in.  Alert messages disappear when clicked and optionally can disappear after a set timeout.  
+This is a responsive way to add bootstrap alerts into the DOM, prepended to the element passed in.  Alert messages disappear when clicked and optionally can disappear after a set timeout.
 
 ** Requires FontAwesome **
 
@@ -245,9 +245,9 @@ Optionally you can use content from the DOM or created in jQuery;
         title: 'Modal Title',
         size: 'small',
         content: $('<div/>').html('Some Text...')
-      });  
+      });
 
-Buttons can also be added, and support cssClass, label, close: true/false and and optional onClick.  
+Buttons can also be added, and support cssClass, label, close: true/false and and optional onClick.
 
 Here is an example of a jayOnAction with  jayModal that confirms a delete before deleting via jayAjax.
 
@@ -298,4 +298,107 @@ A simple jayAlert can be called as well, which wraps jayModal with a *small* mod
     jay.alert('title','message');
 
 ## Putting it all together
+Lets say that you have a task to design a dashbaord with several graphs and widgets.  Perhaps  the *Graphs* have JSON POSTs (JsonResult), and of the *Widgets* have HTML Snippet POSTS (PartialViewResult). All stitched together by a *Main Page* GET (ViewResult).  You might consider using jayOnVisible and jayOnAction to create a load scenario.
+
+First lets write a jayAction handler to handle loading hte Widgets:
+
+    $.onAction('loadWidget', //name it something meaningful
+      function(evt, data) {
+        var $t = $(this);
+        if ($t.isEmpty()){
+            $t.addInlineLoading('<strong>Loading...<strong>');
+        } else{
+            $t.showContentLoading();
+        }
+
+        jay.ajaxPostHtml({
+            url: data.url,
+            data: data.postData || {}
+        }).fail(function() {
+            $t.empty().message('error', jay.failMessage);
+        }).done(function(html) {
+            var $html = $(html);
+            $.triggerDataEvent($html.data());
+            $t.html($html).hideContentLoading();
+        });
+
+And one to handle the JSON data for graphs.
+
+    $.onAction('loadGraph', //name it something meaningful
+      function(evt, data) {
+        var $t = $(this);
+        if ($t.isEmpty()){
+            $t.addInlineLoading('<strong>Loading...<strong>');
+        } else{
+            $t.showContentLoading();
+        }
+
+        jay.ajax({
+            url: data.url,
+            data: data.postData || {}
+        }).fail(function() {
+            $t.empty().message('error', jay.failMessage);
+        }).error(function() {
+            $t.empty().message('error', jay.failMessage);
+        }).done(function(json) {
+            $t.empty().highcharts(json);  // Need to add the highcharts plugin
+        });
+
+Then in your *Main Page* you could use bootstrap to layout a responsive grid:
+
+    <div class="row">
+      <div class="col-12 col-md-6 col-xl-4 on-visible" data-visibility-action="loadGraph" data-url="@Url.GraphOne()"></div>
+      <div class="col-12 col-md-6 col-xl-4 on-visible" data-visibility-action="loadWidget" data-url="@Url.WidgetOne()"></div>
+      <div class="col-12 col-md-6 col-xl-4 on-visible" data-visibility-action="loadGraph" data-url="@Url.GraphTwo()"></div>
+      <div class="col-12 col-md-6 col-xl-4 on-visible" data-visibility-action="loadWidget" data-url="@Url.WidgetTwo()"></div>
+      <div class="col-12 col-md-6 col-xl-4 on-visible" data-visibility-action="loadGraph" data-url="@Url.GraphThree()"></div>
+      <div class="col-12 col-md-6 col-xl-4 on-visible" data-visibility-action="loadWidget" data-url="@Url.WidgetThree()"></div>
+    </div>
+
+So you see the *Main Page* drives the rest of its content.  The URLs could be on different controllers or the same controller with different actions, with the only rule that the *Graph* URLS return the JSON data to build the highchart graph, and the *Widget* URLS return HTML snippets.
+
+How does it work?  the jayOnVisible will call the data-visibility-action and then remove the on-action class.  IIf the on-action class gets added again it will simply call the action again. But in the actions above we added indicators that that section was loading.
+
+Now lets say when you click on the div containing a *WidgetOne* or *GraphOne* you also want do do a modal popup to ask for extra data (like a time range). Assume that the Controller Action on the back end takes in an optional date range.
+
+Lets add one more jayAction to handle the click.
+
+    $.onAction('popupEditCriteria',  //name it something meaningful
+      function(e, data){
+        var $widgetDiv = $(this);
+        jay.modal({
+          partialUrl: data.dateRangeUrl,
+          partialData: data.postData || {}
+          size: 'small',
+          title: 'Change date range',
+          buttons: [
+            {
+              label: 'Cancel',
+              close: true
+            },{
+              label: 'Change',
+              onClick: function(e, $content){
+                $widgetDiv
+                  .data('postData', $content.getInputValues() ) //set some data to post upon redraw
+                  .addClass('on-visible'); // do redraw
+              }
+            }
+          ]
+        });
+      });
+
+And lets change the markup for *WidgetOne* and *GraphOne*.
+
+    <div class="row">
+      <div class="col-12 col-md-6 col-xl-4 on-visible action-popup-edit-criteria" data-visibility-action="loadGraph" data-url="@Url.GraphOne()" data-date-range-url="@Url.DateRangePopup()"></div>
+      <div class="col-12 col-md-6 col-xl-4 on-visible action-popup-edit-criteria" data-visibility-action="loadWidget" data-url="@Url.WidgetOne()" data-date-range-url="@Url.DateRangePopup()"></div>
+      <div class="col-12 col-md-6 col-xl-4 on-visible" data-visibility-action="loadGraph" data-url="@Url.GraphTwo()"></div>
+      <div class="col-12 col-md-6 col-xl-4 on-visible" data-visibility-action="loadWidget" data-url="@Url.WidgetTwo()"></div>
+      <div class="col-12 col-md-6 col-xl-4 on-visible" data-visibility-action="loadGraph" data-url="@Url.GraphThree()"></div>
+      <div class="col-12 col-md-6 col-xl-4 on-visible" data-visibility-action="loadWidget" data-url="@Url.WidgetThree()"></div>
+    </div>
+
+How does it work?  the jayOnVisible will call the *data-visibility-action* and then remove the on-action class.  When the *on-action* class gets added again it will simply call the action again. The *popupEditCriteria* action is actually just adding the form's input data to the div via jQuery's *.data()* with the name *postData*.  In the two load actions the *postData* is passed into the jayAjaxCall.  All that remains is to add a simple bootstrap PartialViewResult that asks for a data range.
+
+## More Demos
 Take a look at the sample MVC site that includes some plugins written on the jayMVC framework.  The site will allow you to add, edit and delete ToDo items.  It also illustrates the Bootstrap 4 Typeahead and Bootstrap 4 DateTime Picker.
