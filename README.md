@@ -367,7 +367,7 @@ Lets add one more jayAction to handle the click.
       function(e, data){
         var $widgetDiv = $(this);
         jay.modal({
-          partialUrl: data.dateRangeUrl,
+          partialUrl: data.editCriteriaUrl,
           partialData: data.postData || {}
           size: 'small',
           title: 'Change date range',
@@ -390,8 +390,8 @@ Lets add one more jayAction to handle the click.
 And lets change the markup for *WidgetOne* and *GraphOne*.
 
     <div class="row">
-      <div class="col-12 col-md-6 col-xl-4 on-visible action-popup-edit-criteria" data-visibility-action="loadGraph" data-url="@Url.GraphOne()" data-date-range-url="@Url.DateRangePopup()"></div>
-      <div class="col-12 col-md-6 col-xl-4 on-visible action-popup-edit-criteria" data-visibility-action="loadWidget" data-url="@Url.WidgetOne()" data-date-range-url="@Url.DateRangePopup()"></div>
+      <div class="col-12 col-md-6 col-xl-4 on-visible action-popup-edit-criteria" data-visibility-action="loadGraph" data-url="@Url.GraphOne()" data-edit-criteria-url="@Url.DateRangePopup()"></div>
+      <div class="col-12 col-md-6 col-xl-4 on-visible action-popup-edit-criteria" data-visibility-action="loadWidget" data-url="@Url.WidgetOne()" data-edit-criteria-url="@Url.DateRangePopup()"></div>
       <div class="col-12 col-md-6 col-xl-4 on-visible" data-visibility-action="loadGraph" data-url="@Url.GraphTwo()"></div>
       <div class="col-12 col-md-6 col-xl-4 on-visible" data-visibility-action="loadWidget" data-url="@Url.WidgetTwo()"></div>
       <div class="col-12 col-md-6 col-xl-4 on-visible" data-visibility-action="loadGraph" data-url="@Url.GraphThree()"></div>
