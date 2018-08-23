@@ -53,7 +53,7 @@ A single download file of jaymvc.js or jaymvc.min.js includes the following open
   * sortable.js
   * mouse.js
 * jQuery UI Touchpunch - enables touch for jQuery UI
-* (_) Underscore.js 1.8.3
+* Underscore.js 1.8.3
 * Lockr
 * Moment.js 2.20.1
 * Custom jQuery / Bootstrap plugins
@@ -298,9 +298,9 @@ A simple jayAlert can be called as well, which wraps jayModal with a *small* mod
     jay.alert('title','message');
 
 ## Putting it all together
-Lets say that you have a task to design a dashbaord with several graphs and widgets.  Perhaps  the *Graphs* have JSON POSTs (JsonResult), and of the *Widgets* have HTML Snippet POSTS (PartialViewResult). All stitched together by a *Main Page* GET (ViewResult).  You might consider using jayOnVisible and jayOnAction to create a load scenario.
+Lets say that you have a task to design a dashboard with several graphs and widgets.  Perhaps  the *Graphs* have JSON POSTs (JsonResult), and of the *Widgets* have HTML Snippet POSTS (PartialViewResult). All stitched together by a *Main Page* GET (ViewResult).  You might consider using jayOnVisible and jayOnAction to create a load scenario.
 
-First lets write a jayAction handler to handle loading hte Widgets:
+First lets write a jayAction handler to handle loading the Widgets:
 
     $.onAction('loadWidget', //name it something meaningful
       function(evt, data) {
@@ -355,9 +355,9 @@ Then in your *Main Page* you could use bootstrap to layout a responsive grid:
       <div class="col-12 col-md-6 col-xl-4 on-visible" data-visibility-action="loadWidget" data-url="@Url.WidgetThree()"></div>
     </div>
 
-So you see the *Main Page* drives the rest of its content.  The URLs could be on different controllers or the same controller with different actions, with the only rule that the *Graph* URLS return the JSON data to build the highchart graph, and the *Widget* URLS return HTML snippets.
+So you see the *Main Page* drives the rest of its content.  The URLs could be on different controllers or the same controller with different actions, with the only rule that the *Graph* URLS return the JSON data to build the highcharts graph, and the *Widget* URLS return HTML snippets.
 
-How does it work?  the jayOnVisible will call the data-visibility-action and then remove the on-action class.  IIf the on-action class gets added again it will simply call the action again. But in the actions above we added indicators that that section was loading.
+How does it work?  the jayOnVisible will call the data-visibility-action and then remove the on-action class.  If the on-action class gets added again it will simply call the action again. But in the actions above we added indicators that that section was loading.
 
 Now lets say when you click on the div containing a *WidgetOne* or *GraphOne* you also want do do a modal popup to ask for extra data (like a time range). Assume that the Controller Action on the back end takes in an optional date range.
 
