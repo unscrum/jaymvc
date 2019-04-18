@@ -1,5 +1,5 @@
 # jayMVC
-javascript and dotnetcore mvc 2.1 hybrid framework
+javascript and dotnetcore mvc 2.x hybrid framework
 
 ## Why another MVC framework?
 My goal is to let server side MVC do its job, yet still have a responsive, sexy UI. It seems in frameworks like angular, if you are a FullStack developer you spend time in dotnet making Controllers with injected Services that return Models and then in JS you make more Controllers, that inject Services to call the dotnet Controllers and then create Templates in javascript to draw the Model that was created in C#. But sometimes you use Razor Views to launch SPAs.  Are you dizzy yet?.
