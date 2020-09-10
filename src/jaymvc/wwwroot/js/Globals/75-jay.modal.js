@@ -85,7 +85,8 @@
             .addClass('modal fade')
             .attr('tabindex', -1)
             .append($modalDialog)
-            .appendTo('body');
+            .appendTo('body')
+            .css('overflow-y', 'auto');
         var $modalHeader = $('<div/>')
             .addClass('modal-header')
             .append($('<h5>').addClass('modal-title').html(options.title))
