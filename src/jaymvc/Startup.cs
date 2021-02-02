@@ -7,25 +7,28 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 
 namespace jaymvc
 {
     public class Startup
     {
-        private readonly IHostingEnvironment _hostingEnvironment;
+        private readonly IConfiguration _configuration;
+        private readonly IWebHostEnvironment _hostingEnvironment;
 
-
-        public Startup(IConfiguration configuration, IHostingEnvironment hostingEnvironment)
+        public Startup(IConfiguration configuration, IWebHostEnvironment hostingEnvironment)
         {
+            _configuration = configuration;
             _hostingEnvironment = hostingEnvironment;
         }
-
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
             services
-                .AddSingleton<ITodoService, TodoService>()
+                .AddApplicationInsightsTelemetry(_configuration)
+                .AddHttpContextAccessor()
+                .AddSingleton<ITodoService, TodoService>() 
                 .Configure<MvcOptions>(o =>
                 {
                     // Set LocalTest:skipSsl to true to skip Ssl requrement in
@@ -33,13 +36,14 @@ namespace jaymvc
                     if (!_hostingEnvironment.IsDevelopment())
                         o.Filters.Add(new RequireHttpsAttribute());
                 })
-                .AddMvc();
+                .AddMvc(o=>o.EnableEndpointRouting = false)
+                .SetCompatibilityVersion(CompatibilityVersion.Version_3_0);
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory logging, IServiceProvider svc)
+        public void Configure(IApplicationBuilder app, ILoggerFactory logging, IServiceProvider sp)
         {
-            if (env.IsDevelopment())
+            if (_hostingEnvironment.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
             }
@@ -75,15 +79,24 @@ namespace jaymvc
             app.UseAuthentication();
             app.UseStaticFiles();
 
+            
             app.UseMvc(routes =>
             {
                 routes.MapRoute(
                     name: "default",
                     template: "{controller=Home}/{action=Index}/{id?}");
             });
-
-            logging.AddAzureWebAppDiagnostics();
-            logging.AddApplicationInsights(svc);
+            var logger = logging.CreateLogger<Startup>();
+            try
+            {
+                using var scope = sp.CreateScope();
+                scope.ServiceProvider.GetRequiredService<ITodoService>();
+                logger.LogInformation("Startup Jay MVC Succeeded.");
+            }
+            catch (Exception ex)
+            {
+                logger.LogCritical(ex, "Startup Jay MVC Failed{NewLine}{Error}", Environment.NewLine, ex.ToString());
+            }
         }
     }
 }

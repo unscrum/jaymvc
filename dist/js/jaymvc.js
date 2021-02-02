@@ -30022,6 +30022,7 @@ var jay = {
                     $(target).on('keypress', function (e) {
                         if (e.which === 13){
                             $(this).trigger('blur').off('keypress');
+                            e.preventDefault();
                         }
                     });
                 }
@@ -30510,7 +30511,8 @@ var jay = {
             .addClass('modal fade')
             .attr('tabindex', -1)
             .append($modalDialog)
-            .appendTo('body');
+            .appendTo('body')
+            .css('overflow-y', 'auto');
         var $modalHeader = $('<div/>')
             .addClass('modal-header')
             .append($('<h5>').addClass('modal-title').html(options.title))

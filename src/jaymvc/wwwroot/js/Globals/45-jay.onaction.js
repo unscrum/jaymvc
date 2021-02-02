@@ -154,6 +154,7 @@
                     $(target).on('keypress', function (e) {
                         if (e.which === 13){
                             $(this).trigger('blur').off('keypress');
+                            e.preventDefault();
                         }
                     });
                 }
