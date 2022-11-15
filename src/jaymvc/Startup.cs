@@ -37,7 +37,7 @@ namespace jaymvc
                         o.Filters.Add(new RequireHttpsAttribute());
                 })
                 .AddMvc(o=>o.EnableEndpointRouting = false)
-                .SetCompatibilityVersion(CompatibilityVersion.Version_3_0);
+                .AddNewtonsoftJson();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
