@@ -55,7 +55,7 @@ A single download file of jaymvc.js or jaymvc.min.js includes the following open
 * jQuery UI Touchpunch - enables touch for jQuery UI
 * Underscore.js 1.8.3
 * Lockr
-* Moment.js 2.20.1
+* Moment.js 2.29.4
 * Custom jQuery / Bootstrap plugins
   * jayOnAction
   * jayOnData
