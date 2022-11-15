@@ -1,11 +1,10 @@
 ﻿using System;
 
-namespace jaymvc.Models
+namespace jaymvc.Models;
+
+public class TypeAheadResult
 {
-    public class TypeAheadResult
-    {
-        public Guid Id { get; set; }
-        public string Val { get; set; }
+    public Guid Id { get; set; }
+    public string Val { get; set; }
         
-    }
 }

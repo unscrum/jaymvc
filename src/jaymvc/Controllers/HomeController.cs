@@ -1,26 +1,18 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
-using jaymvc.Framework;
+﻿using jaymvc.Framework;
 using jaymvc.Models.Home;
-using jaymvc.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 
-namespace jaymvc.Controllers
-{
-    public class HomeController : PureMvcControllerBase
-    {
-        private readonly ITodoService _todoService;
+namespace jaymvc.Controllers;
 
-        public HomeController(ILoggerFactory logging, ITodoService todoService) : base(logging)
-        {
-            _todoService = todoService;
-        }
+public class HomeController : PureMvcControllerBase
+{
+    public HomeController(ILoggerFactory logging) : base(logging)
+    {
+    }
         
-        public ViewResult Index()
-        {
-            return View(new Home("World"));
-        }
+    public ViewResult Index()
+    {
+        return View(new Home("World"));
     }
 }
