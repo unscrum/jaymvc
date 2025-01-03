@@ -115,6 +115,9 @@
     $.fn.selectRange = function (start, end) {
         var e = this[0];
         var $this = $(e);
+        if($this.is('[type="number"]'))
+            return this;
+        
         if (arguments.length === 0) {
             start = 0;
             end = $this.val().length;
