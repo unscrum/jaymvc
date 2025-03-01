@@ -297,10 +297,14 @@
 
         if ($.isPlainObject(dict)) {
             for (var key in dict) {
-                if (dict.hasOwnProperty(key)) {
+                if( $(':input[name="' + key + '"]', this).length ){
                     $(':input[name="' + key + '"]', this).addClass('is-invalid').closest('div.form-group')
                         .append($('<span/>').addClass('form-text text-danger')
-                            .html(dict[key]));
+                        .html(dict[key]));
+                } else if( $('#'+key, this).length ){
+                    $('#'+key, this).addClass('is-invalid').closest('div.form-group')
+                        .append($('<span/>').addClass('form-text text-danger')
+                        .html(dict[key]));
                 }
             }
         } else {
